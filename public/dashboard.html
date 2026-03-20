@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praktisk Intelligens — Kundeoversikt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0f14;
+  --surface:#141820;
+  --border:#2a3040;
+  --royal-blue:#1e3a5f;
+  --light-blue:#4fc3f7;
+  --text:#e8eaf0;
+  --muted:#8a93a6;
+  --green:#66bb6a;
+  --orange:#ffa726;
+  --red:#ef5350;
+  --accent:var(--royal-blue);
+}
+
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.5;
+  overflow-x:auto;
+}
+
+h1,h2,h3{font-family:'DM Serif Display',serif}
+
+/* Header */
+.header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:1rem 2rem;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.header-content{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:2rem;
+  flex-wrap:wrap;
+}
+.logo{
+  font-family:'DM Serif Display',serif;
+  font-size:1.5rem;
+  color:var(--text);
+}
+.search-filters{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  flex:1;
+  max-width:500px;
+}
+.search-box{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:.5rem 1rem;
+  color:var(--text);
+  font-size:.9rem;
+  outline:none;
+  flex:1;
+  min-width:200px;
+}
+.search-box:focus{border-color:var(--accent)}
+.filter-btn{
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:.5rem 1rem;
+  border-radius:6px;
+  font-size:.85rem;
+  cursor:pointer;
+  transition:all .2s;
+}
+.filter-btn:hover{border-color:var(--accent);background:var(--surface)}
+.filter-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+
+/* Stats bar */
+.stats-bar{
+  background:var(--surface);
+  padding:1rem 2rem;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  gap:2rem;
+  flex-wrap:wrap;
+}
+.stat{
+  text-align:center;
+  padding:.5rem;
+}
+.stat-number{
+  font-family:'DM Serif Display',serif;
+  font-size:1.8rem;
+  font-weight:400;
+  color:var(--accent);
+}
+.stat-label{
+  font-size:.8rem;
+  color:var(--muted);
+  margin-top:.2rem;
+}
+
+/* Pipeline */
+.pipeline{
+  padding:2rem;
+  display:flex;
+  gap:1.5rem;
+  min-height:calc(100vh - 200px);
+  overflow-x:auto;
+}
+.pipeline-column{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  min-width:320px;
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  max-height:calc(100vh - 220px);
+}
+.column-header{
+  padding:1rem;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.column-title{
+  font-size:.95rem;
+  font-weight:600;
+  color:var(--text);
+}
+.column-count{
+  background:var(--bg);
+  color:var(--muted);
+  padding:.2rem .6rem;
+  border-radius:12px;
+  font-size:.8rem;
+}
+.column-content{
+  flex:1;
+  padding:1rem;
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  overflow-y:auto;
+}
+
+/* Lead cards */
+.lead-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:1rem;
+  cursor:pointer;
+  transition:all .2s ease;
+  position:relative;
+}
+.lead-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-1px);
+}
+.lead-card.dragging{
+  opacity:.5;
+  transform:rotate(2deg);
+}
+.lead-header{
+  display:flex;
+  align-items:flex-start;
+  gap:.75rem;
+  margin-bottom:.75rem;
+}
+.score-circle{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.8rem;
+  font-weight:700;
+  color:white;
+  flex-shrink:0;
+}
+.score-low{background:var(--red)}
+.score-medium{background:var(--orange)}
+.score-high{background:var(--green)}
+.lead-info{
+  flex:1;
+  min-width:0;
+}
+.lead-name{
+  font-weight:600;
+  font-size:.95rem;
+  margin-bottom:.2rem;
+  color:var(--text);
+}
+.lead-company{
+  font-size:.85rem;
+  color:var(--muted);
+  margin-bottom:.3rem;
+}
+.lead-tag{
+  display:inline-block;
+  background:rgba(255,167,38,.1);
+  color:var(--orange);
+  padding:.2rem .5rem;
+  border-radius:4px;
+  font-size:.75rem;
+  margin-bottom:.5rem;
+}
+.lead-date{
+  font-size:.75rem;
+  color:var(--muted);
+}
+.lead-menu{
+  position:absolute;
+  top:.5rem;
+  right:.5rem;
+  color:var(--muted);
+  cursor:pointer;
+  padding:.2rem;
+  opacity:0;
+  transition:opacity .2s;
+}
+.lead-card:hover .lead-menu{opacity:1}
+.lead-menu:hover{color:var(--text)}
+
+/* Expanded profile modal */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:200;
+  opacity:0;
+  visibility:hidden;
+  transition:all .3s ease;
+  padding:1rem;
+}
+.modal-overlay.active{
+  opacity:1;
+  visibility:visible;
+}
+.modal{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  max-width:800px;
+  width:100%;
+  max-height:90vh;
+  overflow-y:auto;
+  transform:translateY(20px);
+  transition:transform .3s ease;
+}
+.modal-overlay.active .modal{transform:translateY(0)}
+.modal-header{
+  padding:1.5rem;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.modal-title{
+  font-size:1.2rem;
+  color:var(--text);
+}
+.modal-close{
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-size:1.5rem;
+  cursor:pointer;
+  padding:.5rem;
+}
+.modal-close:hover{color:var(--text)}
+.modal-content{
+  padding:1.5rem;
+}
+.profile-header{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  margin-bottom:2rem;
+}
+.profile-score{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.2rem;
+  font-weight:700;
+  color:white;
+}
+.profile-info h3{
+  font-size:1.3rem;
+  margin-bottom:.3rem;
+  color:var(--text);
+}
+.profile-company{
+  color:var(--muted);
+  margin-bottom:.5rem;
+}
+.profile-meta{
+  display:flex;
+  gap:1rem;
+  font-size:.85rem;
+  color:var(--muted);
+}
+
+/* Tabs */
+.modal-tabs{
+  display:flex;
+  border-bottom:1px solid var(--border);
+  margin-bottom:1.5rem;
+}
+.tab{
+  background:none;
+  border:none;
+  padding:.75rem 1rem;
+  color:var(--muted);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+}
+.tab.active{
+  color:var(--accent);
+  border-bottom-color:var(--accent);
+}
+.tab:hover{color:var(--text)}
+.tab-content{
+  display:none;
+}
+.tab-content.active{display:block}
+
+/* Form elements */
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  margin-bottom:1rem;
+}
+.form-group{
+  margin-bottom:1rem;
+}
+.form-group label{
+  display:block;
+  font-size:.85rem;
+  color:var(--text);
+  margin-bottom:.4rem;
+  font-weight:500;
+}
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:.6rem;
+  color:var(--text);
+  font-size:.9rem;
+  outline:none;
+  transition:border .2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+  border-color:var(--accent);
+}
+.form-group textarea{
+  resize:vertical;
+  min-height:80px;
+}
+
+/* Buttons */
+.btn{
+  background:var(--accent);
+  color:white;
+  border:none;
+  padding:.6rem 1rem;
+  border-radius:6px;
+  font-size:.9rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+}
+.btn:hover{background:#2a4870}
+.btn-secondary{
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+.btn-secondary:hover{
+  border-color:var(--accent);
+  background:var(--surface);
+}
+
+/* Radar chart container */
+.radar-container{
+  max-width:400px;
+  margin:2rem auto;
+  background:var(--bg);
+  border-radius:8px;
+  padding:1rem;
+}
+
+/* Interactions log */
+.interaction{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:.75rem;
+  margin-bottom:.75rem;
+}
+.interaction-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:.5rem;
+}
+.interaction-type{
+  font-size:.8rem;
+  padding:.2rem .5rem;
+  border-radius:4px;
+  background:var(--accent);
+  color:white;
+}
+.interaction-date{
+  font-size:.8rem;
+  color:var(--muted);
+}
+.interaction-content{
+  font-size:.85rem;
+  line-height:1.5;
+}
+
+/* Mobile responsive */
+@media(max-width:768px){
+  .header{padding:1rem}
+  .header-content{flex-direction:column;gap:1rem}
+  .search-filters{width:100%}
+  .stats-bar{flex-direction:column;gap:1rem;text-align:center}
+  .pipeline{
+    flex-direction:column;
+    padding:1rem;
+  }
+  .pipeline-column{
+    min-width:100%;
+    max-height:400px;
+  }
+  .modal{margin:1rem}
+  .form-row{grid-template-columns:1fr}
+}
+
+/* Animations */
+.lead-card{
+  animation:cardEntry .3s ease;
+}
+@keyframes cardEntry{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* Drag and drop */
+.column-content.drag-over{
+  background:rgba(30,58,95,.1);
+  border:2px dashed var(--accent);
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">Praktisk Intelligens — Kundeoversikt</div>
+    <div class="search-filters">
+      <input type="text" class="search-box" placeholder="Søk etter navn, bedrift eller e-post..." id="searchBox">
+      <button class="filter-btn active" onclick="filterByScore('all')">Alle</button>
+      <button class="filter-btn" onclick="filterByScore('high')">Høy score</button>
+      <button class="filter-btn" onclick="filterByScore('low')">Lav score</button>
+    </div>
+  </div>
+</header>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-number" id="totalLeads">5</div>
+    <div class="stat-label">Totalt leads</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number" id="avgScore">42</div>
+    <div class="stat-label">Snitt-score</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number" id="conversionRate">20%</div>
+    <div class="stat-label">Konverteringsrate</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number" id="activeDeals">2</div>
+    <div class="stat-label">Aktive forhandlinger</div>
+  </div>
+</div>
+
+<!-- Pipeline -->
+<div class="pipeline">
+  <div class="pipeline-column" data-stage="ny">
+    <div class="column-header">
+      <div class="column-title">Nye leads</div>
+      <div class="column-count" id="count-ny">0</div>
+    </div>
+    <div class="column-content" id="column-ny"></div>
+  </div>
+  
+  <div class="pipeline-column" data-stage="kontaktet">
+    <div class="column-header">
+      <div class="column-title">Kontaktet</div>
+      <div class="column-count" id="count-kontaktet">0</div>
+    </div>
+    <div class="column-content" id="column-kontaktet"></div>
+  </div>
+  
+  <div class="pipeline-column" data-stage="booket">
+    <div class="column-header">
+      <div class="column-title">Booket møte</div>
+      <div class="column-count" id="count-booket">0</div>
+    </div>
+    <div class="column-content" id="column-booket"></div>
+  </div>
+  
+  <div class="pipeline-column" data-stage="møte">
+    <div class="column-header">
+      <div class="column-title">Møte holdt</div>
+      <div class="column-count" id="count-møte">0</div>
+    </div>
+    <div class="column-content" id="column-møte"></div>
+  </div>
+  
+  <div class="pipeline-column" data-stage="tilbud">
+    <div class="column-header">
+      <div class="column-title">Tilbud sendt</div>
+      <div class="column-count" id="count-tilbud">0</div>
+    </div>
+    <div class="column-content" id="column-tilbud"></div>
+  </div>
+  
+  <div class="pipeline-column" data-stage="kunde">
+    <div class="column-header">
+      <div class="column-title">Kunde</div>
+      <div class="column-count" id="count-kunde">0</div>
+    </div>
+    <div class="column-content" id="column-kunde"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Kundedetaljer</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-content">
+      <div class="profile-header">
+        <div class="profile-score score-medium" id="modalScore">45</div>
+        <div class="profile-info">
+          <h3 id="modalName">Kundenavn</h3>
+          <div class="profile-company" id="modalCompany">Bedriftsnavn</div>
+          <div class="profile-meta">
+            <span id="modalDate">15. mars 2026</span>
+            <span>•</span>
+            <span id="modalSource">Bedriftsquiz</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-tabs">
+        <button class="tab active" onclick="showTab('overview')">Oversikt</button>
+        <button class="tab" onclick="showTab('answers')">Quiz-svar</button>
+        <button class="tab" onclick="showTab('website')">Nettside</button>
+        <button class="tab" onclick="showTab('notes')">Notater</button>
+        <button class="tab" onclick="showTab('interactions')">Interaksjoner</button>
+      </div>
+      
+      <div class="tab-content active" id="tab-overview">
+        <div class="radar-container">
+          <canvas id="radarChart" width="300" height="300"></canvas>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pipeline-steg</label>
+            <select id="pipelineStage" onchange="updatePipelineStage()">
+              <option value="ny">Ny</option>
+              <option value="kontaktet">Kontaktet</option>
+              <option value="booket">Booket møte</option>
+              <option value="møte">Møte holdt</option>
+              <option value="tilbud">Tilbud sendt</option>
+              <option value="kunde">Kunde</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Neste oppfølging</label>
+            <input type="date" id="nextFollowup">
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="tab-answers">
+        <div id="quizAnswers">
+          <!-- Quiz answers will be populated here -->
+        </div>
+      </div>
+      
+      <div class="tab-content" id="tab-website">
+        <div id="websiteResults">
+          <!-- Website scan results will be populated here -->
+        </div>
+      </div>
+      
+      <div class="tab-content" id="tab-notes">
+        <div class="form-group">
+          <label>Notater</label>
+          <textarea id="notesField" placeholder="Legg til notater om denne kunden..."></textarea>
+        </div>
+        <button class="btn" onclick="saveNotes()">💾 Lagre notater</button>
+      </div>
+      
+      <div class="tab-content" id="tab-interactions">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <h4>Interaksjonslogg</h4>
+          <button class="btn" onclick="addInteraction()">+ Legg til notat</button>
+        </div>
+        <div id="interactionsList">
+          <!-- Interactions will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Demo data - 5 realistic Tromsø businesses
+let leads = [
+  {
+    id: 'lead_1',
+    name: 'Lars Pedersen',
+    email: 'lars@nordlysbygg.no',
+    company: 'Nordlys Bygg AS',
+    website: 'nordlysbygg.no',
+    score: 25,
+    weakestCategory: 'KI-bruk',
+    date: '2026-03-15',
+    stage: 'ny',
+    source: 'Bedriftsquiz',
+    notes: '',
+    nextFollowup: '2026-03-22',
+    answers: [0,1,0,1,1,0,2,1,0,1,0,1],
+    categoryScores: {
+      'KI-bruk i dag': 1,
+      'Digitale verktøy': 2,
+      'Prosesser & Automatisering': 3,
+      'Teamkompetanse': 1,
+      'Ledelse & Strategi': 1,
+      'Data & Sikkerhet': 1
+    },
+    scanResults: {
+      performance: 45,
+      accessibility: 60,
+      ssl: true,
+      tools: { chatbot: false, analytics: false }
+    },
+    interactions: [
+      {
+        id: 'int_1',
+        type: 'note',
+        date: '2026-03-15',
+        content: 'Tok bedriftsquiz. Lav KI-modenhet, men interessert i å lære mer.'
+      }
+    ]
+  },
+  {
+    id: 'lead_2',
+    name: 'Ingrid Svendsen',
+    email: 'ingrid@arctictours.no',
+    company: 'Arctic Tours',
+    website: 'arctictours.no',
+    score: 65,
+    weakestCategory: 'Automatisering',
+    date: '2026-03-14',
+    stage: 'kontaktet',
+    source: 'Bedriftsquiz',
+    notes: 'Var interessert i ChatGPT for kundehåndtering',
+    nextFollowup: '2026-03-25',
+    answers: [2,2,3,2,2,1,2,3,1,2,3,2],
+    categoryScores: {
+      'KI-bruk i dag': 7,
+      'Digitale verktøy': 4,
+      'Prosesser & Automatisering': 8,
+      'Teamkompetanse': 2,
+      'Ledelse & Strategi': 3,
+      'Data & Sikkerhet': 2
+    },
+    scanResults: {
+      performance: 78,
+      accessibility: 85,
+      ssl: true,
+      tools: { chatbot: true, analytics: true }
+    },
+    interactions: [
+      {
+        id: 'int_2',
+        type: 'call',
+        date: '2026-03-16',
+        content: 'Ringte og snakket om KI-muligheter. Hun var svært interessert.'
+      }
+    ]
+  },
+  {
+    id: 'lead_3',
+    name: 'Knut Hansen',
+    email: 'knut@polarlight.no',
+    company: 'Polar Light Elektro',
+    website: 'polarlight.no',
+    score: 35,
+    weakestCategory: 'Data & Sikkerhet',
+    date: '2026-03-13',
+    stage: 'booket',
+    source: 'Bedriftsquiz',
+    notes: 'Møte booket for mandag 24. mars kl 10:00',
+    nextFollowup: '2026-03-24',
+    answers: [1,1,2,1,0,2,1,2,0,1,0,0],
+    categoryScores: {
+      'KI-bruk i dag': 3,
+      'Digitale verktøy': 3,
+      'Prosesser & Automatisering': 5,
+      'Teamkompetanse': 1,
+      'Ledelse & Strategi': 0,
+      'Data & Sikkerhet': 0
+    },
+    scanResults: {
+      performance: 52,
+      accessibility: 40,
+      ssl: false,
+      tools: { chatbot: false, analytics: false }
+    },
+    interactions: [
+      {
+        id: 'int_3',
+        type: 'email',
+        date: '2026-03-17',
+        content: 'Sendt oppfølgings-e-post med info om KI-workshop.'
+      },
+      {
+        id: 'int_4',
+        type: 'meeting',
+        date: '2026-03-18',
+        content: 'Teams-møte. Booket fysisk møte for å gå gjennom KI-muligheter.'
+      }
+    ]
+  },
+  {
+    id: 'lead_4',
+    name: 'Anne Kristoffersen',
+    email: 'anne@nordernregnskap.no',
+    company: 'Nordern Regnskap',
+    website: '',
+    score: 58,
+    weakestCategory: 'Teamkompetanse',
+    date: '2026-03-12',
+    stage: 'møte',
+    source: 'Bedriftsquiz',
+    notes: 'Meget interessert i automatisering av regnskapsrutiner',
+    nextFollowup: '2026-03-26',
+    answers: [3,2,2,3,2,3,2,2,1,2,2,1],
+    categoryScores: {
+      'KI-bruk i dag': 7,
+      'Digitale verktøy': 6,
+      'Prosesser & Automatisering': 7,
+      'Teamkompetanse': 1,
+      'Ledelse & Strategi': 2,
+      'Data & Sikkerhet': 1
+    },
+    scanResults: null,
+    interactions: [
+      {
+        id: 'int_5',
+        type: 'meeting',
+        date: '2026-03-20',
+        content: 'Møte gjennomført. Hun var svært interessert og vil ha tilbud.'
+      }
+    ]
+  },
+  {
+    id: 'lead_5',
+    name: 'Tor Mikkelsen',
+    email: 'tor@fiskeritromsoe.no',
+    company: 'Tromsø Fiskeri AS',
+    website: 'fiskeritromsoe.no',
+    score: 18,
+    weakestCategory: 'KI-bruk',
+    date: '2026-03-11',
+    stage: 'tilbud',
+    source: 'Bedriftsquiz',
+    notes: 'Tilbud sendt 21. mars - grunnleggende digitalisering først',
+    nextFollowup: '2026-03-28',
+    answers: [0,0,1,0,1,1,0,1,0,0,1,0],
+    categoryScores: {
+      'KI-bruk i dag': 0,
+      'Digitale verktøy': 1,
+      'Prosesser & Automatisering': 2,
+      'Teamkompetanse': 0,
+      'Ledelse & Strategi': 1,
+      'Data & Sikkerhet': 0
+    },
+    scanResults: {
+      performance: 25,
+      accessibility: 30,
+      ssl: false,
+      tools: { chatbot: false, analytics: false }
+    },
+    interactions: [
+      {
+        id: 'int_6',
+        type: 'call',
+        date: '2026-03-21',
+        content: 'Ringte for å følge opp tilbudet. Venter på svar fra styret.'
+      }
+    ]
+  }
+];
+
+let currentLead = null;
+let radarChart = null;
+
+// Initialize dashboard
+function initDashboard() {
+  renderPipeline();
+  updateStats();
+  initSearch();
+  initDragAndDrop();
+}
+
+// Render pipeline
+function renderPipeline() {
+  const stages = ['ny', 'kontaktet', 'booket', 'møte', 'tilbud', 'kunde'];
+  
+  stages.forEach(stage => {
+    const stageLeads = leads.filter(lead => lead.stage === stage);
+    const column = document.getElementById(`column-${stage}`);
+    const countEl = document.getElementById(`count-${stage}`);
+    
+    column.innerHTML = '';
+    countEl.textContent = stageLeads.length;
+    
+    stageLeads.forEach(lead => {
+      const card = createLeadCard(lead);
+      column.appendChild(card);
+    });
+  });
+}
+
+// Create lead card
+function createLeadCard(lead) {
+  const card = document.createElement('div');
+  card.className = 'lead-card';
+  card.draggable = true;
+  card.dataset.leadId = lead.id;
+  
+  const scoreClass = lead.score < 30 ? 'score-low' : lead.score < 60 ? 'score-medium' : 'score-high';
+  const formatDate = new Date(lead.date).toLocaleDateString('no-NO', { day: 'numeric', month: 'long' });
+  
+  card.innerHTML = `
+    <div class="lead-header">
+      <div class="score-circle ${scoreClass}">${lead.score}</div>
+      <div class="lead-info">
+        <div class="lead-name">${lead.name}</div>
+        <div class="lead-company">${lead.company}</div>
+        <div class="lead-tag">${lead.weakestCategory}</div>
+        <div class="lead-date">${formatDate}</div>
+      </div>
+    </div>
+    <div class="lead-menu">⋮</div>
+  `;
+  
+  card.addEventListener('click', () => openModal(lead));
+  
+  return card;
+}
+
+// Open modal
+function openModal(lead) {
+  currentLead = lead;
+  
+  // Populate basic info
+  document.getElementById('modalName').textContent = lead.name;
+  document.getElementById('modalCompany').textContent = lead.company;
+  document.getElementById('modalDate').textContent = new Date(lead.date).toLocaleDateString('no-NO');
+  document.getElementById('modalSource').textContent = lead.source;
+  
+  // Score circle
+  const scoreEl = document.getElementById('modalScore');
+  scoreEl.textContent = lead.score;
+  scoreEl.className = `profile-score ${lead.score < 30 ? 'score-low' : lead.score < 60 ? 'score-medium' : 'score-high'}`;
+  
+  // Pipeline stage
+  document.getElementById('pipelineStage').value = lead.stage;
+  document.getElementById('nextFollowup').value = lead.nextFollowup;
+  document.getElementById('notesField').value = lead.notes;
+  
+  // Render radar chart
+  renderRadarChart(lead.categoryScores);
+  
+  // Populate quiz answers
+  renderQuizAnswers(lead.answers);
+  
+  // Populate website results
+  renderWebsiteResults(lead.scanResults);
+  
+  // Populate interactions
+  renderInteractions(lead.interactions);
+  
+  // Show modal
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+// Close modal
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  if (radarChart) {
+    radarChart.destroy();
+    radarChart = null;
+  }
+  currentLead = null;
+}
+
+// Render radar chart
+function renderRadarChart(categoryScores) {
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  
+  if (radarChart) {
+    radarChart.destroy();
+  }
+  
+  const categories = ['KI-bruk i dag', 'Digitale verktøy', 'Prosesser & Automatisering', 'Teamkompetanse', 'Ledelse & Strategi', 'Data & Sikkerhet'];
+  const maxScores = [12, 8, 16, 4, 4, 4];
+  const data = categories.map((cat, i) => Math.round((categoryScores[cat] / maxScores[i]) * 100));
+  
+  radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: categories.map(cat => cat.length > 15 ? cat.substring(0, 12) + '...' : cat),
+      datasets: [{
+        label: 'Score (%)',
+        data: data,
+        borderColor: '#1e3a5f',
+        backgroundColor: 'rgba(30, 58, 95, 0.2)',
+        borderWidth: 2,
+        pointBackgroundColor: '#1e3a5f'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            display: false
+          },
+          grid: {
+            color: '#2a3040'
+          },
+          angleLines: {
+            color: '#2a3040'
+          },
+          pointLabels: {
+            color: '#8a93a6',
+            font: {
+              size: 10
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Render quiz answers
+function renderQuizAnswers(answers) {
+  const questions = [
+    'Bruker du eller noen i bedriften KI-verktøy?',
+    'Har dere prøvd å ta i bruk KI-verktøy?',
+    'Hvor mye tid sparer KI dere per uke?',
+    'Hvordan holder dere oversikt over kunder?',
+    'Hvordan sender dere tilbud og fakturaer?',
+    'Hvordan håndterer dere kundehenvendelser?',
+    'Hva skjer når dere får en ny kunde?',
+    'Poster dere på sosiale medier?',
+    'Hva er den største hindringen for KI?',
+    'Hvor komfortable er ansatte med nye verktøy?',
+    'Har bedriften en plan for KI?',
+    'Vet dere hva som skjer med KI-data?'
+  ];
+  
+  let html = '';
+  questions.forEach((q, i) => {
+    const score = answers[i];
+    const color = score === 0 ? 'var(--red)' : score < 2 ? 'var(--orange)' : 'var(--green)';
+    html += `
+      <div style="margin-bottom:1rem;padding:.75rem;background:var(--bg);border-radius:6px;border-left:3px solid ${color}">
+        <div style="font-weight:600;margin-bottom:.3rem">${i + 1}. ${q}</div>
+        <div style="color:var(--muted);font-size:.85rem">Svar: ${score}/4 poeng</div>
+      </div>
+    `;
+  });
+  
+  document.getElementById('quizAnswers').innerHTML = html;
+}
+
+// Render website results
+function renderWebsiteResults(scanResults) {
+  const container = document.getElementById('websiteResults');
+  
+  if (!scanResults) {
+    container.innerHTML = '<p style="color:var(--muted)">Ingen nettside-skanning tilgjengelig.</p>';
+    return;
+  }
+  
+  let html = `
+    <div style="margin-bottom:1.5rem">
+      <h4 style="margin-bottom:1rem">📊 PageSpeed-resultater</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div style="background:var(--bg);padding:1rem;border-radius:6px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:700;color:${scanResults.performance >= 80 ? 'var(--green)' : scanResults.performance >= 50 ? 'var(--orange)' : 'var(--red)'}">${scanResults.performance}</div>
+          <div style="color:var(--muted);font-size:.8rem">Ytelse</div>
+        </div>
+        <div style="background:var(--bg);padding:1rem;border-radius:6px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:700;color:${scanResults.accessibility >= 80 ? 'var(--green)' : scanResults.accessibility >= 50 ? 'var(--orange)' : 'var(--red)'}">${scanResults.accessibility}</div>
+          <div style="color:var(--muted);font-size:.8rem">Tilgjengelighet</div>
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <h4 style="margin-bottom:1rem">🔍 Teknisk analyse</h4>
+      <div style="background:var(--bg);padding:1rem;border-radius:6px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+          <span>SSL-sertifikat (HTTPS)</span>
+          <span style="color:${scanResults.ssl ? 'var(--green)' : 'var(--red)'}">${scanResults.ssl ? '✅ Aktiv' : '❌ Mangler'}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+          <span>Chatbot funnet</span>
+          <span style="color:${scanResults.tools?.chatbot ? 'var(--green)' : 'var(--muted)'}">${scanResults.tools?.chatbot ? '✅ Ja' : '❌ Nei'}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span>Analytics installert</span>
+          <span style="color:${scanResults.tools?.analytics ? 'var(--green)' : 'var(--muted)'}">${scanResults.tools?.analytics ? '✅ Ja' : '❌ Nei'}</span>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// Render interactions
+function renderInteractions(interactions) {
+  const container = document.getElementById('interactionsList');
+  
+  if (!interactions || interactions.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted)">Ingen interaksjoner registrert ennå.</p>';
+    return;
+  }
+  
+  let html = '';
+  interactions.forEach(interaction => {
+    const typeColors = {
+      call: 'var(--green)',
+      email: 'var(--light-blue)',
+      meeting: 'var(--orange)',
+      note: 'var(--muted)'
+    };
+    
+    const typeLabels = {
+      call: 'Samtale',
+      email: 'E-post',
+      meeting: 'Møte',
+      note: 'Notat'
+    };
+    
+    html += `
+      <div class="interaction">
+        <div class="interaction-header">
+          <span class="interaction-type" style="background:${typeColors[interaction.type]}">${typeLabels[interaction.type]}</span>
+          <span class="interaction-date">${new Date(interaction.date).toLocaleDateString('no-NO')}</span>
+        </div>
+        <div class="interaction-content">${interaction.content}</div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// Add interaction
+function addInteraction() {
+  const content = prompt('Legg til et notat:');
+  if (content && currentLead) {
+    const interaction = {
+      id: 'int_' + Date.now(),
+      type: 'note',
+      date: new Date().toISOString().split('T')[0],
+      content: content
+    };
+    
+    currentLead.interactions.push(interaction);
+    renderInteractions(currentLead.interactions);
+    saveToLocalStorage();
+  }
+}
+
+// Show tab
+function showTab(tabName) {
+  // Remove active class from all tabs and contents
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  
+  // Add active class to clicked tab and corresponding content
+  event.target.classList.add('active');
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+}
+
+// Update pipeline stage
+function updatePipelineStage() {
+  if (!currentLead) return;
+  
+  const newStage = document.getElementById('pipelineStage').value;
+  currentLead.stage = newStage;
+  
+  // Add interaction
+  const interaction = {
+    id: 'int_' + Date.now(),
+    type: 'note',
+    date: new Date().toISOString().split('T')[0],
+    content: `Flyttet til '${newStage}' steg i pipeline`
+  };
+  currentLead.interactions.push(interaction);
+  
+  saveToLocalStorage();
+  renderPipeline();
+  renderInteractions(currentLead.interactions);
+  updateStats();
+}
+
+// Save notes
+function saveNotes() {
+  if (!currentLead) return;
+  
+  const notes = document.getElementById('notesField').value;
+  currentLead.notes = notes;
+  
+  // Add interaction if there are new notes
+  if (notes.trim()) {
+    const interaction = {
+      id: 'int_' + Date.now(),
+      type: 'note',
+      date: new Date().toISOString().split('T')[0],
+      content: 'Notater oppdatert'
+    };
+    currentLead.interactions.push(interaction);
+  }
+  
+  saveToLocalStorage();
+  renderInteractions(currentLead.interactions);
+  
+  // Visual feedback
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = '✅ Lagret!';
+  setTimeout(() => {
+    btn.textContent = originalText;
+  }, 2000);
+}
+
+// Update stats
+function updateStats() {
+  const totalLeads = leads.length;
+  const avgScore = Math.round(leads.reduce((sum, lead) => sum + lead.score, 0) / totalLeads);
+  const customers = leads.filter(lead => lead.stage === 'kunde').length;
+  const conversionRate = Math.round((customers / totalLeads) * 100);
+  const activeDeals = leads.filter(lead => ['møte', 'tilbud'].includes(lead.stage)).length;
+  
+  document.getElementById('totalLeads').textContent = totalLeads;
+  document.getElementById('avgScore').textContent = avgScore;
+  document.getElementById('conversionRate').textContent = conversionRate + '%';
+  document.getElementById('activeDeals').textContent = activeDeals;
+}
+
+// Initialize search
+function initSearch() {
+  const searchBox = document.getElementById('searchBox');
+  searchBox.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    const cards = document.querySelectorAll('.lead-card');
+    
+    cards.forEach(card => {
+      const leadId = card.dataset.leadId;
+      const lead = leads.find(l => l.id === leadId);
+      const matches = lead.name.toLowerCase().includes(query) || 
+                     lead.company.toLowerCase().includes(query) ||
+                     lead.email.toLowerCase().includes(query);
+      
+      card.style.display = matches ? 'block' : 'none';
+    });
+  });
+}
+
+// Filter by score
+function filterByScore(filter) {
+  // Update button states
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  const cards = document.querySelectorAll('.lead-card');
+  
+  cards.forEach(card => {
+    const leadId = card.dataset.leadId;
+    const lead = leads.find(l => l.id === leadId);
+    
+    let show = true;
+    if (filter === 'high' && lead.score < 60) show = false;
+    if (filter === 'low' && lead.score >= 60) show = false;
+    
+    card.style.display = show ? 'block' : 'none';
+  });
+}
+
+// Initialize drag and drop
+function initDragAndDrop() {
+  let draggedCard = null;
+  let draggedLead = null;
+  
+  document.addEventListener('dragstart', (e) => {
+    if (e.target.classList.contains('lead-card')) {
+      draggedCard = e.target;
+      draggedLead = leads.find(l => l.id === e.target.dataset.leadId);
+      e.target.classList.add('dragging');
+    }
+  });
+  
+  document.addEventListener('dragend', (e) => {
+    if (e.target.classList.contains('lead-card')) {
+      e.target.classList.remove('dragging');
+      draggedCard = null;
+      draggedLead = null;
+    }
+  });
+  
+  document.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+  
+  document.addEventListener('dragenter', (e) => {
+    if (e.target.classList.contains('column-content')) {
+      e.target.classList.add('drag-over');
+    }
+  });
+  
+  document.addEventListener('dragleave', (e) => {
+    if (e.target.classList.contains('column-content')) {
+      e.target.classList.remove('drag-over');
+    }
+  });
+  
+  document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    
+    if (e.target.classList.contains('column-content') && draggedLead) {
+      const newStage = e.target.closest('.pipeline-column').dataset.stage;
+      
+      if (newStage !== draggedLead.stage) {
+        // Update lead stage
+        draggedLead.stage = newStage;
+        
+        // Add interaction
+        const interaction = {
+          id: 'int_' + Date.now(),
+          type: 'note',
+          date: new Date().toISOString().split('T')[0],
+          content: `Flyttet til '${newStage}' via drag & drop`
+        };
+        draggedLead.interactions.push(interaction);
+        
+        // Re-render pipeline
+        renderPipeline();
+        updateStats();
+        saveToLocalStorage();
+      }
+      
+      e.target.classList.remove('drag-over');
+    }
+  });
+}
+
+// Local storage functions
+function saveToLocalStorage() {
+  localStorage.setItem('praktiski_leads', JSON.stringify(leads));
+}
+
+function loadFromLocalStorage() {
+  const saved = localStorage.getItem('praktiski_leads');
+  if (saved) {
+    try {
+      leads = JSON.parse(saved);
+    } catch (e) {
+      console.log('Could not load saved data, using demo data');
+    }
+  }
+}
+
+// Close modal when clicking outside
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('modalOverlay')) {
+    closeModal();
+  }
+});
+
+// Load saved data and initialize
+loadFromLocalStorage();
+initDashboard();
+
+// Auto-save every 30 seconds
+setInterval(saveToLocalStorage, 30000);
+</script>
+
+</body>
+</html>

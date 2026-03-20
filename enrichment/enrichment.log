@@ -1,0 +1,16 @@
+2026-03-20 20:47:23,667 [INFO] Laster bedriftsdata fra /home/krisf/.openclaw/workspace/projects/ki-kartlegging/scan-results.json
+2026-03-20 20:47:23,675 [INFO] Lastet 1886 bedrifter
+2026-03-20 20:47:23,676 [INFO] Fant 1673 bedrifter som trenger enrichment
+2026-03-20 20:47:23,676 [INFO] Dry-run - viser kun hva som ville blitt prosessert:
+2026-03-20 20:47:23,676 [INFO]   1: HARILA EIENDOM AS - mangler: e-post
+2026-03-20 20:47:23,676 [INFO]   11: AS TROMSØ AUTOMOBILCOMPANI - AS TACO - mangler: e-post, nettside
+2026-03-20 20:47:23,676 [INFO]   12: NORGESGRUPPEN NORD AS - mangler: e-post, nettside
+2026-03-20 20:47:23,676 [INFO]   13: ELKOTEK IDV AS - mangler: nettside
+2026-03-20 20:47:23,676 [INFO]   18: BJØRN EIENDOM AS - mangler: nettside
+2026-03-20 20:47:23,676 [INFO]   19: KYSTENS HUS AS - mangler: e-post, nettside
+2026-03-20 20:47:23,676 [INFO]   20: JM HANSEN EIENDOM AS - mangler: e-post, nettside
+2026-03-20 20:47:23,676 [INFO]   21: GRIMSHOLM EIENDOM AS - mangler: nettside
+2026-03-20 20:47:23,676 [INFO]   22: PELLERIN AS - mangler: e-post, nettside
+2026-03-20 20:47:23,676 [INFO]   23: OLAVSVERN GROUP AS - mangler: nettside
+2026-03-20 20:47:23,676 [INFO]   ... og 1663 til
+2026-03-20 20:47:23,676 [INFO] Estimert kjøretid: 3.3 timer

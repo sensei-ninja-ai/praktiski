@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personlig KI-Quiz — Hvor god er du med KI?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0f14;--surface:#141820;--border:#2a3040;
+  --accent:#a78bfa;--green:#66bb6a;--orange:#ffa726;--red:#ef5350;
+  --text:#e8eaf0;--muted:#8a93a6;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:1rem}
+.mono{font-family:'JetBrains Mono',monospace}
+.container{max-width:640px;width:100%;position:relative}
+.screen{display:none;animation:fadeIn .4s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.hero-title{font-size:2.2rem;font-weight:700;line-height:1.2;margin-bottom:.5rem}
+.hero-title span{color:var(--accent)}
+.hero-sub{color:var(--muted);font-size:1.05rem;line-height:1.6;margin-bottom:1.5rem}
+.badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:.35rem .9rem;font-size:.85rem;color:var(--muted);margin-bottom:2rem}
+.badge svg{width:16px;height:16px;fill:var(--accent)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;background:var(--accent);color:#0c0f14;font-family:'Outfit',sans-serif;font-weight:600;font-size:1rem;border:none;border-radius:12px;padding:.85rem 2rem;cursor:pointer;transition:all .2s;width:100%}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-row{display:flex;gap:.75rem;margin-top:1.5rem}
+.btn-row .btn{flex:1}
+
+.progress-wrap{margin-bottom:2rem}
+.progress-label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-bottom:.4rem}
+.progress-bar{height:6px;background:var(--surface);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease}
+
+.q-category{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:.5rem;font-weight:600}
+.q-text{font-size:1.15rem;font-weight:600;line-height:1.5;margin-bottom:1.5rem}
+
+.options{display:flex;flex-direction:column;gap:.6rem}
+.option{display:flex;align-items:flex-start;gap:.75rem;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:.9rem 1rem;cursor:pointer;transition:all .2s;position:relative}
+.option:hover{border-color:var(--accent);background:#1a1d2a}
+.option.selected{border-color:var(--accent);background:rgba(167,139,250,.08)}
+.option-key{min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--muted);transition:all .2s;flex-shrink:0}
+.option.selected .option-key{background:var(--accent);color:#0c0f14;border-color:var(--accent)}
+.option-text{font-size:.95rem;line-height:1.5;padding-top:2px}
+
+.loading-screen{text-align:center;padding:4rem 0}
+.spinner{width:64px;height:64px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 2rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:1.1rem;color:var(--muted)}
+.loading-dots::after{content:'';animation:dots 1.5s steps(4,end) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+.score-circle{width:180px;height:180px;margin:0 auto 1.5rem;position:relative}
+.score-circle svg{width:100%;height:100%;transform:rotate(-90deg)}
+.score-circle circle{fill:none;stroke-width:8;stroke-linecap:round}
+.score-bg{stroke:var(--surface)}
+.score-fg{stroke:var(--accent);transition:stroke-dashoffset 2s ease}
+.score-value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-number{font-family:'JetBrains Mono',monospace;font-size:3rem;font-weight:700;line-height:1}
+.score-label{font-size:.85rem;color:var(--muted);margin-top:.2rem}
+.level-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.2rem;border-radius:12px;font-size:1.1rem;font-weight:600;margin-bottom:1.5rem}
+.level-desc{color:var(--muted);line-height:1.7;margin-bottom:2rem;font-size:.95rem}
+
+.cat-section{margin-bottom:2rem}
+.cat-section h3{font-size:1rem;font-weight:600;margin-bottom:1rem}
+.cat-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.cat-name{min-width:140px;font-size:.85rem;color:var(--muted)}
+.cat-bar-wrap{flex:1;height:8px;background:var(--surface);border-radius:99px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:99px;transition:width 1.5s ease}
+.cat-pct{font-family:'JetBrains Mono',monospace;font-size:.8rem;min-width:38px;text-align:right}
+
+.rec-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:.75rem}
+.rec-card h4{font-size:.95rem;font-weight:600;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.rec-card p{font-size:.88rem;color:var(--muted);line-height:1.6}
+
+.strengths-section{margin-bottom:2rem}
+.strengths-section h3{font-size:1rem;font-weight:600;margin-bottom:.75rem}
+.strength-tag{display:inline-flex;align-items:center;gap:.3rem;background:rgba(102,187,106,.1);border:1px solid var(--green);color:var(--green);border-radius:8px;padding:.35rem .75rem;font-size:.85rem;margin-right:.5rem;margin-bottom:.5rem}
+.weakness-tag{display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,167,38,.1);border:1px solid var(--orange);color:var(--orange);border-radius:8px;padding:.35rem .75rem;font-size:.85rem;margin-right:.5rem;margin-bottom:.5rem}
+
+.cta-box{background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(102,187,106,.1));border:1px solid var(--accent);border-radius:14px;padding:1.5rem;text-align:center;margin-top:2rem}
+.cta-box h3{font-size:1.1rem;margin-bottom:.5rem}
+.cta-box p{font-size:.88rem;color:var(--muted);margin-bottom:1rem;line-height:1.5}
+
+.footer{text-align:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.footer p{font-size:.8rem;color:#555d6e}
+
+@media(max-width:500px){
+  .hero-title{font-size:1.6rem}
+  .q-text{font-size:1.05rem}
+  .cat-name{min-width:110px;font-size:.78rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- SCREEN: Intro -->
+<div class="screen active" id="screen-intro">
+  <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> 3 minutter</div>
+  <h1 class="hero-title">Hvor god er <span>du</span> med KI?</h1>
+  <p class="hero-sub">12 spørsmål som avslører ditt KI-nivå — fra KI-turist til KI-sensei. Ingen fagsjargong, bare ærlige spørsmål om hvordan du bruker KI i hverdagen.</p>
+  <button class="btn" onclick="showScreen('screen-quiz');renderQuestion()">Ta quizen →</button>
+</div>
+
+<!-- SCREEN: Quiz -->
+<div class="screen" id="screen-quiz">
+  <div class="progress-wrap">
+    <div class="progress-label"><span id="q-counter">Spørsmål 1 av 12</span><span id="q-pct">8%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="q-bar" style="width:8%"></div></div>
+  </div>
+  <div id="q-category" class="q-category"></div>
+  <div id="q-text" class="q-text"></div>
+  <div id="q-options" class="options"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="btn-back" onclick="prevQuestion()">← Tilbake</button>
+    <button class="btn" id="btn-next" onclick="nextQuestion()" disabled>Neste →</button>
+  </div>
+</div>
+
+<!-- SCREEN: Loading -->
+<div class="screen" id="screen-loading">
+  <div class="loading-screen">
+    <div class="spinner"></div>
+    <p class="loading-text">Beregner KI-nivået ditt<span class="loading-dots"></span></p>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:.75rem">Analyserer svarene dine</p>
+  </div>
+</div>
+
+<!-- SCREEN: Results -->
+<div class="screen" id="screen-results">
+  <div style="text-align:center">
+    <div class="score-circle">
+      <svg viewBox="0 0 200 200">
+        <circle class="score-bg" cx="100" cy="100" r="88"/>
+        <circle class="score-fg" id="score-arc" cx="100" cy="100" r="88" stroke-dasharray="553" stroke-dashoffset="553"/>
+      </svg>
+      <div class="score-value">
+        <div class="score-number mono" id="score-num">0</div>
+        <div class="score-label">av 36</div>
+      </div>
+    </div>
+    <div class="level-badge" id="level-badge"></div>
+  </div>
+  <p class="level-desc" id="level-desc"></p>
+
+  <!-- Strengths / weaknesses -->
+  <div class="strengths-section" id="strengths-section"></div>
+
+  <!-- Category breakdown -->
+  <div class="cat-section">
+    <h3>📊 Score per kategori</h3>
+    <div id="cat-bars"></div>
+  </div>
+
+  <!-- Recommendations -->
+  <div id="recs"></div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h3>🧠 Vil du bli bedre?</h3>
+    <p>Bli med i Praktisk Intelligens-fellesskapet på Skool — Norges mest hands-on KI-community. Her lærer du prompting, verktøy og automatisering med folk som deg.</p>
+    <button class="btn" onclick="window.open('https://www.skool.com/praktisere-kunstig-intelligens-9038','_blank')">Bli med gratis →</button>
+  </div>
+
+  <div id="expert-cta" style="display:none;margin-top:1rem">
+    <div class="rec-card" style="border-color:var(--accent);text-align:center">
+      <h4>🥷 Du kan mye — vil du lære ANDRE?</h4>
+      <p>Vi ser etter folk som kan bidra i fellesskapet. Ta kontakt med Kristoffer.</p>
+    </div>
+  </div>
+
+  <div class="footer"><p>Personlig KI-Quiz av Praktisk Intelligens © 2026</p></div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  // KI i hverdagen (3)
+  {cat:"KI i hverdagen",catIdx:0,text:"Hvor ofte bruker du KI-verktøy bevisst?",opts:["Aldri / vet ikke hva det er","Har prøvd ChatGPT et par ganger","Bruker det ukentlig til enkle ting","Daglig — det er en del av rutinen min"]},
+  {cat:"KI i hverdagen",catIdx:0,text:"Hva bruker du KI til oftest?",opts:["Ingenting / bare hørt om det","Stille spørsmål som jeg kunne googlet","Skrive tekster, oppsummere, eller planlegge","Automatisere oppgaver, lage innhold, analysere data"]},
+  {cat:"KI i hverdagen",catIdx:0,text:"Hvis du fikk en ny KI-funksjon, hva gjør du?",opts:["Ignorerer det","Leser om det, men prøver sjelden","Tester det ut samme dag","Tester det, og finner ut hvordan det passer inn i rutinen min"]},
+
+  // Prompting-skills (3)
+  {cat:"Prompting-skills",catIdx:1,text:"Hva gjør du når ChatGPT gir et dårlig svar?",opts:["Gir opp — «KI er jo bare hype»","Prøver igjen med omtrent samme spørsmål","Omformulerer og gir mer kontekst","Gir rolle, kontekst, format og eksempler — og itererer"]},
+  {cat:"Prompting-skills",catIdx:1,text:"Vet du hva «prompt engineering» betyr?",opts:["Nei","Noe med å stille spørsmål til KI?","Ja — det handler om å skrive gode instruksjoner til KI","Ja, og jeg bruker teknikker som chain-of-thought, few-shot, og rollespill"]},
+  {cat:"Prompting-skills",catIdx:1,text:"Hva er en «system prompt»?",opts:["Ingen peiling","Tror det er noe teknisk","En instruksjon som setter rammene for KI-en","Bruker det aktivt for å tilpasse KI til mine behov"]},
+
+  // Verktøykunnskap (2)
+  {cat:"Verktøykunnskap",catIdx:2,text:"Hvilke KI-verktøy kjenner du til?",opts:["Bare ChatGPT / ingen","ChatGPT + et par til (Gemini, Copilot)","4-5 verktøy, inkl. bilde/video-KI","6+ verktøy, og jeg vet hva hvert brukes til"]},
+  {cat:"Verktøykunnskap",catIdx:2,text:"Har du betalt for et KI-verktøy?",opts:["Nei, og kommer ikke til det","Nei, men vurderer det","Ja, ChatGPT Plus eller lignende","Ja, flere verktøy som jeg bruker regelmessig"]},
+
+  // Automatisering (2)
+  {cat:"Automatisering",catIdx:3,text:"Har du noen gang automatisert en oppgave med KI?",opts:["Vet ikke hva det betyr","Nei, men skjønner konseptet","Ja, enkle ting (auto-svar, maler, etc.)","Ja, flere workflows — KI gjør ting for meg uten at jeg er involvert"]},
+  {cat:"Automatisering",catIdx:3,text:"Kjenner du til verktøy som Make, Zapier, eller n8n?",opts:["Aldri hørt om","Hørt om, men aldri prøvd","Prøvd, men fikk det ikke helt til","Bruker det aktivt til å koble systemer sammen"]},
+
+  // Sikkerhet & personvern (2)
+  {cat:"Sikkerhet & personvern",catIdx:4,text:"Hva tenker du på før du deler info med en KI?",opts:["Tenker ikke over det","Litt usikker, men gjør det likevel","Unngår sensitiv info, men vet ikke nøyaktig hva som er risikoen","Vet hva som lagres, sjekker personverninnstillinger, og tilpasser hva jeg deler"]},
+  {cat:"Sikkerhet & personvern",catIdx:4,text:"Stoler du på at KI alltid gir riktig svar?",opts:["Ja, det er jo en datamaskin","Stort sett, men sjekker av og til","Nei, jeg dobbeltsjekker viktig info","Aldri blindt — jeg vet at KI hallusinerer og bruker den deretter"]}
+];
+
+const categories = [
+  {name:"KI i hverdagen",max:9,icon:"🌍"},
+  {name:"Prompting-skills",max:9,icon:"✍️"},
+  {name:"Verktøykunnskap",max:6,icon:"🧰"},
+  {name:"Automatisering",max:6,icon:"⚡"},
+  {name:"Sikkerhet & personvern",max:6,icon:"🔒"}
+];
+
+const levels = [
+  {min:0,max:7,name:"KI-turisten",emoji:"🫣",color:"var(--red)",desc:"Du har sett KI fra utsiden, men aldri egentlig sjekket inn. Null stress — alle starter her. Det viktigste er at du er nysgjerrig nok til å ta denne quizen."},
+  {min:8,max:15,name:"Copy-pasteren",emoji:"📋",color:"var(--orange)",desc:"Du bruker KI som en fancy Google. Det funker, men du utnytter kanskje 10% av potensialet. Med noen enkle grep kan du gå fra å spørre KI til å samarbeide med den."},
+  {min:16,max:23,name:"KI-brukeren",emoji:"🎯",color:"var(--accent)",desc:"Du er i gang og vet mer enn de fleste. Men det er noen smarte triks du går glipp av som kan spare deg timer i uka."},
+  {min:24,max:30,name:"Prompt-ninjaen",emoji:"🥷",color:"var(--green)",desc:"Du vet hva du gjør. KI er en del av hverdagen din, og du sparer seriøs tid. Du er blant de som faktisk forstår kraften i gode prompts."},
+  {min:31,max:36,name:"KI-sensei",emoji:"🧠",color:"var(--green)",desc:"Du er blant de 1% som virkelig forstår og bruker KI effektivt. Folk burde lære av deg — og kanskje du burde lære dem?"}
+];
+
+const levelTips = [
+  [
+    {t:"Last ned ChatGPT-appen i dag",d:"Still den et spørsmål du ellers ville googlet. Se forskjellen."},
+    {t:"Prøv å skrive en e-post med KI",d:"Gi ChatGPT temaet og tonen — du blir overrasket over resultatet."},
+    {t:"Sett av 15 min i uka til å eksperimentere",d:"Ingen forventninger, bare utforsk. Nysgjerrighet er alt du trenger."}
+  ],[
+    {t:"Gi KI-en kontekst og rolle",d:"Ikke bare «skriv en tekst» — prøv «Du er en norsk markedsfører. Skriv en Facebook-post for...»"},
+    {t:"Bruk KI som sparringpartner",d:"Be den om å finne svakheter i planene dine, brainstorme idéer, eller strukturere tankene dine."},
+    {t:"Prøv ett nytt KI-verktøy denne uka",d:"Gemini for research, Claude for lange dokumenter, Canva AI for design. Finn din favoritt."}
+  ],[
+    {t:"Lær deg chain-of-thought prompting",d:"Be KI-en tenke steg for steg. Kvaliteten på svarene øker dramatisk."},
+    {t:"Bygg deg 3-5 gjenbrukbare prompts",d:"Lagre de som funker best. En god prompt er som et godt verktøy — bruk det igjen og igjen."},
+    {t:"Prøv å automatisere én repetitiv oppgave",d:"Make.com eller Zapier + KI. Start med noe enkelt som ukentlig oppsummering av e-post."}
+  ],[
+    {t:"Bygg et system, ikke bare prompts",d:"Koble KI-verktøy sammen med automatisering for å lage workflows som jobber for deg."},
+    {t:"Del kunnskapen din",d:"Lær opp kolleger eller venner. Det som er opplagt for deg er magi for andre."},
+    {t:"Utforsk agenter og autonome systemer",d:"Neste nivå er KI som gjør oppgaver uten at du styrer hvert steg."}
+  ],[
+    {t:"Bli en KI-mentor",d:"Du kan nok til å lære andre. Vurder å holde workshops eller dele kunnskap i et community."},
+    {t:"Hold deg oppdatert på bleeding edge",d:"Nye modeller, nye muligheter — sett av tid til å teste det siste."},
+    {t:"Bygg noe unikt",d:"Kombiner KI med din domeneekspertise. Det er der den virkelige verdien ligger."}
+  ]
+];
+
+let currentQ = 0;
+let answers = new Array(12).fill(-1);
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQuestion(){
+  const q = questions[currentQ];
+  document.getElementById('q-counter').textContent=`Spørsmål ${currentQ+1} av 12`;
+  const pct = Math.round(((currentQ+1)/12)*100);
+  document.getElementById('q-pct').textContent=pct+'%';
+  document.getElementById('q-bar').style.width=pct+'%';
+  document.getElementById('q-category').textContent=q.cat;
+  document.getElementById('q-text').textContent=q.text;
+
+  const keys=['A','B','C','D'];
+  let html='';
+  q.opts.forEach((o,i)=>{
+    const sel = answers[currentQ]===i?'selected':'';
+    html+=`<div class="option ${sel}" onclick="selectOption(${i})">
+      <div class="option-key">${keys[i]}</div>
+      <div class="option-text">${o}</div>
+    </div>`;
+  });
+  document.getElementById('q-options').innerHTML=html;
+
+  document.getElementById('btn-back').style.visibility=currentQ===0?'hidden':'visible';
+  const btnNext = document.getElementById('btn-next');
+  btnNext.disabled = answers[currentQ]===-1;
+  btnNext.textContent = currentQ===11?'Se resultater →':'Neste →';
+}
+
+function selectOption(idx){
+  answers[currentQ]=idx;
+  document.querySelectorAll('.option').forEach((el,i)=>{
+    el.classList.toggle('selected',i===idx);
+  });
+  document.getElementById('btn-next').disabled=false;
+  setTimeout(()=>nextQuestion(),300);
+}
+
+function nextQuestion(){
+  if(answers[currentQ]===-1)return;
+  if(currentQ<11){currentQ++;renderQuestion()}
+  else{showScreen('screen-loading');setTimeout(()=>showResults(),2500)}
+}
+
+function prevQuestion(){
+  if(currentQ>0){currentQ--;renderQuestion()}
+}
+
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('screen-quiz').classList.contains('active'))return;
+  const keyMap={'a':0,'b':1,'c':2,'d':3,'1':0,'2':1,'3':2,'4':3};
+  if(e.key.toLowerCase() in keyMap)selectOption(keyMap[e.key.toLowerCase()]);
+  if(e.key==='Enter'&&answers[currentQ]!==-1)nextQuestion();
+  if(e.key==='Backspace'||e.key==='ArrowLeft')prevQuestion();
+});
+
+function showResults(){
+  const catScores = categories.map(()=>0);
+  questions.forEach((q,i)=>{catScores[q.catIdx]+=answers[i]});
+  const total = catScores.reduce((a,b)=>a+b,0);
+  const catPcts = categories.map((c,i)=>Math.round((catScores[i]/c.max)*100));
+
+  const levelIdx = total<=7?0:total<=15?1:total<=23?2:total<=30?3:4;
+  const level = levels[levelIdx];
+
+  showScreen('screen-results');
+
+  // Score arc
+  const arc = document.getElementById('score-arc');
+  const circumference = 553;
+  const offset = circumference - (total/36)*circumference;
+  setTimeout(()=>{arc.style.strokeDashoffset=offset;arc.style.stroke=level.color},100);
+
+  // Count up
+  let count=0;
+  const numEl=document.getElementById('score-num');
+  const counter=setInterval(()=>{
+    count++;
+    if(count>=total){count=total;clearInterval(counter)}
+    numEl.textContent=count;
+  },50);
+
+  // Level badge
+  const badge=document.getElementById('level-badge');
+  badge.innerHTML=`${level.emoji} ${level.name}`;
+  badge.style.background='rgba(167,139,250,.12)';
+  badge.style.color=level.color;
+  badge.style.border=`1px solid ${level.color}`;
+
+  document.getElementById('level-desc').textContent=level.desc;
+
+  // Strengths / weaknesses
+  const catWithPct = categories.map((c,i)=>({...c,pct:catPcts[i],idx:i}));
+  catWithPct.sort((a,b)=>b.pct-a.pct);
+  const strengths = catWithPct.filter(c=>c.pct>=60).slice(0,2);
+  const weaknesses = catWithPct.filter(c=>c.pct<60).slice(-2).reverse();
+
+  let swHtml='';
+  if(strengths.length){
+    swHtml+='<h3>💪 Dine styrker</h3><div style="margin-bottom:1rem">';
+    strengths.forEach(s=>{swHtml+=`<span class="strength-tag">${s.icon} ${s.name}</span>`});
+    swHtml+='</div>';
+  }
+  if(weaknesses.length){
+    swHtml+='<h3>📈 Forbedringspotensial</h3><div style="margin-bottom:1rem">';
+    weaknesses.forEach(w=>{swHtml+=`<span class="weakness-tag">${w.icon} ${w.name}</span>`});
+    swHtml+='</div>';
+  }
+  document.getElementById('strengths-section').innerHTML=swHtml;
+
+  // Category bars
+  const barColors=['var(--accent)','var(--green)','var(--orange)','var(--accent)','var(--green)'];
+  let barsHtml='';
+  categories.forEach((c,i)=>{
+    barsHtml+=`<div class="cat-row">
+      <div class="cat-name">${c.icon} ${c.name}</div>
+      <div class="cat-bar-wrap"><div class="cat-bar-fill" style="width:0;background:${barColors[i]}" data-w="${catPcts[i]}%"></div></div>
+      <div class="cat-pct mono">${catPcts[i]}%</div>
+    </div>`;
+  });
+  document.getElementById('cat-bars').innerHTML=barsHtml;
+  setTimeout(()=>{
+    document.querySelectorAll('.cat-bar-fill').forEach(el=>{el.style.width=el.dataset.w});
+  },200);
+
+  // Recommendations
+  const tips = levelTips[levelIdx];
+  let recsHtml='<h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">💡 3 ting du kan gjøre nå</h3>';
+  tips.forEach((r,i)=>{
+    recsHtml+=`<div class="rec-card"><h4>${i+1}. ${r.t}</h4><p>${r.d}</p></div>`;
+  });
+  document.getElementById('recs').innerHTML=recsHtml;
+
+  // Expert CTA for level 4-5
+  if(levelIdx>=3){
+    document.getElementById('expert-cta').style.display='block';
+  }
+  
+  // Submit data to API
+  submitQuizData({
+    quiz_type: 'personlig',
+    total_score: total,
+    level: level.name,
+    answers: answers,
+    category_scores: catScores,
+    category_percentages: catPcts
+  });
+}
+
+async function submitQuizData(data) {
+  try {
+    // Show loading indicator
+    const loadingEl = document.createElement('div');
+    loadingEl.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:.85rem;margin-top:1rem">📊 Lagrer resultatene dine...</p>';
+    document.querySelector('.footer').appendChild(loadingEl);
+    
+    const response = await fetch('/api/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        quiz_type: data.quiz_type,
+        name: null, // Personal quiz doesn't collect name
+        email: null, // Personal quiz doesn't collect email
+        phone: null,
+        company: null,
+        website: null,
+        role: null,
+        total_score: data.total_score,
+        category_scores: data.category_scores,
+        answers: data.answers,
+        scan_results: null,
+        source: 'personal-quiz-completion',
+        device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+        metadata: {
+          level: data.level,
+          category_percentages: data.category_percentages
+        }
+      })
+    });
+    
+    const result = await response.json();
+    
+    // Update loading indicator
+    loadingEl.innerHTML = `<p style="text-align:center;color:var(--green);font-size:.85rem;margin-top:1rem">✅ Lagret! ID: ${result.id || 'Unknown'}</p>`;
+    
+    setTimeout(() => {
+      loadingEl.remove();
+    }, 3000);
+    
+  } catch (error) {
+    console.error('Error submitting quiz data:', error);
+    // Show error message
+    const errorEl = document.createElement('div');
+    errorEl.innerHTML = '<p style="text-align:center;color:var(--orange);font-size:.85rem;margin-top:1rem">⚠️ Kunne ikke lagre data, men resultatet ditt er klar!</p>';
+    document.querySelector('.footer').appendChild(errorEl);
+    
+    setTimeout(() => {
+      errorEl.remove();
+    }, 5000);
+  }
+}
+</script>
+</body>
+</html>

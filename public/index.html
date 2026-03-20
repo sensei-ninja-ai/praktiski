@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praktisk Intelligens — KI for norske bedrifter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0f14;
+  --surface:#141820;
+  --border:#2a3040;
+  --royal-blue:#1e3a5f;
+  --light-blue:#4fc3f7;
+  --text:#e8eaf0;
+  --muted:#8a93a6;
+  --green:#66bb6a;
+  --orange:#ffa726;
+}
+
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+}
+
+h1,h2,h3{font-family:'DM Serif Display',serif}
+
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 2rem;
+}
+
+/* Header */
+.header{
+  background:var(--bg);
+  padding:2rem 0;
+  border-bottom:1px solid var(--border);
+}
+.nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.logo{
+  font-family:'DM Serif Display',serif;
+  font-size:1.8rem;
+  font-weight:400;
+  color:var(--text);
+  text-decoration:none;
+}
+
+/* Hero */
+.hero{
+  padding:6rem 0;
+  text-align:center;
+  background:linear-gradient(135deg,rgba(30,58,95,0.1),rgba(79,195,247,0.05));
+}
+.hero-title{
+  font-size:clamp(3rem,5vw,4.5rem);
+  font-weight:400;
+  line-height:1.1;
+  margin-bottom:1.5rem;
+  color:var(--text);
+}
+.hero-subtitle{
+  font-size:1.3rem;
+  color:var(--muted);
+  margin-bottom:3rem;
+  max-width:600px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.hero-buttons{
+  display:flex;
+  gap:1.5rem;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:2rem;
+}
+
+/* Buttons */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.75rem;
+  padding:1rem 2rem;
+  border-radius:12px;
+  font-family:'DM Sans',sans-serif;
+  font-weight:600;
+  font-size:1.1rem;
+  text-decoration:none;
+  transition:all .2s ease;
+  border:none;
+  cursor:pointer;
+}
+.btn-primary{
+  background:var(--royal-blue);
+  color:white;
+}
+.btn-primary:hover{
+  background:#2a4870;
+  transform:translateY(-2px);
+}
+.btn-secondary{
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+.btn-secondary:hover{
+  border-color:var(--light-blue);
+  background:#1a1f2b;
+}
+
+/* About section */
+.about{
+  padding:6rem 0;
+  background:var(--surface);
+}
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4rem;
+  align-items:center;
+}
+.about-content h2{
+  font-size:2.5rem;
+  margin-bottom:1.5rem;
+  color:var(--text);
+}
+.about-content p{
+  font-size:1.1rem;
+  color:var(--muted);
+  margin-bottom:1.5rem;
+}
+.about-features{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-top:2rem;
+}
+.feature{
+  background:var(--bg);
+  padding:1.5rem;
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+.feature-icon{
+  font-size:2rem;
+  margin-bottom:.75rem;
+  display:block;
+}
+.feature h3{
+  font-size:1.2rem;
+  margin-bottom:.5rem;
+  color:var(--text);
+}
+.feature p{
+  font-size:.95rem;
+  color:var(--muted);
+}
+
+/* CTA section */
+.cta-section{
+  padding:6rem 0;
+  text-align:center;
+  background:linear-gradient(135deg,var(--royal-blue),#2a4870);
+}
+.cta-section h2{
+  font-size:2.5rem;
+  color:white;
+  margin-bottom:1rem;
+}
+.cta-section p{
+  font-size:1.2rem;
+  color:rgba(255,255,255,0.9);
+  margin-bottom:2rem;
+  max-width:600px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.cta-section .btn{
+  background:white;
+  color:var(--royal-blue);
+  font-size:1.2rem;
+  padding:1.25rem 2.5rem;
+}
+.cta-section .btn:hover{
+  background:#f8f9fa;
+  transform:translateY(-2px);
+}
+
+/* Footer */
+.footer{
+  background:var(--bg);
+  padding:3rem 0;
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+.footer p{
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+/* Mobile responsive */
+@media(max-width:768px){
+  .hero{padding:4rem 0}
+  .hero-title{font-size:2.5rem}
+  .hero-buttons{flex-direction:column;align-items:center}
+  .btn{width:100%;max-width:300px}
+  
+  .about-grid{
+    grid-template-columns:1fr;
+    gap:3rem;
+    text-align:center;
+  }
+  .about-features{grid-template-columns:1fr}
+  
+  .container{padding:0 1rem}
+}
+
+/* Smooth animations */
+.hero,
+.about,
+.cta-section{
+  opacity:0;
+  transform:translateY(30px);
+  animation:fadeInUp .8s ease forwards;
+}
+.about{animation-delay:.2s}
+.cta-section{animation-delay:.4s}
+
+@keyframes fadeInUp{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <a href="#" class="logo">Praktisk Intelligens</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <h1 class="hero-title">KI som faktisk fungerer<br>for norske bedrifter</h1>
+    <p class="hero-subtitle">Slutt å lure på om KI kan hjelpe bedriften din. Test deg selv og finn ut nøyaktig hvor du skal starte — på vanlig norsk, uten fjas.</p>
+    <div class="hero-buttons">
+      <a href="/quiz" class="btn btn-primary">Test bedriften din →</a>
+      <a href="/test" class="btn btn-secondary">Test deg selv →</a>
+    </div>
+    <p style="color:var(--muted);font-size:.9rem;margin-top:1rem">Tar 3 minutter • 100% gratis</p>
+  </div>
+</section>
+
+<!-- About Section -->
+<section class="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-content">
+        <h2>Hvorfor Praktisk Intelligens?</h2>
+        <p>De fleste norske bedrifter vet at KI er viktig, men få vet hvor de skal starte. Vi oversetter KI-mulighetene til konkrete grep som faktisk fungerer i norsk hverdagsvirksomhet.</p>
+        <p>Ingen akademisk fjas. Ingen engelsk fagsjargong. Bare praktiske løsninger som sparer deg tid og penger fra dag én.</p>
+      </div>
+      <div class="about-features">
+        <div class="feature">
+          <span class="feature-icon">🎯</span>
+          <h3>Skreddersydd</h3>
+          <p>Tilpasset norske bedrifter og måten vi jobber på</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">⚡</span>
+          <h3>Rask effekt</h3>
+          <p>Se resultater allerede i første uke</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">🤝</span>
+          <h3>Hands-on støtte</h3>
+          <p>Ikke bare teori — vi hjelper deg å gjennomføre</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">💰</span>
+          <h3>Reell ROI</h3>
+          <p>Tjen inn investeringen på uker, ikke år</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Finn ut hvor du står i dag</h2>
+    <p>To enkle tester som forteller deg nøyaktig hva ditt neste KI-grep bør være. Ingen selgerprat, bare ærlige svar basert på der du faktisk er.</p>
+    <a href="/quiz" class="btn">Start med bedriftstesten →</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 Praktisk Intelligens. Laget av folk som forstår norske bedrifter.</p>
+  </div>
+</footer>
+
+</body>
+</html>

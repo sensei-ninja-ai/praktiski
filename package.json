@@ -1,0 +1,28 @@
+{
+  "name": "praktiski",
+  "version": "1.0.0",
+  "description": "Praktisk Intelligens - KI for norske bedrifter",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site, no build needed'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "ki",
+    "ai",
+    "norway",
+    "business",
+    "quiz",
+    "dashboard"
+  ],
+  "author": "Praktisk Intelligens",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
