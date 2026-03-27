@@ -2414,22 +2414,47 @@ Du bruker totalt <strong>${totalH} timer/uke</strong> på ${procs.length} proses
 document.querySelectorAll('.pkg-card').forEach(c=>{c.classList.remove('recommended');if(Number(c.dataset.pkg)===recPkg)c.classList.add('recommended')});
 
 const saving=Math.round(totalH*0.5);
-const weeklySaving=saving*800;
 const roiEl=document.getElementById('roiContent');
 if(totalH>0){
+const curHourly=document.getElementById('roiHourlyRate')?.value||800;
+const curSaving=document.getElementById('roiSavedHours')?.value||saving;
 roiEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent2)">${totalH}</div><div style="font-size:.75rem;color:var(--muted)">Timer/uke admin</div></div>
-<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent)">${(totalH*800).toLocaleString('nb-NO')} kr</div><div style="font-size:.75rem;color:var(--muted)">Kostnad/uke (800 kr/t)</div></div></div>
-<div style="text-align:center;font-size:.9rem;color:var(--text)">Med KI sparer du ~<strong>${saving} timer/uke</strong> → <strong style="color:var(--green)">${weeklySaving.toLocaleString('nb-NO')} kr/uke</strong> → <strong style="color:var(--green)">${(weeklySaving*47).toLocaleString('nb-NO')} kr/år (47 uker)</strong></div>`;
+<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px">
+<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">Timer spart/uke med KI</div>
+<input type="number" id="roiSavedHours" value="${curSaving}" min="0" max="80" style="width:80px;text-align:center;font-size:1.5rem;font-weight:800;color:var(--green);background:transparent;border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:4px" oninput="updateROICalc()">
+</div>
+<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px">
+<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">Timepris (kr)</div>
+<input type="number" id="roiHourlyRate" value="${curHourly}" min="0" max="5000" step="50" style="width:100px;text-align:center;font-size:1.5rem;font-weight:800;color:var(--accent);background:transparent;border:1px solid rgba(240,165,0,.3);border-radius:8px;padding:4px" oninput="updateROICalc()">
+</div></div>
+<div id="roiSummaryLine" style="text-align:center;font-size:.9rem;color:var(--text)"></div>`;
+updateROICalc();
 }else{roiEl.innerHTML='<span style="color:var(--muted)">Legg inn prosesser for å se ROI.</span>'}
 
+updateBreakEven();
+}
+
+function updateROICalc(){
+const hrs=Number(document.getElementById('roiSavedHours')?.value||0);
+const rate=Number(document.getElementById('roiHourlyRate')?.value||800);
+const weekly=hrs*rate;
+const yearly=weekly*47;
+const line=document.getElementById('roiSummaryLine');
+if(line)line.innerHTML=`<strong style="color:var(--green)">${hrs} timer/uke</strong> × <strong>${rate.toLocaleString('nb-NO')} kr/t</strong> → <strong style="color:var(--green)">${weekly.toLocaleString('nb-NO')} kr/uke</strong> → <strong style="color:var(--green)">${(yearly/1000).toFixed(0)}k kr/år (47 uker)</strong>`;
+updateBreakEven();
+}
+
+function updateBreakEven(){
+const hrs=Number(document.getElementById('roiSavedHours')?.value||0);
+const rate=Number(document.getElementById('roiHourlyRate')?.value||800);
+const weeklySaving=hrs*rate;
 const beDays=document.getElementById('breakEvenDays');
-const activePkg=selectedPkg||recPkg;
-if(weeklySaving>0){
+const activePkg=selectedPkg||(typeof recPkg!=='undefined'?recPkg:1);
+if(weeklySaving>0&&pkgPrices[activePkg]){
 const days=Math.ceil(pkgPrices[activePkg]/(weeklySaving/7));
 beDays.textContent=days+' dager';
 document.getElementById('breakEvenBox').querySelector('div:last-child').textContent=`${pkgNames[activePkg]} (${pkgPrices[activePkg].toLocaleString('nb-NO')} kr) betaler seg på ${days} dager`;
-}else{beDays.textContent='—'}
+}else if(beDays){beDays.textContent='—'}
 }
 
 function selectPackage(num){
@@ -2438,6 +2463,7 @@ document.querySelectorAll('.pkg-card').forEach(c=>{c.classList.toggle('selected'
 document.getElementById('selectedPkgConfirm').style.display='block';
 document.getElementById('selectedPkgName').textContent=pkgNames[num]+' ('+pkgPrices[num].toLocaleString('nb-NO')+' kr)';
 document.getElementById('breakEvenBox').style.display='block';
+updateBreakEven();
 buildPackageSection();save();
 }
 
