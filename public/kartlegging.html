@@ -12,16 +12,16 @@ html{font-size:18px;touch-action:manipulation}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--navy);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
 
 /* INTRO SCREEN */
-#introScreen{position:fixed;inset:0;z-index:999;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;text-align:center;overflow:hidden;gap:8px}
+#introScreen{position:fixed;inset:0;z-index:999;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;overflow-y:auto}
 .intro-logo{font-size:3.5rem;margin-bottom:16px}
-.intro-brand{font-size:.85rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.intro-title{font-size:1.4rem;font-weight:800;line-height:1.2;margin-bottom:8px;color:var(--text)}
+.intro-brand{font-size:.95rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+.intro-title{font-size:1.6rem;font-weight:800;line-height:1.25;margin-bottom:14px;color:var(--text)}
 .intro-title span{color:var(--accent)}
-.intro-sub{font-size:.88rem;color:var(--muted);line-height:1.5;margin-bottom:12px;max-width:440px}
-.intro-bullets{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:14px 20px;margin-bottom:14px;text-align:left;max-width:420px;width:100%}
+.intro-sub{font-size:.95rem;color:var(--muted);line-height:1.6;margin-bottom:28px;max-width:440px}
+.intro-bullets{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;text-align:left;max-width:420px;width:100%}
 .intro-bullets li{list-style:none;font-size:.92rem;color:var(--text);padding:6px 0;line-height:1.4}
 .intro-bullets li+li{border-top:1px solid rgba(255,255,255,.05)}
-.intro-start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:16px 40px;font-size:1.1rem;font-weight:800;cursor:pointer;width:100%;max-width:420px;min-height:56px;transition:opacity .15s;letter-spacing:.3px}
+.intro-start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:22px 40px;font-size:1.15rem;font-weight:800;cursor:pointer;width:100%;max-width:420px;min-height:68px;transition:opacity .15s;letter-spacing:.3px}
 .intro-start-btn:active{opacity:.85}
 .intro-footer{margin-top:20px;font-size:.75rem;color:var(--muted)}
 
@@ -186,6 +186,9 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 /* ===== INTRO SCREEN: ANIMATED CYBER GRID ===== */
 #introScreen {
   background: var(--navy);
+  background-image: var(--grid-bg), var(--scan-line);
+  background-size: 40px 40px, 100% 100%;
+  animation: gridPulse 4s ease-in-out infinite;
   position: relative;
   overflow: hidden;
 }
@@ -195,26 +198,63 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
   50% { background-size: 42px 42px, 100% 100%; }
 }
 
-/* Graph canvas background */
-#graphCanvas {
+/* Floating particles via pseudo-elements */
+#introScreen::before {
+  content: '';
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(79,195,247,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(240,165,0,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 60% 30%, rgba(52,211,153,0.04) 0%, transparent 30%);
+  animation: particleFloat 6s ease-in-out infinite;
   pointer-events: none;
+  z-index: 0;
 }
 
-/* Keep all intro children above graph canvas */
+#introScreen::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 8px;
+  height: 8px;
+  background: var(--glow-primary);
+  border-radius: 50%;
+  box-shadow: 
+    0 0 12px var(--glow-primary),
+    80px 120px 0 rgba(240,165,0,0.6),
+    -30px 200px 0 rgba(52,211,153,0.5),
+    150px 80px 0 rgba(79,195,247,0.4),
+    250px 300px 0 rgba(240,165,0,0.3),
+    -80px 400px 0 rgba(79,195,247,0.3),
+    300px 200px 0 rgba(52,211,153,0.4);
+  animation: floatParticles 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes particleFloat {
+  0%, 100% { opacity: 0.6; transform: translate(0, 0); }
+  33% { opacity: 1; transform: translate(10px, -10px); }
+  66% { opacity: 0.8; transform: translate(-5px, 8px); }
+}
+
+@keyframes floatParticles {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+}
+
+/* Keep all intro children above pseudo-elements */
 #introScreen > * { position: relative; z-index: 1; }
 
 /* Logo: glowing hexagon/circle */
 .intro-logo {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(240,165,0,0.1));
   border: 2px solid var(--glow-primary);
-  border-radius: 16px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -223,8 +263,8 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
     0 0 40px rgba(79,195,247,0.15),
     inset 0 0 20px rgba(79,195,247,0.05);
   animation: logoGlow 2.5s ease-in-out infinite;
-  margin: 0 auto 8px;
-  font-size: 2rem;
+  margin: 0 auto 16px;
+  font-size: 2.5rem;
   clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
   clip-path: none; /* keep readable on mobile */
 }
@@ -823,6 +863,14 @@ body::after {
 
 /* ===== MOBILE: 320px – 480px ===== */
 @media (max-width: 480px) {
+  /* Kill heavy particle/glow pseudo elements */
+  #introScreen::after { display: none; }
+  #introScreen::before {
+    background:
+      radial-gradient(circle at 50% 30%, rgba(79,195,247,0.05) 0%, transparent 60%);
+    animation: none;
+  }
+
   /* Intro screen: tighten layout for small screens */
   #introScreen {
     padding: 24px 16px;
@@ -1093,7 +1141,6 @@ body::after {
 
 <!-- INTRO SCREEN -->
 <div id="introScreen">
-  <canvas id="graphCanvas"></canvas>
   <div class="intro-logo">🧠</div>
   <div class="intro-brand">Praktisk Intelligens</div>
   <h1 class="intro-title">KI-Kartlegging — <span>Finn ut hva KI kan gjøre for bedriften din</span></h1>
@@ -1123,7 +1170,7 @@ body::after {
 <div id="mainApp">
 <div class="header">
   <div class="brand">
-    <h1 onclick="document.getElementById('introScreen').style.display='flex';window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">🧠 Praktisk Intelligens</h1>
+    <h1 onclick="current=0;render();window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">🧠 Praktisk Intelligens</h1>
     <small>KI-Kartlegging</small>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
@@ -1489,115 +1536,8 @@ body::after {
 <div id="rapport-content"></div>
 
 <script>
-// ====== GRAPH VIEW ANIMASJON ======
-(function() {
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReduced) return;
-
-  const canvas = document.getElementById('graphCanvas');
-  const ctx = canvas.getContext('2d');
-  let animId = null;
-  const COLORS = ['#4fc3f7', '#f0a500', '#34d399'];
-  const CONNECT_DIST = 150;
-  const isMobile = () => window.innerWidth < 768;
-
-  function makeNode(w, h) {
-    return {
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      baseR: 2 + Math.random() * 3,
-      phase: Math.random() * Math.PI * 2,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)]
-    };
-  }
-
-  let nodes = [];
-
-  function resize() {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
-    ctx.scale(dpr, dpr);
-    const count = isMobile() ? 14 : 26;
-    nodes = Array.from({ length: count }, () => makeNode(rect.width, rect.height));
-  }
-
-  function draw(ts) {
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvas.width / dpr;
-    const h = canvas.height / dpr;
-    ctx.clearRect(0, 0, w, h);
-
-    // Update & draw connections
-    for (let i = 0; i < nodes.length; i++) {
-      const a = nodes[i];
-      for (let j = i + 1; j < nodes.length; j++) {
-        const b = nodes[j];
-        const dx = b.x - a.x, dy = b.y - a.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < CONNECT_DIST) {
-          const alpha = (1 - dist / CONNECT_DIST) * 0.35;
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.strokeStyle = `rgba(79,195,247,${alpha})`;
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-      }
-    }
-
-    // Update & draw nodes
-    for (const n of nodes) {
-      n.x += n.vx;
-      n.y += n.vy;
-      if (n.x < 0 || n.x > w) n.vx *= -1;
-      if (n.y < 0 || n.y > h) n.vy *= -1;
-      n.x = Math.max(0, Math.min(w, n.x));
-      n.y = Math.max(0, Math.min(h, n.y));
-
-      n.phase += 0.018;
-      const r = n.baseR + Math.sin(n.phase) * 1.2;
-
-      // Glow
-      const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 3);
-      grad.addColorStop(0, n.color.replace(')', ',0.5)').replace('rgb', 'rgba').replace('#', 'rgba(').replace('rgba(', 'rgba('));
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2);
-      ctx.fillStyle = n.color + '18';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = n.color + 'aa';
-      ctx.fill();
-    }
-
-    animId = requestAnimationFrame(draw);
-  }
-
-  window.stopGraphAnimation = function() {
-    if (animId) { cancelAnimationFrame(animId); animId = null; }
-  };
-
-  window.addEventListener('resize', () => {
-    stopGraphAnimation();
-    resize();
-    animId = requestAnimationFrame(draw);
-  });
-
-  resize();
-  animId = requestAnimationFrame(draw);
-})();
-
 // ====== INTRO ======
 function startKartlegging(){
-if (window.stopGraphAnimation) window.stopGraphAnimation();
 document.getElementById('introScreen').style.display='none';
 document.getElementById('mainApp').style.display='block';
 render();
