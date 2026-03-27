@@ -1811,7 +1811,7 @@ html+=`<tr><td>${p.prosess_custom||p.prosess||'—'}</td><td>${t}t</td><td>${f>0
 });
 html+=`</tbody></table>
 <p style="margin-top:8px"><strong>Total admin-tid:</strong> ${totalH} timer/uke</p>
-<p><strong>Estimert besparelse:</strong> ~${saving} timer/uke (~${(saving*800).toLocaleString('nb-NO')} kr/uke)</p>
+<p><strong>Estimert besparelse:</strong> ~${saving} timer/uke (~${(saving*getRate()).toLocaleString('nb-NO')} kr/uke)</p>
 </div>`;
 }
 
@@ -1848,12 +1848,9 @@ else{html+='<p style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å s
 html+=`</div>`;
 
 if(totalH>0){
-const yearSaving=saving*800*47;
 html+=`<div class="summary-cards">
 <div class="summary-card"><div class="big">${totalH}</div><div class="label">Timer/uke admin</div></div>
 <div class="summary-card"><div class="big">~${saving}</div><div class="label">Timer spart med KI</div></div>
-<div class="summary-card"><div class="big">${(saving*800).toLocaleString('nb-NO')}</div><div class="label">Spart kr/uke</div></div>
-<div class="summary-card"><div class="big">${(yearSaving/1000).toFixed(0)}k</div><div class="label">Spart kr/år (47 uker)</div></div>
 </div>`;
 }
 el.innerHTML=html;
@@ -1987,7 +1984,7 @@ const modenhet=avgScore>=6?'Digital Leder':avgScore>=4?'Digital Utforsker':avgSc
 const modenhetFarge=avgScore>=6?'#34d399':avgScore>=4?'#f0a500':'#ef4444';
 
 // Weekly cost
-const weeklySaving=saving*800;
+const weeklySaving=saving*getRate();
 const yearlySaving=weeklySaving*47;
 
 // Package recommendation
@@ -2128,7 +2125,7 @@ const rapportHTML=`
   <div style="background:#1a2332;border-radius:16px;padding:28px;margin-bottom:24px">
     <div style="font-size:13px;color:#8a9bb5;margin-bottom:8px">Estimert KI-besparelse per år</div>
     <div style="font-size:40px;font-weight:900;color:#f0a500">${(yearlySaving).toLocaleString('nb-NO')} kr</div>
-    <div style="font-size:13px;color:#8a9bb5;margin-top:8px">${saving} timer/uke × 800 kr/t × 52 uker = ${(yearlySaving).toLocaleString('nb-NO')} kr</div>
+    <div style="font-size:13px;color:#8a9bb5;margin-top:8px">${saving} timer/uke × ${getRate()} kr/t × 47 uker = ${(yearlySaving).toLocaleString('nb-NO')} kr</div>
   </div>
 
   <div style="background:#f8f9fa;border-radius:12px;padding:20px">
@@ -2259,7 +2256,7 @@ const rapportHTML=`
           <div style="font-size:10px;color:#8a9bb5">Spart med KI</div>
         </div>
         <div style="background:#fff;border-radius:8px;padding:12px;text-align:center">
-          <div style="font-size:16px;font-weight:800;color:#f0a500">${(estSaving*800).toLocaleString('nb-NO')} kr</div>
+          <div style="font-size:16px;font-weight:800;color:#f0a500">${(estSaving*getRate()).toLocaleString('nb-NO')} kr</div>
           <div style="font-size:10px;color:#8a9bb5">Per uke</div>
         </div>
       </div>
@@ -2305,8 +2302,8 @@ const rapportHTML=`
       <th style="padding:12px 16px;text-align:right;font-size:11px;color:#f0a500">Per år</th>
     </tr></thead>
     <tbody>
-      <tr style="background:#f8f9fa"><td style="padding:12px 16px;font-size:13px">Admin-timer i dag</td><td style="padding:12px 16px;text-align:right;font-size:13px">${totalH}t × 800 kr = ${(totalH*800).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700">${(totalH*800*47).toLocaleString('nb-NO')} kr</td></tr>
-      <tr><td style="padding:12px 16px;font-size:13px">Med KI (~50% reduksjon)</td><td style="padding:12px 16px;text-align:right;font-size:13px">${Math.round(totalH*0.5)}t × 800 kr = ${(Math.round(totalH*0.5)*800).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px">${(Math.round(totalH*0.5)*800*47).toLocaleString('nb-NO')} kr</td></tr>
+      <tr style="background:#f8f9fa"><td style="padding:12px 16px;font-size:13px">Admin-timer i dag</td><td style="padding:12px 16px;text-align:right;font-size:13px">${totalH}t × ${getRate()} kr = ${(totalH*getRate()).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700">${(totalH*getRate()*47).toLocaleString('nb-NO')} kr</td></tr>
+      <tr><td style="padding:12px 16px;font-size:13px">Med KI (~50% reduksjon)</td><td style="padding:12px 16px;text-align:right;font-size:13px">${Math.round(totalH*0.5)}t × ${getRate()} kr = ${(Math.round(totalH*0.5)*getRate()).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px">${(Math.round(totalH*0.5)*getRate()*47).toLocaleString('nb-NO')} kr</td></tr>
       <tr style="background:#e8f5e9"><td style="padding:12px 16px;font-size:13px;font-weight:700;color:#1a2332">Netto besparelse</td><td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700;color:#34d399">${(weeklySaving).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:15px;font-weight:800;color:#34d399">${(yearlySaving).toLocaleString('nb-NO')} kr</td></tr>
     </tbody>
   </table>
@@ -2344,7 +2341,7 @@ const rapportHTML=`
       <div style="width:28px;height:28px;background:#f0a500;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#1a2332;flex-shrink:0;font-size:13px">${i+1}</div>
       <div>
         <div style="font-size:14px;font-weight:600;color:#fff">${p.prosess_custom||p.prosess}</div>
-        <div style="font-size:12px;color:#8a9bb5">Estimert besparelse: ~${Math.round(p.timer*0.5)} timer/uke = ${(Math.round(p.timer*0.5)*800).toLocaleString('nb-NO')} kr/uke</div>
+        <div style="font-size:12px;color:#8a9bb5">Estimert besparelse: ~${Math.round(p.timer*0.5)} timer/uke = ${(Math.round(p.timer*0.5)*getRate()).toLocaleString('nb-NO')} kr/uke</div>
       </div>
     </div>`).join('')}
   </div>`:''}
@@ -2416,23 +2413,25 @@ document.querySelectorAll('.pkg-card').forEach(c=>{c.classList.remove('recommend
 const saving=Math.round(totalH*0.5);
 const roiEl=document.getElementById('roiContent');
 if(totalH>0){
-const curHourly=document.getElementById('roiHourlyRate')?.value||800;
+const curHourly=document.getElementById('roiHourlyRate')?.value||500;
 const curSaving=document.getElementById('roiSavedHours')?.value||saving;
-roiEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px">
-<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">Timer spart/uke med KI</div>
-<input type="number" id="roiSavedHours" value="${curSaving}" min="0" max="80" style="width:80px;text-align:center;font-size:1.5rem;font-weight:800;color:var(--green);background:transparent;border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:4px" oninput="updateROICalc()">
+roiEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+<div style="text-align:center;padding:14px;background:rgba(255,255,255,.03);border-radius:10px">
+<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px">Timer spart/uke med KI</div>
+<input type="number" id="roiSavedHours" value="${curSaving}" min="0" max="80" style="width:80px;text-align:center;font-size:1.8rem;font-weight:800;color:var(--green);background:transparent;border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:6px" oninput="updateROICalc()">
 </div>
-<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px">
-<div style="font-size:.7rem;color:var(--muted);margin-bottom:4px">Timepris (kr)</div>
-<input type="number" id="roiHourlyRate" value="${curHourly}" min="0" max="5000" step="50" style="width:100px;text-align:center;font-size:1.5rem;font-weight:800;color:var(--accent);background:transparent;border:1px solid rgba(240,165,0,.3);border-radius:8px;padding:4px" oninput="updateROICalc()">
+<div style="text-align:center;padding:14px;background:rgba(255,255,255,.03);border-radius:10px">
+<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px">Din timepris (kr)</div>
+<input type="number" id="roiHourlyRate" value="${curHourly}" min="0" max="5000" step="50" style="width:100px;text-align:center;font-size:1.8rem;font-weight:800;color:var(--accent);background:transparent;border:1px solid rgba(240,165,0,.3);border-radius:8px;padding:6px" oninput="updateROICalc()">
 </div></div>
-<div id="roiSummaryLine" style="text-align:center;font-size:.9rem;color:var(--text)"></div>`;
+<div id="roiSummaryLine" style="text-align:center;font-size:.95rem;color:var(--text);line-height:1.6"></div>`;
 updateROICalc();
 }else{roiEl.innerHTML='<span style="color:var(--muted)">Legg inn prosesser for å se ROI.</span>'}
 
 updateBreakEven();
 }
+
+function getRate(){return Number(document.getElementById('roiHourlyRate')?.value||500)}
 
 function updateROICalc(){
 const hrs=Number(document.getElementById('roiSavedHours')?.value||0);
