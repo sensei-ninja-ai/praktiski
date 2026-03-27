@@ -828,17 +828,312 @@ body::after {
   opacity: 0.4;
 }
 
-/* ===== MOBILE: REDUCE ANIMATIONS ===== */
+/* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
+/* ===== HOVER EFFECTS ONLY ON POINTER DEVICES ===== */
+/* Prevents hover glow from sticking on touch devices */
+@media (hover: none) {
+  .process-card:hover,
+  .summary-card:hover,
+  .sum-block:hover,
+  .radio-group label:hover,
+  .check-group label:hover,
+  .btn-next:hover,
+  .btn-back:hover,
+  .add-btn:hover,
+  .pkg-card[data-pkg="1"]:hover,
+  .pkg-card[data-pkg="2"]:hover,
+  .pkg-card[data-pkg="3"]:hover,
+  .pkg-card[data-pkg="4"]:hover,
+  .confirm-btn-primary:hover,
+  .confirm-btn-secondary:hover {
+    box-shadow: none !important;
+    border-color: inherit !important;
+  }
+  /* Disable shimmer sweep on touch */
+  .btn-next::before { display: none; }
+}
+
+/* ===== MOBILE: 320px – 480px ===== */
 @media (max-width: 480px) {
-  #introScreen::after { display: none; } /* remove particles on small screens */
-  .progress-fill::after { width: 8px; height: 8px; }
+  /* Kill heavy particle/glow pseudo elements */
+  #introScreen::after { display: none; }
+  #introScreen::before {
+    background:
+      radial-gradient(circle at 50% 30%, rgba(79,195,247,0.05) 0%, transparent 60%);
+    animation: none;
+  }
+
+  /* Intro screen: tighten layout for small screens */
+  #introScreen {
+    padding: 24px 16px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .intro-logo {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+    margin-bottom: 12px;
+    /* Reduce glow intensity on small screens */
+    box-shadow: 0 0 12px rgba(79,195,247,0.25), inset 0 0 10px rgba(79,195,247,0.04);
+    animation: none;
+    border: 1px solid rgba(79,195,247,0.3);
+  }
+
+  .intro-title { font-size: 1.35rem; }
+  .intro-sub { font-size: .88rem; margin-bottom: 20px; }
+
+  .intro-bullets {
+    padding: 16px;
+    margin-bottom: 20px;
+    /* Lighter glow on small screens */
+    box-shadow: 0 0 8px rgba(79,195,247,0.06);
+  }
+
+  .intro-bullets li { font-size: .85rem; padding: 7px 0; }
+
+  .intro-start-btn {
+    padding: 18px 24px;
+    font-size: 1.05rem;
+    min-height: 60px;
+    /* Reduce pulsing glow — battery + readability */
+    animation: none;
+    box-shadow: 0 0 12px rgba(240,165,0,0.3);
+  }
+
+  /* Progress bar: keep thin, no dot overflow */
+  .progress-bar { height: 4px; overflow: hidden; }
+  .progress-fill::after { display: none; }
+  .progress-fill { box-shadow: 0 0 6px rgba(79,195,247,0.4); }
+
+  /* Header fits narrow screens */
+  .header { padding: 10px 12px 0; }
+  .brand h1 { font-size: 1rem; }
+
+  /* Container: full width, no overflow */
+  .container {
+    padding: 16px 12px;
+    padding-bottom: 140px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* All inputs: full width, comfortable touch targets */
+  input[type=text],
+  input[type=number],
+  input[type=date],
+  input[type=email],
+  input[type=tel],
+  textarea,
+  select {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1rem;
+    padding: 14px 14px;
+  }
+
+  /* Textarea: scrollable on touch */
+  textarea {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    min-height: 80px;
+  }
+
+  /* Radio/check: stack vertically on very small screens */
+  .radio-group,
+  .check-group {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .radio-group label,
+  .check-group label {
+    width: 100%;
+    flex: 1 1 100%;
+    min-height: 52px;
+    font-size: .92rem;
+    padding: 14px 16px;
+    /* No glow on mobile touch elements */
+    box-shadow: none !important;
+  }
+
+  /* Selected state: keep color, reduce glow */
+  .radio-group label:has(input:checked),
+  .check-group label:has(input:checked) {
+    box-shadow: 0 0 6px rgba(240,165,0,0.2) !important;
+  }
+
+  /* Check group: allow 2-col on 380px+ */
+  .check-group label { flex: 1 1 100%; }
+
+  /* Process cards: full width, readable */
+  .process-card {
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  }
+
+  /* Package cards: full width, stacked */
+  .pkg-card {
+    width: 100%;
+    padding: 16px !important;
+  }
+
+  /* Rarity labels: smaller, no overflow */
+  .pkg-card[data-pkg="1"]::before,
+  .pkg-card[data-pkg="2"]::before,
+  .pkg-card[data-pkg="3"]::before,
+  .pkg-card[data-pkg="4"]::before {
+    font-size: 0.55rem;
+    top: 6px;
+    right: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Summary cards: 1 column on 320px, 2 on 380px+ */
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Nav buttons: always 48px+ touch target */
+  .nav { padding: 10px 12px; gap: 8px; }
+  .nav button {
+    min-height: 56px;
+    font-size: 1rem;
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  /* Slider thumb: keep large for touch */
+  .slider-wrap input[type=range]::-webkit-slider-thumb {
+    width: 64px;
+    height: 64px;
+    box-shadow: 0 0 10px rgba(240,165,0,0.5);
+  }
+
+  /* Scan-lines: reduce opacity on mobile (readability) */
+  body::after { opacity: 0.2; }
+
+  /* Emoji row: comfortable spacing */
+  .emoji-row button { width: 54px; height: 54px; font-size: 1.8rem; }
+
+  /* Quick-add buttons: comfortable */
+  .quick-add-btn { min-height: 48px; font-size: .85rem; }
+
+  /* Section intro: readable text */
+  .section-intro { font-size: .82rem; }
+
+  /* Dots: larger tap targets */
+  .dot { width: 16px; height: 16px; padding: 5px; }
+
+  /* Tool group headers: no overflow */
+  .tool-group h3::after { display: none; } /* remove glowing underline on mobile */
+}
+
+/* ===== SMALL PHONE: 380px+ — 2-col check group ===== */
+@media (min-width: 380px) and (max-width: 480px) {
+  .check-group label { flex: 1 1 45%; }
+  .summary-cards { grid-template-columns: 1fr 1fr; }
+}
+
+/* ===== TABLET: 481px – 768px ===== */
+@media (min-width: 481px) and (max-width: 768px) {
+  .container { padding: 20px 20px; padding-bottom: 150px; max-width: 100%; }
+
+  input[type=text],
+  input[type=number],
+  input[type=date],
+  input[type=email],
+  input[type=tel],
+  textarea,
+  select { min-height: 52px; }
+
+  textarea { touch-action: pan-y; }
+
+  .radio-group label,
+  .check-group label { min-height: 52px; }
+
+  .check-group label { flex: 1 1 45%; }
+
+  .nav button { min-height: 60px; font-size: 1.05rem; }
+
+  /* Moderate glow — not full desktop strength */
+  .progress-fill::after { width: 9px; height: 9px; }
+}
+
+/* ===== TABLET LANDSCAPE + SMALL DESKTOP: 769px – 1024px ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container { max-width: 720px; margin: 0 auto; padding: 24px; padding-bottom: 140px; }
+
+  /* Intro: landscape mode — compact vertically */
+  #introScreen { padding: 24px 40px; }
+  .intro-bullets { max-width: 500px; }
+  .intro-start-btn { max-width: 500px; }
+
+  /* Cards: more breathing room */
+  .process-card { padding: 20px; }
+  .summary-card { padding: 24px; }
+
+  /* Radio groups: 3 per row where possible */
+  .radio-group label,
+  .check-group label { flex: 1 1 30%; }
+
+  .nav button { min-height: 60px; }
+}
+
+/* ===== DESKTOP: 1025px+ ===== */
+@media (min-width: 1025px) {
+  /* Max container width */
+  .container { max-width: 780px; margin: 0 auto; padding: 28px; padding-bottom: 120px; }
+
+  #introScreen { gap: 4px; }
+  .intro-logo { width: 90px; height: 90px; }
+  .intro-title { font-size: 1.8rem; }
+
+  /* Radio groups: natural wrap, 3+ per row */
+  .radio-group label,
+  .check-group label { flex: 0 1 auto; min-width: 120px; }
+
+  /* Summary cards: always 2-col */
+  .summary-cards { grid-template-columns: 1fr 1fr; }
+
+  /* Nav: centered with max-width */
+  .nav { justify-content: center; }
+  .nav button { max-width: 240px; }
+
+  /* Stronger glow on desktop — hover users only */
+  @media (hover: hover) {
+    .process-card:hover {
+      border-color: rgba(79,195,247,0.5) !important;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.4), 0 0 25px rgba(79,195,247,0.18) !important;
+      transform: translateY(-1px);
+    }
+
+    .summary-card:hover {
+      box-shadow: 0 6px 30px rgba(0,0,0,0.4), 0 0 30px rgba(240,165,0,0.2) !important;
+    }
+
+    .radio-group label:hover,
+    .check-group label:hover {
+      border-color: rgba(79,195,247,0.4);
+      box-shadow: 0 0 12px rgba(79,195,247,0.12);
+    }
+  }
+
+  /* Grid background more visible on large screens */
+  #introScreen {
+    background-size: 50px 50px, 100% 100%;
+  }
 }
 </style>
 </head>
