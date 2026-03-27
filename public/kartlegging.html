@@ -1270,8 +1270,8 @@ body::after {
 </div>
 <div class="tool-group"><h3>Nettside</h3>
 <div class="check-group" data-key="nettside" id="nettsideCheckGroup">
-<label><input type="checkbox" value="Ja" id="nettsideJa" onchange="toggleNettsideUrl()"><span>Ja, vi har nettside</span></label>
-<label><input type="checkbox" value="Nei" onchange="if(this.checked){document.getElementById('nettsideJa').checked=false;toggleNettsideUrl()}"><span>Nei, ikke ennå</span></label>
+<label><input type="checkbox" value="Ja" id="nettsideJa" onchange="if(this.checked){document.getElementById('nettsideNei').checked=false}toggleNettsideUrl()"><span>Ja, vi har nettside</span></label>
+<label><input type="checkbox" value="Nei" id="nettsideNei" onchange="if(this.checked){document.getElementById('nettsideJa').checked=false}toggleNettsideUrl()"><span>Nei, ikke ennå</span></label>
 </div>
 <div id="nettsideUrlWrap" style="display:none;margin-top:8px">
 <input type="text" data-key="nettside_url" placeholder="https://dinbedrift.no">
