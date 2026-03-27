@@ -31,7 +31,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .field{margin-bottom:24px}
 .field label{display:block;font-size:.85rem;font-weight:600;margin-bottom:8px;color:var(--text)}
 .field .hint{font-size:.75rem;color:var(--muted);margin-bottom:6px}
-input[type=text],input[type=number],input[type=date],textarea,select{width:100%;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px 18px;font-size:1.05rem;color:var(--text);outline:none;transition:border .2s;min-height:56px}
+input[type=text],input[type=email],input[type=tel],input[type=number],input[type=date],textarea,select{width:100%;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px 18px;font-size:1.05rem;color:var(--text);outline:none;transition:border .2s;min-height:56px}
 input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 textarea{min-height:80px;resize:vertical}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238a9bb5' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
@@ -195,7 +195,9 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <label><input type="radio" name="omsetning" value="10–20M"><span>10–20M</span></label>
 <label><input type="radio" name="omsetning" value="20M+"><span>20M+</span></label>
 <label><input type="radio" name="omsetning" value="Vil ikke oppgi"><span>Vil ikke oppgi</span></label>
-</div></div>
+</div>
+<input type="text" data-key="omsetning_eksakt" placeholder="Eller skriv inn nøyaktig omsetning..." style="margin-top:8px">
+</div>
 <div class="field"><label>Bransje</label><input type="text" data-key="bransje" placeholder="F.eks. Bygg og anlegg"></div>
 </div>
 
