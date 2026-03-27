@@ -448,6 +448,16 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 
 <div id="summaryContent"></div>
 
+<h3 style="font-size:1.1rem;margin:24px 0 12px;color:var(--green);text-align:center">💰 ROI-kalkulator</h3>
+<div id="roiCalc" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:20px">
+<div id="roiContent" style="font-size:.88rem;color:var(--muted);line-height:1.8"></div>
+</div>
+
+<div id="breakEvenBox" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(240,165,0,.1));border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:20px">
+<div id="breakEvenDays" style="font-size:2.2rem;font-weight:800;color:var(--green)"></div>
+<div style="color:var(--muted);font-size:.82rem;margin-top:4px">Tid til break-even</div>
+</div>
+
 <div class="actions" style="margin-top:24px">
 <button onclick="generateRapport()">📊 Generer Rapport (PDF)</button>
 <button onclick="exportJSON()">💾 JSON</button>
@@ -532,15 +542,7 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 </div>
 </div>
 
-<h3 style="font-size:1rem;margin:20px 0 12px;color:var(--green);text-align:center">💰 Live ROI-kalkulator</h3>
-<div id="roiCalc" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:20px">
-<div id="roiContent" style="font-size:.88rem;color:var(--muted);line-height:1.8"></div>
-</div>
 
-<div id="breakEvenBox" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(240,165,0,.1));border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:20px">
-<div id="breakEvenDays" style="font-size:2.2rem;font-weight:800;color:var(--green)"></div>
-<div style="color:var(--muted);font-size:.82rem;margin-top:4px">Tid til break-even</div>
-</div>
 
 <div class="footer">Kartlagt av Praktisk Intelligens</div>
 </div>
