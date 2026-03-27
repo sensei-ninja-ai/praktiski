@@ -18,7 +18,9 @@
   ],
   "author": "Praktisk Intelligens",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@supabase/supabase-js": "^2.100.1"
+  },
   "devDependencies": {
     "vercel": "^33.0.0"
   },

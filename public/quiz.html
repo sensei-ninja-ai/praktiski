@@ -47,6 +47,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .form-group input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--text);outline:none;transition:border .2s}
 .form-group input:focus{border-color:var(--accent)}
 .form-group input::placeholder{color:#555d6e}
+.form-group select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--text);outline:none;transition:border .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a93a6' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;cursor:pointer}
+.form-group select:focus{border-color:var(--accent)}
+.form-group select option{background:var(--surface);color:var(--text)}
 
 /* Progress */
 .progress-wrap{margin-bottom:2rem}
@@ -164,6 +167,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="form-group"><label>Nettside (valgfritt)</label><input id="f-url" placeholder="https://dinbedrift.no"></div>
   <div class="form-group"><label>E-post</label><input id="f-email" type="email" placeholder="din@epost.no"></div>
   <div class="form-group"><label>Ditt navn</label><input id="f-name" placeholder="Ola Nordmann"></div>
+  <div class="form-group"><label>Hvilken by bor du i? <span style="color:var(--muted);font-weight:400">(valgfritt)</span></label><input id="f-city" placeholder="F.eks. Tromsø"></div>
+  <div class="form-group"><label>Hvordan fant du quizen? <span style="color:var(--muted);font-weight:400">(valgfritt)</span></label><select id="f-referral"><option value="" disabled selected>Velg...</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="google">Google-søk</option><option value="linkedin">LinkedIn</option><option value="bekjent">Anbefalt av noen</option><option value="foredrag">Foredrag/event</option><option value="annet">Annet</option></select></div>
   <p id="lead-error" style="color:var(--red);font-size:.85rem;margin-bottom:.5rem;display:none"></p>
   <button class="btn" onclick="startQuiz()" style="margin-top:.5rem">Start quiz →</button>
 </div>
@@ -458,7 +463,9 @@ function startQuiz(){
     err.style.display='block';
     return;
   }
-  leadData = {company,email,name,url};
+  const city = document.getElementById('f-city').value.trim();
+  const referral = document.getElementById('f-referral').value;
+  leadData = {company,email,name,url,city,referral};
 
   // Background scans — all in parallel
   if(url){
@@ -709,6 +716,8 @@ async function submitQuizData(payload) {
         answers: payload.quiz.answers,
         scan_results: payload.scan,
         qualifyData: payload.qualify,
+        city: payload.lead.city || null,
+        referral_source: payload.lead.referral || null,
         source: 'quiz-completion',
         device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
       })
