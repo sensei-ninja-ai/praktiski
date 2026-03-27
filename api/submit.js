@@ -32,9 +32,7 @@ export default async function handler(req, res) {
       stilling: role || null,
       score: total_score || null,
       nivaa: scoreToNivaa(total_score),
-      svar: { quiz_type, answers, scan_results, qualifyData, category_scores, website, device, metadata },
-      by: city || null,
-      kilde_kanal: referral_source || null,
+      svar: { quiz_type, answers, scan_results, qualifyData, category_scores, website, device, metadata, city: city || null, referral_source: referral_source || null },
       kilde: source || 'quiz',
       status: 'ny'
     };
