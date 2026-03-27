@@ -12,16 +12,16 @@ html{font-size:18px;touch-action:manipulation}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--navy);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
 
 /* INTRO SCREEN */
-#introScreen{position:fixed;inset:0;z-index:999;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;overflow-y:auto}
+#introScreen{position:fixed;inset:0;z-index:999;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;text-align:center;overflow:hidden;gap:8px}
 .intro-logo{font-size:3.5rem;margin-bottom:16px}
-.intro-brand{font-size:.95rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
-.intro-title{font-size:1.6rem;font-weight:800;line-height:1.25;margin-bottom:14px;color:var(--text)}
+.intro-brand{font-size:.85rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.intro-title{font-size:1.4rem;font-weight:800;line-height:1.2;margin-bottom:8px;color:var(--text)}
 .intro-title span{color:var(--accent)}
-.intro-sub{font-size:.95rem;color:var(--muted);line-height:1.6;margin-bottom:28px;max-width:440px}
-.intro-bullets{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;text-align:left;max-width:420px;width:100%}
+.intro-sub{font-size:.88rem;color:var(--muted);line-height:1.5;margin-bottom:12px;max-width:440px}
+.intro-bullets{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:14px 20px;margin-bottom:14px;text-align:left;max-width:420px;width:100%}
 .intro-bullets li{list-style:none;font-size:.92rem;color:var(--text);padding:6px 0;line-height:1.4}
 .intro-bullets li+li{border-top:1px solid rgba(255,255,255,.05)}
-.intro-start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:22px 40px;font-size:1.15rem;font-weight:800;cursor:pointer;width:100%;max-width:420px;min-height:68px;transition:opacity .15s;letter-spacing:.3px}
+.intro-start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:16px 40px;font-size:1.1rem;font-weight:800;cursor:pointer;width:100%;max-width:420px;min-height:56px;transition:opacity .15s;letter-spacing:.3px}
 .intro-start-btn:active{opacity:.85}
 .intro-footer{margin-top:20px;font-size:.75rem;color:var(--muted)}
 
@@ -186,9 +186,6 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 /* ===== INTRO SCREEN: ANIMATED CYBER GRID ===== */
 #introScreen {
   background: var(--navy);
-  background-image: var(--grid-bg), var(--scan-line);
-  background-size: 40px 40px, 100% 100%;
-  animation: gridPulse 4s ease-in-out infinite;
   position: relative;
   overflow: hidden;
 }
@@ -213,11 +210,11 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 
 /* Logo: glowing hexagon/circle */
 .intro-logo {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(240,165,0,0.1));
   border: 2px solid var(--glow-primary);
-  border-radius: 20px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,8 +223,8 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
     0 0 40px rgba(79,195,247,0.15),
     inset 0 0 20px rgba(79,195,247,0.05);
   animation: logoGlow 2.5s ease-in-out infinite;
-  margin: 0 auto 16px;
-  font-size: 2.5rem;
+  margin: 0 auto 8px;
+  font-size: 2rem;
   clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
   clip-path: none; /* keep readable on mobile */
 }
