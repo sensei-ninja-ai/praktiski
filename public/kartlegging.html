@@ -4,34 +4,56 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>KI-Kartlegging — Praktisk Intelligens</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--navy:#1a2332;--slate:#2d3a4a;--card:#354357;--accent:#f0a500;--accent2:#ff6b35;--text:#e8ecf1;--muted:#8a9bb5;--green:#34d399;--red:#ef4444;--radius:14px;--shadow:0 4px 20px rgba(0,0,0,.3)}
 html{font-size:18px;touch-action:manipulation}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--navy);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+
+/* INTRO SCREEN */
+#introScreen{position:fixed;inset:0;z-index:999;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;overflow-y:auto}
+.intro-logo{font-size:3.5rem;margin-bottom:16px}
+.intro-brand{font-size:.95rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+.intro-title{font-size:1.6rem;font-weight:800;line-height:1.25;margin-bottom:14px;color:var(--text)}
+.intro-title span{color:var(--accent)}
+.intro-sub{font-size:.95rem;color:var(--muted);line-height:1.6;margin-bottom:28px;max-width:440px}
+.intro-bullets{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;text-align:left;max-width:420px;width:100%}
+.intro-bullets li{list-style:none;font-size:.92rem;color:var(--text);padding:6px 0;line-height:1.4}
+.intro-bullets li+li{border-top:1px solid rgba(255,255,255,.05)}
+.intro-start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:22px 40px;font-size:1.15rem;font-weight:800;cursor:pointer;width:100%;max-width:420px;min-height:68px;transition:opacity .15s;letter-spacing:.3px}
+.intro-start-btn:active{opacity:.85}
+.intro-footer{margin-top:20px;font-size:.75rem;color:var(--muted)}
+
+/* CONFIRMATION SCREEN */
+#confirmScreen{position:fixed;inset:0;z-index:998;background:var(--navy);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.confirm-icon{font-size:4rem;margin-bottom:20px}
+.confirm-title{font-size:1.6rem;font-weight:800;color:var(--green);margin-bottom:14px}
+.confirm-body{font-size:.95rem;color:var(--text);line-height:1.7;max-width:420px;margin-bottom:28px}
+.confirm-body strong{color:var(--accent)}
+.confirm-actions{display:flex;flex-direction:column;gap:12px;width:100%;max-width:420px}
+.confirm-btn-primary{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:20px;font-size:1.05rem;font-weight:700;cursor:pointer;min-height:60px}
+.confirm-btn-secondary{background:transparent;color:var(--accent);border:2px solid var(--accent);border-radius:var(--radius);padding:18px;font-size:1rem;font-weight:600;cursor:pointer;min-height:60px}
+
+/* MAIN APP */
+#mainApp{display:none}
 .header{position:sticky;top:0;z-index:100;background:var(--navy);padding:12px 16px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .brand h1{font-size:1.1rem;font-weight:700;color:var(--accent)}
 .brand small{font-size:.7rem;color:var(--muted)}
-.timer-bar{display:flex;align-items:center;gap:10px;font-size:.72rem;color:var(--muted);margin-bottom:6px}
-.timer-bar .elapsed{font-weight:700;color:var(--accent);font-size:.8rem}
-.timer-bar .pace{opacity:.8}
-.timer-bar .start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;min-height:32px}
 .progress-bar{height:4px;background:var(--slate);border-radius:2px;margin-bottom:8px}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .4s ease}
 .section-title-bar{font-size:.75rem;color:var(--muted);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.section-title-bar .coaching-toggle{background:none;border:none;font-size:1rem;cursor:pointer;padding:4px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
-.coaching-hint{background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:var(--accent);display:none;animation:fadeIn .3s ease}
-.coaching-hint.visible{display:block}
 .container{padding:20px;padding-bottom:160px}
 .section{display:none;animation:fadeIn .3s ease}
 .section.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideDown{from{max-height:0;opacity:0}to{max-height:800px;opacity:1}}
+.section-intro{background:rgba(240,165,0,.07);border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;margin-bottom:20px;font-size:.83rem;color:var(--muted);line-height:1.5}
+.section-intro strong{color:var(--accent)}
 .field{margin-bottom:24px}
 .field label{display:block;font-size:.85rem;font-weight:600;margin-bottom:8px;color:var(--text)}
 .field .hint{font-size:.75rem;color:var(--muted);margin-bottom:6px}
-input[type=text],input[type=email],input[type=tel],input[type=number],input[type=date],textarea,select{width:100%;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px 18px;font-size:1.05rem;color:var(--text);outline:none;transition:border .2s;min-height:56px}
+input[type=text],input[type=number],input[type=date],input[type=email],input[type=tel],textarea,select{width:100%;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px 18px;font-size:1.05rem;color:var(--text);outline:none;transition:border .2s;min-height:56px}
 input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 textarea{min-height:80px;resize:vertical}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238a9bb5' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
@@ -53,18 +75,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .ki-badge.medium{background:rgba(240,165,0,.2);color:#f0a500}
 .ki-badge.lav{background:rgba(52,211,153,.2);color:#34d399}
 .card-actions{display:flex;gap:4px;align-items:center}
-.remove-card,.demo-btn{background:none;border:none;font-size:1.4rem;cursor:pointer;padding:10px;min-width:56px;min-height:56px;display:flex;align-items:center;justify-content:center;border-radius:12px}
-.remove-card:active,.demo-btn:active{background:rgba(255,255,255,.08)}
-.remove-card{color:var(--red)}
-.demo-btn{color:var(--accent);font-size:1.4rem}
+.remove-card{background:none;border:none;font-size:1.4rem;cursor:pointer;padding:10px;min-width:56px;min-height:56px;display:flex;align-items:center;justify-content:center;border-radius:12px;color:var(--red)}
+.remove-card:active{background:rgba(255,255,255,.08)}
 .emoji-row{display:flex;gap:4px}
 .emoji-row button{font-size:2rem;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:62px;height:62px;cursor:pointer;transition:all .15s}
 .emoji-row button:active{transform:scale(.9)}
 .emoji-row button.selected{background:var(--accent);border-color:var(--accent);transform:scale(1.15)}
 .slider-wrap{position:relative;padding:8px 0}
 .slider-wrap input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;background:var(--slate);outline:none}
-.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:72px;height:72px;border-radius:50%;background:#f0a500;cursor:pointer;box-shadow:0 4px 16px rgba(240,165,0,.5);border:3px solid #ffcc44}
-.slider-wrap input[type=range]::-moz-range-thumb{width:72px;height:72px;border-radius:50%;background:#f0a500;cursor:pointer;border:3px solid #ffcc44;box-shadow:0 4px 16px rgba(240,165,0,.5)}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:56px;height:56px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.slider-wrap input[type=range]::-moz-range-thumb{width:56px;height:56px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
 .slider-wrap input[type=range]{height:16px}
 .slider-val{text-align:center;font-size:1.8rem;font-weight:700;color:var(--accent);margin-top:4px}
 .add-btn{width:100%;padding:20px;background:transparent;border:2px dashed var(--muted);border-radius:var(--radius);color:var(--muted);font-size:1.05rem;font-weight:600;cursor:pointer;min-height:64px;transition:all .2s}
@@ -98,19 +118,6 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .actions button{flex:1;padding:14px;border:2px solid var(--accent);border-radius:var(--radius);background:transparent;color:var(--accent);font-size:.95rem;font-weight:600;cursor:pointer;min-height:52px}
 .actions button:active{background:var(--accent);color:var(--navy)}
 .footer{text-align:center;padding:20px 0 8px;font-size:.7rem;color:var(--muted)}
-/* Holy Shit Panel */
-.hs-panel{overflow:hidden;max-height:0;opacity:0;transition:max-height .4s ease,opacity .3s ease;background:#0f1923;border-radius:0 0 var(--radius) var(--radius);margin:-4px -16px -16px;padding:0 16px}
-.hs-panel.open{max-height:900px;opacity:1;padding:16px}
-.hs-panel .hs-close{float:right;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px 8px;min-width:40px;min-height:40px}
-.hs-section{margin-bottom:12px}
-.hs-section h4{font-size:.78rem;margin-bottom:4px}
-.hs-section.now h4{color:#ef4444}
-.hs-section.after h4{color:var(--green)}
-.hs-section.saving h4{color:var(--accent)}
-.hs-section.tool h4{color:#60a5fa}
-.hs-section p{font-size:.82rem;color:var(--muted);line-height:1.4}
-.hs-copy{background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;font-size:.8rem;color:var(--accent);cursor:pointer;width:100%;text-align:center;margin-top:8px;min-height:44px;font-weight:600}
-.hs-copy:active{background:var(--accent);color:var(--navy)}
 /* SOP Tabs */
 .sop-tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .sop-tabs::-webkit-scrollbar{display:none}
@@ -138,8 +145,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .pkg-card.recommended{border-color:var(--accent)!important;box-shadow:0 0 20px rgba(240,165,0,.25),var(--shadow);position:relative}
 .pkg-card.recommended::before{content:'⭐ Anbefalt';position:absolute;top:-10px;right:16px;background:var(--accent);color:var(--navy);font-size:.65rem;font-weight:700;padding:2px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
 .pkg-card.selected{border-color:var(--green)!important;box-shadow:0 0 16px rgba(52,211,153,.2),var(--shadow)}
+/* Rapport hidden div */
+#rapport-content{position:absolute;left:-9999px;top:0;width:800px;background:#fff;color:#111}
 @media print{
-.header,.nav,.actions,.add-btn,.remove-card,.dots,.demo-btn,.hs-panel,.quick-add-row,.coaching-hint,.timer-bar,.ki-badge,.coaching-toggle,.sop-tabs,.sop-processes,.rank-arrows{display:none!important}
+.header,.nav,.actions,.add-btn,.remove-card,.dots,.quick-add-row,.ki-badge,.sop-tabs,.sop-processes,.rank-arrows{display:none!important}
 body{background:#fff;color:#111;font-size:12px}
 .section{display:block!important;page-break-inside:avoid;margin-bottom:20px}
 .process-card,.summary-card,.qw-card,.sum-block{border:1px solid #ccc;box-shadow:none;background:#f9f9f9}
@@ -150,37 +159,59 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 </style>
 </head>
 <body>
+
+<!-- INTRO SCREEN -->
+<div id="introScreen">
+  <div class="intro-logo">🧠</div>
+  <div class="intro-brand">Praktisk Intelligens</div>
+  <h1 class="intro-title">KI-Kartlegging — <span>Finn ut hva KI kan gjøre for bedriften din</span></h1>
+  <p class="intro-sub">Denne kartleggingen tar ca. 10–15 minutter. Du får en komplett rapport med KI-potensial, ROI-estimat og anbefalinger — helt gratis.</p>
+  <ul class="intro-bullets">
+    <li>✅ Kartlegg digitale verktøy og prosesser</li>
+    <li>✅ Finn de største tidstyver</li>
+    <li>✅ Få personlig KI-anbefaling</li>
+    <li>✅ Motta rapport på e-post</li>
+  </ul>
+  <button class="intro-start-btn" onclick="startKartlegging()">Start kartlegging →</button>
+  <p class="intro-footer">100% gratis · Ingen forpliktelser · Konfidensielt</p>
+</div>
+
+<!-- CONFIRMATION SCREEN -->
+<div id="confirmScreen">
+  <div class="confirm-icon">🎉</div>
+  <h2 class="confirm-title">Kartleggingen er mottatt!</h2>
+  <p class="confirm-body">Du får en <strong>komplett rapport på e-post</strong> innen få minutter. <strong>Krisfred tar kontakt innen 24 timer</strong> for å gå gjennom funnene.</p>
+  <div class="confirm-actions">
+    <button class="confirm-btn-primary" onclick="generateRapport()">📊 Last ned din rapport (PDF)</button>
+    <button class="confirm-btn-secondary" onclick="location.reload()">Start ny kartlegging</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp">
 <div class="header">
-<div class="brand">
-<h1 onclick="current=0;render();window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">🧠 Praktisk Intelligens</h1>
-<small>KI-Kartlegging</small>
-</div>
-<div class="timer-bar" id="timerBar">
-<button class="start-btn" id="timerBtn" onclick="toggleTimer()">▶ Start</button>
-<span class="elapsed" id="timerElapsed">00:00</span>
-<span class="pace" id="timerPace"></span>
-</div>
-<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
-<div class="section-title-bar">
-<span id="sectionLabel"></span>
-<div style="display:flex;align-items:center;gap:4px">
-<span id="sectionNum"></span>
-<button class="coaching-toggle" id="coachToggle" onclick="toggleCoaching()" title="Coaching-hint">🎯</button>
-</div>
-</div>
+  <div class="brand">
+    <h1 onclick="current=0;render();window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">🧠 Praktisk Intelligens</h1>
+    <small>KI-Kartlegging</small>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="section-title-bar">
+    <span id="sectionLabel"></span>
+    <span id="sectionNum" style="font-weight:700;color:var(--accent)"></span>
+  </div>
 </div>
 
 <div class="container" id="app">
 
 <!-- Section 1 -->
 <div class="section" data-section="0" data-title="Bedriftsprofil">
-<div class="coaching-hint" data-coach="0">💡 Start med small talk. Bruk Chase Hughes' controlled stillness. Ikke rush gjennom dette.</div>
-<div class="field"><label>Bedriftsnavn</label><input type="text" data-key="bedriftsnavn" placeholder="Fyll inn bedriftsnavn..." id="bedriftsnavn"></div>
+<div class="section-intro"><strong>Vi bruker dette til å tilpasse rapporten din.</strong> Bedriftsprofilen hjelper oss å gi konkrete anbefalinger som passer din størrelse og bransje.</div>
+<div class="field"><label>Bedriftsnavn</label><input type="text" data-key="bedriftsnavn" placeholder="F.eks. Hansen Bygg AS" id="bedriftsnavn"></div>
 <div class="field"><label>Org.nummer</label><input type="text" data-key="orgnummer" placeholder="F.eks. 912 345 678"></div>
-<div class="field"><label>Kontaktperson</label><input type="text" data-key="kontaktperson" placeholder="Navn"></div>
-<div class="field"><label>Rolle</label><input type="text" data-key="rolle" placeholder="Daglig leder, prosjektleder..."></div>
+<div class="field"><label>Kontaktperson</label><input type="text" data-key="kontaktperson" placeholder="Ditt fulle navn"></div>
+<div class="field"><label>Din rolle i bedriften</label><input type="text" data-key="rolle" placeholder="F.eks. Daglig leder, prosjektleder, eier..."></div>
 <div class="field"><label>E-post</label><input type="email" data-key="epost" placeholder="din@bedrift.no"></div>
-<div class="field"><label>Telefonnummer</label><input type="tel" data-key="telefon" placeholder="F.eks. 900 00 000"></div>
+<div class="field"><label>Telefonnummer</label><input type="tel" data-key="telefon" placeholder="F.eks. 900 12 345"></div>
 <div class="field"><label>Antall ansatte</label>
 <div class="radio-group" data-key="ansatte">
 <label><input type="radio" name="ansatte" value="1-5"><span>1–5</span></label>
@@ -195,15 +226,13 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <label><input type="radio" name="omsetning" value="10–20M"><span>10–20M</span></label>
 <label><input type="radio" name="omsetning" value="20M+"><span>20M+</span></label>
 <label><input type="radio" name="omsetning" value="Vil ikke oppgi"><span>Vil ikke oppgi</span></label>
-</div>
-<input type="text" data-key="omsetning_eksakt" placeholder="Eller skriv inn nøyaktig omsetning..." style="margin-top:8px">
-</div>
-<div class="field"><label>Bransje</label><input type="text" data-key="bransje" placeholder="F.eks. Bygg og anlegg"></div>
+</div></div>
+<div class="field"><label>Bransje</label><input type="text" data-key="bransje" placeholder="F.eks. Bygg og anlegg, rørlegger, transport..."></div>
 </div>
 
 <!-- Section 2 -->
 <div class="section" data-section="1" data-title="Digital Modenhet">
-<div class="coaching-hint" data-coach="1">💡 Ikke døm verktøyene deres. Anerkjenn det som funker (f.eks. Tripletex = bra valg!).</div>
+<div class="section-intro"><strong>For å forstå utgangspunktet ditt.</strong> Vi kartlegger hvilke digitale verktøy dere allerede bruker — dette forteller oss hvor dere er i dag og hva slags KI-løsninger som passer best.</div>
 <div class="tool-group"><h3>Regnskap</h3>
 <div class="check-group" data-key="regnskap">
 <label><input type="checkbox" value="Fiken"><span>Fiken</span></label>
@@ -211,7 +240,7 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <label><input type="checkbox" value="Visma"><span>Visma</span></label>
 <label><input type="checkbox" value="Tripletex"><span>Tripletex</span></label>
 </div>
-<input type="text" data-key="regnskap_annet" placeholder="Andre regnskapssystemer?" style="margin-top:8px">
+<input type="text" data-key="regnskap_annet" placeholder="Andre regnskapssystemer dere bruker?" style="margin-top:8px">
 </div>
 <div class="tool-group"><h3>Prosjektstyring</h3>
 <div class="check-group" data-key="prosjektstyring">
@@ -221,16 +250,16 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <label><input type="checkbox" value="Tripletex"><span>Tripletex</span></label>
 <label><input type="checkbox" value="Manuelt"><span>Manuelt</span></label>
 </div>
-<input type="text" data-key="prosjektstyring_annet" placeholder="Andre verktøy?" style="margin-top:8px">
+<input type="text" data-key="prosjektstyring_annet" placeholder="Andre prosjektstyringsverktøy?" style="margin-top:8px">
 </div>
 <div class="tool-group"><h3>Kundeoppfølging</h3>
 <div class="check-group" data-key="kundeoppfolging">
 <label><input type="checkbox" value="Excel"><span>Excel</span></label>
-<label><input type="checkbox" value="CRM"><span>CRM</span></label>
-<label><input type="checkbox" value="Notater"><span>Notater</span></label>
-<label><input type="checkbox" value="Ingenting"><span>Ingenting</span></label>
+<label><input type="checkbox" value="CRM"><span>CRM-system</span></label>
+<label><input type="checkbox" value="Notater"><span>Notater/papir</span></label>
+<label><input type="checkbox" value="Ingenting"><span>Ingen system</span></label>
 </div>
-<input type="text" data-key="kundeoppfolging_annet" placeholder="Annet system?" style="margin-top:8px">
+<input type="text" data-key="kundeoppfolging_annet" placeholder="Hvilket CRM bruker dere? Eller annet?" style="margin-top:8px">
 </div>
 <div class="tool-group"><h3>Kalkulasjon / Tilbud</h3>
 <div class="check-group" data-key="kalkulas">
@@ -239,15 +268,15 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <label><input type="checkbox" value="Holte Smartkalk"><span>Holte Smartkalk</span></label>
 <label><input type="checkbox" value="Manuelt"><span>Manuelt</span></label>
 </div>
-<input type="text" data-key="kalkulas_annet" placeholder="Andre kalkulasjonsverktøy?" style="margin-top:8px">
+<input type="text" data-key="kalkulas_annet" placeholder="Andre kalkulasjons- eller tilbudsverktøy?" style="margin-top:8px">
 </div>
 <div class="tool-group"><h3>Timeregistrering</h3>
 <div class="check-group" data-key="timereg">
-<label><input type="checkbox" value="Manuelt"><span>Manuelt</span></label>
+<label><input type="checkbox" value="Manuelt"><span>Manuelt/papir</span></label>
 <label><input type="checkbox" value="App"><span>App</span></label>
 <label><input type="checkbox" value="Regnskapssystem"><span>Regnskapssystem</span></label>
 </div>
-<input type="text" data-key="timereg_annet" placeholder="Hvilken app/system?" style="margin-top:8px">
+<input type="text" data-key="timereg_annet" placeholder="Hvilken app eller system?" style="margin-top:8px">
 </div>
 <div class="tool-group"><h3>Sosiale Medier</h3>
 <div class="check-group" data-key="some">
@@ -262,31 +291,31 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 </div>
 <div class="tool-group"><h3>Nettside</h3>
 <div class="check-group" data-key="nettside" id="nettsideCheckGroup">
-<label><input type="checkbox" value="Ja" id="nettsideJa" onchange="toggleNettsideUrl()"><span>Ja</span></label>
-<label><input type="checkbox" value="Nei" onchange="if(this.checked){document.getElementById('nettsideJa').checked=false;toggleNettsideUrl()}"><span>Nei</span></label>
+<label><input type="checkbox" value="Ja" id="nettsideJa" onchange="toggleNettsideUrl()"><span>Ja, vi har nettside</span></label>
+<label><input type="checkbox" value="Nei" onchange="if(this.checked){document.getElementById('nettsideJa').checked=false;toggleNettsideUrl()}"><span>Nei, ikke ennå</span></label>
 </div>
 <div id="nettsideUrlWrap" style="display:none;margin-top:8px">
 <input type="text" data-key="nettside_url" placeholder="https://dinbedrift.no">
 </div>
-<input type="text" data-key="nettside_drift" placeholder="Hvem drifter nettsiden?" style="margin-top:8px">
+<input type="text" data-key="nettside_drift" placeholder="Hvem drifter/laget nettsiden?" style="margin-top:8px">
 </div>
-<div class="field"><label>Andre verktøy</label><input type="text" data-key="andre_verktoy" placeholder="Noe annet dere bruker?"></div>
-<div class="field"><label>Ofte brukte/besøkte nettsider i bedriftssammenheng</label>
-<textarea data-key="brukte_nettsider" placeholder="F.eks. Optimera.no, Finn.no, yr.no, Google Maps..."></textarea></div>
-<div class="field"><label>Nettsider/tjenester bedriften har registrert bruker på</label>
-<textarea data-key="registrerte_tjenester" placeholder="F.eks. Byggmakker, Proff.no, Finn.no, Brønnøysund, Altinn, etc."></textarea></div>
-<div class="field"><label>Har noen i bedriften prøvd KI?</label>
+<div class="field"><label>Andre verktøy og programmer</label><input type="text" data-key="andre_verktoy" placeholder="F.eks. Teams, Slack, Google Workspace, Dropbox..."></div>
+<div class="field"><label>Nettsider dere besøker ofte i jobbsammenheng</label>
+<textarea data-key="brukte_nettsider" placeholder="F.eks. Optimera.no, Finn.no, yr.no, Proff.no, Google Maps..."></textarea></div>
+<div class="field"><label>Tjenester bedriften har brukerregistrering på</label>
+<textarea data-key="registrerte_tjenester" placeholder="F.eks. Byggmakker, Altinn, Brønnøysundregistrene, Finn.no, Mittanbud..."></textarea></div>
+<div class="field"><label>Har noen i bedriften prøvd KI (f.eks. ChatGPT)?</label>
 <div class="radio-group" data-key="provd_ki">
 <label><input type="radio" name="provd_ki" value="Ja"><span>Ja</span></label>
 <label><input type="radio" name="provd_ki" value="Nei"><span>Nei</span></label>
 <label><input type="radio" name="provd_ki" value="Vet ikke"><span>Vet ikke</span></label>
 </div></div>
-<div class="field"><label>Hvis ja — hva og hvordan gikk det?</label><textarea data-key="ki_erfaring" placeholder="Fortell om erfaringen..."></textarea></div>
+<div class="field"><label>Hvis ja — hva prøvde dere, og hvordan gikk det?</label><textarea data-key="ki_erfaring" placeholder="Beskriv gjerne opplevelsen med KI-verktøy dere har testet..."></textarea></div>
 </div>
 
 <!-- Section 3 -->
 <div class="section" data-section="2" data-title="Daglig Arbeid">
-<div class="coaching-hint" data-coach="2">💡 DETTE er hoveddelen. Bruk «Beskriv for meg hvordan dere gjør X i dag» — la de snakke.</div>
+<div class="section-intro"><strong>Her finner vi de største mulighetene for KI.</strong> Velg bransjen din og huk av prosessene dere bruker tid på. Vi lager da et eget kort for hver prosess så du kan beskrive dem i detalj.</div>
 <p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Velg bransje(r) og huk av prosessene dere bruker tid på. Avhukede prosesser blir til kort du kan fylle ut.</p>
 
 <div class="sop-tabs" id="sopTabs"></div>
@@ -298,8 +327,11 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 
 <!-- Section 4 -->
 <div class="section" data-section="3" data-title="Smertepunkter">
-<div class="coaching-hint" data-coach="3">💡 Chris Voss: «Det høres ut som [frustrasjon] tar mye energi?» — label their emotions.</div>
-<div class="field"><label>Hva er den STØRSTE frustrasjonen i arbeidshverdagen?</label><textarea data-key="storste_frustrasjon" placeholder="Vær ærlig — dette hjelper oss å finne de beste løsningene..." style="min-height:120px"></textarea></div>
+<div class="section-intro"><strong>Dine frustrasjoner = våre muligheter.</strong> Jo mer ærlig du er her, desto bedre kan vi peke ut akkurat der KI kan gjøre mest nytte for din bedrift.</div>
+<div class="field"><label>Hva er den STØRSTE frustrasjonen i arbeidshverdagen?</label>
+<p class="hint">Tenk på hva som tar mest unødvendig tid, skaper stress eller koster dere penger</p>
+<textarea data-key="storste_frustrasjon" placeholder="F.eks. 'Vi bruker altfor mye tid på å lage tilbud manuelt, og det skjer feil...' eller 'Kunder glemmer å svare og leads faller mellom stolene...'" style="min-height:120px"></textarea></div>
+
 <div class="field"><label>Hvis DU hadde 10 ekstra timer i uka — hva ville du gjort?</label>
 <div class="check-group full" data-key="ekstra_timer">
 <label><input type="checkbox" value="Flere kunder/salg"><span>Flere kunder/salg</span></label>
@@ -307,11 +339,12 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <label><input type="checkbox" value="Mer produserende arbeid"><span>Mer produserende arbeid</span></label>
 <label><input type="checkbox" value="Bedre prosjektplanlegging"><span>Bedre prosjektplanlegging</span></label>
 <label><input type="checkbox" value="Mer ferie/fritid"><span>Mer ferie/fritid</span></label>
-<label><input type="checkbox" value="Opplæring/kursing ansatte"><span>Opplæring/kursing ansatte</span></label>
+<label><input type="checkbox" value="Opplæring/kursing ansatte"><span>Opplæring/kursing av ansatte</span></label>
 </div>
-<input type="text" data-key="ekstra_timer_annet" placeholder="Annet..." style="margin-top:8px">
+<input type="text" data-key="ekstra_timer_annet" placeholder="Noe annet?" style="margin-top:8px">
 </div>
 <div class="field"><label>Tid på admin vs produksjon</label>
+<p class="hint">Dra slideren — hvor mye av arbeidsdagen går til kontor/admin-arbeid?</p>
 <div class="slider-combo">
 <input type="range" min="0" max="100" value="30" data-key="kontor_pct" id="kontorSlider">
 <input type="number" min="0" max="100" value="30" id="kontorInput" style="border-radius:var(--radius)">
@@ -319,6 +352,7 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <div class="slider-val"><span id="kontorVal">30</span>% admin — <span id="prodVal">70</span>% produksjon</div>
 </div>
 <div class="field"><label>Hva koster en tapt kunde for dere?</label>
+<p class="hint">Tenk på gjennomsnittsverdien av en typisk kontrakt eller oppdrag</p>
 <div class="radio-group" data-key="tapt_kunde">
 <label><input type="radio" name="tapt_kunde" value="Under 10k"><span>Under 10k</span></label>
 <label><input type="radio" name="tapt_kunde" value="10-50k"><span>10–50k</span></label>
@@ -331,8 +365,8 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 
 <!-- Section 5 -->
 <div class="section" data-section="4" data-title="Konkurranse og Marked">
-<div class="coaching-hint" data-coach="4">💡 Ikke nevn Ninja Bygg. Fokuser på DERES marked og muligheter.</div>
-<div class="field"><label>Hvem ser dere på som hovedkonkurrenter?</label><textarea data-key="konkurrenter" placeholder="Andre bedrifter i området..."></textarea></div>
+<div class="section-intro"><strong>For å forstå markedet og mulighetene dine.</strong> Vi ser på hvem dere konkurrerer med og hvordan dere skaffer kunder — dette hjelper oss å finne KI-muligheter som gir konkurransefortrinn.</div>
+<div class="field"><label>Hvem ser dere på som hovedkonkurrenter?</label><textarea data-key="konkurrenter" placeholder="F.eks. andre lokale bedrifter i bransjen din, store kjeder, nasjonale aktører..."></textarea></div>
 <div class="field"><label>Hvor får dere mest jobb/leads fra?</label>
 <div class="check-group" data-key="kundekanaer">
 <label><input type="checkbox" value="Muntlig anbefaling"><span>Muntlig anbefaling</span></label>
@@ -350,31 +384,33 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 </div>
 <input type="hidden" data-key="kundekanal_annet" id="kundekanal_annet_hidden">
 </div>
-<div class="field"><label>Hva skiller dere fra konkurrentene?</label><textarea data-key="usp" placeholder="Hva gjør dere bedre/annerledes?"></textarea></div>
+<div class="field"><label>Hva skiller dere fra konkurrentene?</label><textarea data-key="usp" placeholder="F.eks. raskere levering, spesialkompetanse, lokal tilstedeværelse, fastprisgaranti..."></textarea></div>
 <div class="field"><label>Hva er målet for de neste...</label>
 <div style="margin-bottom:12px">
 <label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">📌 3 måneder — Kortsiktig, hva haster?</label>
-<textarea data-key="maal_3mnd" placeholder="Hva må løses NÅ? Akutte utfordringer, raske gevinster..."></textarea>
+<textarea data-key="maal_3mnd" placeholder="F.eks. fylle opp ordreboken, ansette en medarbeider, starte markedsføring på nett..."></textarea>
 </div>
 <div style="margin-bottom:12px">
 <label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">📅 6 måneder — Halvårsplan</label>
-<textarea data-key="maal_6mnd" placeholder="Halvårsplaner, prosjekter som bør være i gang..."></textarea>
+<textarea data-key="maal_6mnd" placeholder="F.eks. ny nettside, automatisere fakturering, komme i gang med sosiale medier..."></textarea>
 </div>
 <div style="margin-bottom:12px">
 <label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">🎯 12 måneder — Årsmål</label>
-<textarea data-key="maal_12mnd" placeholder="Vekst, nye ansatte, nye tjenester, omsetning..."></textarea>
+<textarea data-key="maal_12mnd" placeholder="F.eks. vokse til 10 ansatte, nå 10M i omsetning, ekspandere til nabokommunen..."></textarea>
 </div>
 <div>
 <label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">🚀 24 måneder — Langsiktig visjon</label>
-<textarea data-key="maal_24mnd" placeholder="Hvor vil dere være om 2 år? Drømmescenario..."></textarea>
+<textarea data-key="maal_24mnd" placeholder="Hvor vil dere være om 2 år? Drømmescenario for bedriften..."></textarea>
 </div>
 </div>
 </div>
 
 <!-- Section 6 -->
 <div class="section" data-section="5" data-title="KI-Interesse">
-<div class="coaching-hint" data-coach="5">💡 Soft close: «Basert på alt vi har snakket om — hva tror du er det viktigste første steget?»</div>
-<div class="field"><label>Hva håper dere å få ut av denne kartleggingen?</label><textarea data-key="forventning" placeholder="Hva ville vært det beste utfallet for dere?"></textarea></div>
+<div class="section-intro"><strong>Hjelper oss å gi riktig anbefaling.</strong> Vi trenger å forstå hva dere ønsker å oppnå og hva dere er klare for — det sikrer at anbefalingen vår treffer behovet.</div>
+<div class="field"><label>Hva håper dere å få ut av denne kartleggingen?</label>
+<p class="hint">Beskriv gjerne det beste utfallet for dere</p>
+<textarea data-key="forventning" placeholder="F.eks. 'Forstå hvilke KI-verktøy vi kan bruke i dag', 'Se om KI kan spare oss tid på tilbudsarbeid', 'Finne ut hva konkurrentene gjør med KI'..."></textarea></div>
 <div class="field"><label>Hvilke områder er dere MEST interessert i å forbedre?</label>
 <p class="hint">Bruk pilene for å sortere — viktigst øverst</p>
 <ul class="rank-list" id="rankList">
@@ -386,43 +422,34 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 </ul>
 </div>
 <div class="field"><label>Budsjett for digitalisering/KI neste 1 år?</label>
+<p class="hint">Dette hjelper oss å anbefale løsninger i riktig prisklasse</p>
 <div class="radio-group" data-key="budsjett">
 <label><input type="radio" name="budsjett" value="1–10k"><span>1–10k</span></label>
 <label><input type="radio" name="budsjett" value="10–50k"><span>10–50k</span></label>
 <label><input type="radio" name="budsjett" value="50–100k"><span>50–100k</span></label>
 <label><input type="radio" name="budsjett" value="100–150k+"><span>100–150k+</span></label>
 </div></div>
-<div class="field"><label>Budsjett for digitalisering/KI per måned (APIer, credits, tokens)</label>
+<div class="field"><label>Budsjett for løpende KI-kostnader per måned (APIer, abonnementer)</label>
 <div class="radio-group" data-key="budsjett_mnd">
 <label><input type="radio" name="budsjett_mnd" value="0 kr"><span>0 kr</span></label>
-<label><input type="radio" name="budsjett_mnd" value="Under 500 kr/mnd"><span>Under 500 kr/mnd</span></label>
-<label><input type="radio" name="budsjett_mnd" value="500-2000 kr/mnd"><span>500–2000 kr/mnd</span></label>
-<label><input type="radio" name="budsjett_mnd" value="2000-5000 kr/mnd"><span>2000–5000 kr/mnd</span></label>
-<label><input type="radio" name="budsjett_mnd" value="5000+ kr/mnd"><span>5000+ kr/mnd</span></label>
+<label><input type="radio" name="budsjett_mnd" value="Under 500 kr/mnd"><span>Under 500 kr</span></label>
+<label><input type="radio" name="budsjett_mnd" value="500-2000 kr/mnd"><span>500–2000 kr</span></label>
+<label><input type="radio" name="budsjett_mnd" value="2000-5000 kr/mnd"><span>2000–5000 kr</span></label>
+<label><input type="radio" name="budsjett_mnd" value="5000+ kr/mnd"><span>5000+ kr</span></label>
 </div></div>
-<div class="field"><label>Er det noe dere IKKE vil at KI skal gjøre?</label><textarea data-key="ki_grenser" placeholder="Noe som er viktig å bevare manuelt?"></textarea></div>
+<div class="field"><label>Er det noe dere IKKE vil at KI skal gjøre?</label>
+<p class="hint">Viktig for å sette riktige grenser — f.eks. direkte kundekontakt, beslutninger om pris, etc.</p>
+<textarea data-key="ki_grenser" placeholder="F.eks. 'KI skal aldri snakke direkte med kunder uten at vi ser det', 'Vi vil ikke ha KI i tilbudsberegningen'..."></textarea></div>
 </div>
 
 <!-- Section 7 -->
 <div class="section" data-section="6" data-title="Oppsummering">
-<div class="coaching-hint" data-coach="6">💡 Vis tallene. La dem synke inn. Still: «Hva tenker du om det?»</div>
 <h2 style="font-size:1.2rem;margin-bottom:16px;text-align:center">📊 Komplett Kartleggingsoppsummering</h2>
 
 <div id="summaryContent"></div>
 
-<h3 style="font-size:1rem;margin:20px 0 12px;color:var(--green);text-align:center">💰 Live ROI-kalkulator</h3>
-<div id="roiCalc" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:20px">
-<div id="roiContent" style="font-size:.88rem;color:var(--muted);line-height:1.8"></div>
-</div>
-
-<div id="breakEvenBox" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(240,165,0,.1));border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:20px">
-<div id="breakEvenDays" style="font-size:2.2rem;font-weight:800;color:var(--green)"></div>
-<div style="color:var(--muted);font-size:.82rem;margin-top:4px">Tid til break-even</div>
-</div>
-
 <div class="actions" style="margin-top:24px">
-<button onclick="generateRapport()">📊 Generer Rapport</button>
-<button onclick="exportPDF()">📄 PDF</button>
+<button onclick="generateRapport()">📊 Generer Rapport (PDF)</button>
 <button onclick="exportJSON()">💾 JSON</button>
 </div>
 <div class="footer">Kartlagt av Praktisk Intelligens</div>
@@ -430,87 +457,70 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 
 <!-- Section 8 -->
 <div class="section" data-section="7" data-title="Anbefaling og Pakker">
-<div class="coaching-hint" data-coach="7">💡 La tallene snakke. Vis ROI-kalkulatoren, pek på break-even. «Hva tenker du?» — ikke push.</div>
-
 <h2 style="font-size:1.2rem;margin-bottom:8px;text-align:center">📦 Anbefaling</h2>
 <div id="autoRecommendation" style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:16px;margin-bottom:20px;font-size:.88rem;color:var(--text);line-height:1.5"></div>
 
 <h3 style="font-size:1rem;margin-bottom:14px;color:var(--accent);text-align:center">Velg pakke</h3>
 <div id="packageCards" style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
 
-<div class="pkg-card" data-pkg="1" onclick="selectPackage(1)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<strong style="font-size:1.05rem;color:var(--text)">Ultra Basic</strong>
-<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">20 000 kr</span>
+<div class="pkg-card" data-pkg="1" onclick="selectPackage(1)" style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+<strong style="font-size:1.1rem;color:var(--text)">🚀 Ultra Basic</strong>
+<span style="font-size:1.2rem;font-weight:800;color:var(--accent)">20 000 kr</span>
 </div>
-<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
-✅ Remote oppsett på kundens PC<br>
-✅ 1 Master-agent (OpenClaw)<br>
-✅ Tilpasset AGENTS.md, SOUL.md og MEMORY.md<br>
-✅ 2–3 CRONjobs<br>
-✅ 30 min opplæring (remote)<br>
-✅ 2 ukers e-post support
+<div style="font-size:.78rem;color:var(--accent);margin-bottom:12px">1–5 ansatte · Remote oppsett · Kom i gang raskt</div>
+<div style="font-size:.85rem;color:var(--muted);line-height:1.8">
+<span style="color:var(--green)">●</span> 1 KI-agent på din PC — klar på én dag<br>
+<span style="color:var(--green)">●</span> Tilpasset bedriftens rutiner og tone<br>
+<span style="color:var(--green)">●</span> 30 min opplæring + 2 ukers support
 </div>
-<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Liten bedrift som vil teste KI uten stor investering</div>
 </div>
 
-<div class="pkg-card" data-pkg="2" onclick="selectPackage(2)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<strong style="font-size:1.05rem;color:var(--text)">Basis</strong>
-<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">79 000 kr</span>
+<div class="pkg-card" data-pkg="2" onclick="selectPackage(2)" style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+<strong style="font-size:1.1rem;color:var(--text)">⚡ Basis</strong>
+<span style="font-size:1.2rem;font-weight:800;color:var(--accent)">79 000 kr</span>
 </div>
-<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
-✅ Mac Mini M4 Pro 64GB inkludert<br>
-✅ OpenClaw-installasjon og konfigurasjon<br>
-✅ 3 Hermes-agenter (tilpasset bedriften)<br>
-✅ Agent-Constitution per agent<br>
-✅ 4 ukers support og opplæring<br>
-✅ 2 × 1-times opplæringsøkter (remote)<br>
-✅ 3 måneders e-post support etter levering
+<div style="font-size:.78rem;color:var(--accent);margin-bottom:12px">2–10 ansatte · Dedikert maskin · 3 agenter</div>
+<div style="font-size:.85rem;color:var(--muted);line-height:1.8">
+<span style="color:var(--green)">●</span> Mac Mini M4 Pro 64GB — din egen KI-server<br>
+<span style="color:var(--green)">●</span> 3 agenter tilpasset bedriften (f.eks. e-post, faktura, kundeservice)<br>
+<span style="color:var(--green)">●</span> 4 ukers opplæring + 3 mnd support
 </div>
-<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Bedrift klar for dedikert KI-løsning</div>
 </div>
 
-<div class="pkg-card" data-pkg="3" onclick="selectPackage(3)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<strong style="font-size:1.05rem;color:var(--text)">Komplett</strong>
-<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">119 000 kr</span>
+<div class="pkg-card" data-pkg="3" onclick="selectPackage(3)" style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+<strong style="font-size:1.1rem;color:var(--text)">🏢 Komplett</strong>
+<span style="font-size:1.2rem;font-weight:800;color:var(--accent)">119 000 kr</span>
 </div>
-<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
-✅ Alt i Basis<br>
-✅ 5–7 Hermes-agenter (skreddersydd)<br>
-✅ Individuelle Agent-Constitutions<br>
-✅ Integrasjoner: CRM, regnskap, e-post, kalender<br>
-✅ 8 ukers support og opplæring<br>
-✅ Månedlig oppfølgingsmøte (første kvartal)<br>
-✅ Enkel workflow-automatisering
+<div style="font-size:.78rem;color:var(--accent);margin-bottom:12px">5–20 ansatte · Full integrasjon · 5–7 agenter</div>
+<div style="font-size:.85rem;color:var(--muted);line-height:1.8">
+<span style="color:var(--green)">●</span> Alt i Basis + kobling til regnskap, CRM og kalender<br>
+<span style="color:var(--green)">●</span> 5–7 skreddersydde agenter med egne roller<br>
+<span style="color:var(--green)">●</span> 8 ukers oppfølging + månedlige møter
 </div>
-<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Bedrift som vil automatisere store deler av hverdagen</div>
 </div>
 
-<div class="pkg-card" data-pkg="4" onclick="selectPackage(4)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<strong style="font-size:1.05rem;color:var(--text)">Premium</strong>
-<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">149 000 kr</span>
+<div class="pkg-card" data-pkg="4" onclick="selectPackage(4)" style="background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+<strong style="font-size:1.1rem;color:var(--text)">👑 Premium</strong>
+<span style="font-size:1.2rem;font-weight:800;color:var(--accent)">149 000 kr</span>
 </div>
-<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
-✅ Alt i Komplett<br>
-✅ Tale-til-tale (agent svarer innkommende anrop)<br>
-✅ iPhone med forhåndskonfigurert oppsett<br>
-✅ Individuelle Agent-Constitutions + kvartalsvise revisjoner<br>
-✅ 6 måneders prioritert support<br>
-✅ Kvartalsvise strategimøter<br>
-✅ Proaktiv optimalisering og upsell-vurdering
+<div style="font-size:.78rem;color:var(--accent);margin-bottom:12px">Vekstbedrift · Agenten svarer telefon · 24/7</div>
+<div style="font-size:.85rem;color:var(--muted);line-height:1.8">
+<span style="color:var(--green)">●</span> Alt i Komplett + tale-til-tale (svarer innkommende anrop)<br>
+<span style="color:var(--green)">●</span> iPhone inkludert, ferdig konfigurert<br>
+<span style="color:var(--green)">●</span> 6 mnd prioritert support + kvartalsvise strategimøter
 </div>
-<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Vekstbedrift som vil ha KI som første kontaktpunkt</div>
 </div>
 
 </div>
 
-<!-- Tilbakemeldinger på kartleggingen -->
+<!-- Tilbakemeldinger -->
 <div style="background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:20px;box-shadow:var(--shadow)">
 <h3 style="font-size:.95rem;color:var(--accent);margin-bottom:14px;text-align:center">💬 Tilbakemelding på kartleggingen</h3>
-<div class="field"><label style="font-size:.85rem">Hva kunne vært bedre med denne kartleggingen?</label><textarea data-key="fb_bedre" placeholder="Dine tanker..."></textarea></div>
+<div class="field"><label style="font-size:.85rem">Hva kunne vært bedre med denne kartleggingen?</label><textarea data-key="fb_bedre" placeholder="Dine tanker hjelper oss å gjøre kartleggingen bedre..."></textarea></div>
 <div class="field"><label style="font-size:.85rem">Var det noe som manglet?</label><textarea data-key="fb_manglet" placeholder="Noe du savnet å bli spurt om?"></textarea></div>
 <div class="field"><label style="font-size:.85rem">Hva ville gjort kartleggingen mer komplett?</label><textarea data-key="fb_komplett" placeholder="F.eks. flere bransjer, andre spørsmål..."></textarea></div>
 <div class="field"><label style="font-size:.85rem">Andre tanker eller tilbakemeldinger?</label><textarea data-key="fb_annet" placeholder="Fritt felt..."></textarea></div>
@@ -522,6 +532,16 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 </div>
 </div>
 
+<h3 style="font-size:1rem;margin:20px 0 12px;color:var(--green);text-align:center">💰 Live ROI-kalkulator</h3>
+<div id="roiCalc" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:20px">
+<div id="roiContent" style="font-size:.88rem;color:var(--muted);line-height:1.8"></div>
+</div>
+
+<div id="breakEvenBox" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(240,165,0,.1));border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:20px">
+<div id="breakEvenDays" style="font-size:2.2rem;font-weight:800;color:var(--green)"></div>
+<div style="color:var(--muted);font-size:.82rem;margin-top:4px">Tid til break-even</div>
+</div>
+
 <div class="footer">Kartlagt av Praktisk Intelligens</div>
 </div>
 </div>
@@ -531,8 +551,19 @@ input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
 <div class="dots" id="dots"></div>
 <button class="btn-next" id="btnNext" onclick="go(1)">Neste →</button>
 </div>
+</div><!-- end mainApp -->
+
+<!-- RAPPORT HIDDEN DIV (for PDF generation) -->
+<div id="rapport-content"></div>
 
 <script>
+// ====== INTRO ======
+function startKartlegging(){
+document.getElementById('introScreen').style.display='none';
+document.getElementById('mainApp').style.display='block';
+render();
+}
+
 // ====== SOP DATA ======
 const sopData={
 'Bygg & Anlegg':['Tilbudsberegning','Kundeoppfølging','Materialbestilling','Prosjektstyring','HMS/SHA','Timelister','Fakturering','Dokumentasjon','Markedsføring','Rekruttering'],
@@ -559,21 +590,19 @@ tab.onclick=()=>{
 if(activeSopTabs.has(bransje)){activeSopTabs.delete(bransje)}else{activeSopTabs.add(bransje)}
 tab.classList.toggle('active');
 renderSopProcesses();
-// Show/hide "Annet" custom input
 const annetInput=document.getElementById('sopAnnetInput');
 if(annetInput){annetInput.style.display=activeSopTabs.has('Annet')?'block':'none'}
 };
 container.appendChild(tab);
 });
-// Add "Annet" custom bransje input after tabs
 let annetWrap=document.getElementById('sopAnnetWrap');
 if(!annetWrap){
 annetWrap=document.createElement('div');
 annetWrap.id='sopAnnetWrap';
 annetWrap.style.marginTop='8px';
 const inp=document.createElement('input');
-inp.type='text';inp.id='sopAnnetInput';inp.data_key='sop_annet_bransje';
-inp.placeholder='Skriv inn bransje...';inp.dataset.key='sop_annet_bransje';
+inp.type='text';inp.id='sopAnnetInput';
+inp.placeholder='Skriv inn din bransje...';inp.dataset.key='sop_annet_bransje';
 inp.style.display=activeSopTabs.has('Annet')?'block':'none';
 annetWrap.appendChild(inp);
 container.parentNode.insertBefore(annetWrap,container.nextSibling);
@@ -594,13 +623,8 @@ const key=bransje+'::'+p;
 const lbl=document.createElement('label');
 lbl.innerHTML=`<input type="checkbox" ${checkedSopProcesses.has(key)?'checked':''} data-sop-key="${key}"><span>${p}</span>`;
 lbl.querySelector('input').onchange=function(){
-if(this.checked){
-checkedSopProcesses.add(key);
-addSopProcessCard(p,bransje);
-}else{
-checkedSopProcesses.delete(key);
-removeSopProcessCard(key);
-}
+if(this.checked){checkedSopProcesses.add(key);addSopProcessCard(p,bransje)}
+else{checkedSopProcesses.delete(key);removeSopProcessCard(key)}
 save();
 };
 div.appendChild(lbl);
@@ -610,7 +634,6 @@ container.appendChild(div);
 }
 
 function addSopProcessCard(processName,bransje){
-// Check if card already exists
 const existing=document.querySelector(`.process-card[data-sop-key="${bransje}::${processName}"]`);
 if(existing)return;
 makeProcessCard({prosess:processName,prosess_custom:'',sopKey:bransje+'::'+processName});
@@ -621,38 +644,12 @@ if(card)card.remove();
 save();
 }
 
-// ====== DYNAMIC STORAGE KEY ======
+// ====== STORAGE ======
 function getStoreKey(){
 const name=(document.getElementById('bedriftsnavn')?.value||'').trim().toLowerCase().replace(/[^a-zæøå0-9]/g,'_');
 return name?'ki_kartlegging_'+name:'ki_kartlegging_default';
 }
 let currentStoreKey=null;
-
-// ====== TIMER ======
-let timerStart=null,timerInterval=null;
-function toggleTimer(){
-if(timerInterval){clearInterval(timerInterval);timerInterval=null;document.getElementById('timerBtn').textContent='▶ Start';return}
-timerStart=Date.now();
-document.getElementById('timerBtn').textContent='⏸ Pause';
-timerInterval=setInterval(updateTimer,1000);
-}
-function updateTimer(){
-if(!timerStart)return;
-const s=Math.floor((Date.now()-timerStart)/1000);
-const m=Math.floor(s/60),sec=s%60;
-document.getElementById('timerElapsed').textContent=String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
-const paceEl=document.getElementById('timerPace');
-if(m<10)paceEl.textContent='Oppvarming — ta det rolig';
-else if(m<20)paceEl.textContent='På skjema ✅';
-else if(m<40)paceEl.textContent='Hoveddel — gå i dybden';
-else if(m<60)paceEl.textContent='Mot oppsummering';
-else if(m<75)paceEl.textContent='Avrunding — neste steg';
-else paceEl.textContent='⏰ Over tid — avslutt snart';
-}
-
-// ====== COACHING ======
-let coachingVisible=false;
-function toggleCoaching(){coachingVisible=!coachingVisible;document.querySelectorAll('.coaching-hint').forEach(h=>h.classList.toggle('visible',coachingVisible))}
 
 // ====== SLIDER + INPUT SYNC ======
 const ks=document.getElementById('kontorSlider');
@@ -677,73 +674,6 @@ list.querySelectorAll('.rank-item').forEach((item,i)=>item.querySelector('.rank-
 save();
 }
 
-// ====== HOLY SHIT TEMPLATES ======
-const demoTemplates={
-'Kundeoppfølging':{
-before:(d)=>`${d.hvem||'Daglig leder'} bruker ${d.timer}t/uke på å følge opp kunder via ${d.verktoy||'telefon/e-post'}. Leads faller mellom stolene, og det koster 50-200k per tapt kunde.`,
-after:(d)=>`Med CRM + KI auto-oppfølging: ${d.hvem||'Daglig leder'} bruker ${Math.round(d.timer*0.3)}t/uke. Systemet sender påminnelser, følger opp automatisk, og ingen leads glipper.`,
-saving:(d)=>`${Math.round(d.timer*0.7)} timer/uke spart = ${Math.round(d.timer*0.7*800)} kr/uke frigjort`,
-tool:'HubSpot Free CRM + ChatGPT for e-postmaler',
-prompt:(d)=>`Du er en kundeoppfølgingsassistent for ${getBedrift()}. Skriv en vennlig oppfølgingsmelding til en kunde som ba om tilbud for 2 uker siden men ikke har svart. Vær profesjonell men uformell.`
-},
-'Tilbudsberegning':{
-before:(d)=>`Tilbud beregnes manuelt — risiko for feil, tar ${d.timer}t/uke, og inkonsistente priser mellom prosjekter.`,
-after:(d)=>`KI-assistert kalkyle med maler: standardpriser auto-fylt, KI foreslår justeringer basert på prosjekttype. ${Math.round(d.timer*0.4)}t/uke istedenfor ${d.timer}t.`,
-saving:(d)=>`${Math.round(d.timer*0.6)} timer/uke spart + færre feilkalkyler`,
-tool:'Excel/Smartkalk + ChatGPT for beskrivelser',
-prompt:(d)=>`Du er en kalkulasjonsassistent for ${getBedrift()}. Lag et detaljert tilbud. Inkluder materialer, arbeidstimer, og påslag. Formater som en profesjonell tilbudstekst.`
-},
-'Fakturering':{
-before:(d)=>`Fakturaer lages manuelt, ${d.timer}t/uke. Risiko for feil, manglende oppfølging av ubetalte fakturaer.`,
-after:(d)=>`Automatisert via regnskapssystem + KI-genererte beskrivelser. Purringer sendes automatisk.`,
-saving:(d)=>`${Math.round(d.timer*0.7)} timer/uke + bedre likviditet`,
-tool:'Tripletex/Fiken + automatiske purringer',
-prompt:(d)=>`Skriv en profesjonell men vennlig purring for en faktura som er 14 dager over forfall. Tonen skal være hyggelig men tydelig.`
-},
-'Markedsføring':{
-before:(d)=>`Poster sporadisk på SoMe. Ingen plan, ingen konsistens. ${d.timer}t/uke når det skjer.`,
-after:(d)=>`KI genererer ukeplan med poster basert på pågående prosjekter. Tekst ferdig på 5 min.`,
-saving:(d)=>`Konsistent posting uten ekstra tid + bedre synlighet`,
-tool:'ChatGPT for tekst + Canva for bilder',
-prompt:(d)=>`Lag 5 Instagram/Facebook-poster for ${getBedrift()}. Inkluder hashtags og engasjerende tekst.`
-}
-};
-const defaultTemplate={
-before:(d)=>`${d.hvem||'Ansatt'} bruker ${d.timer}t/uke på ${(d.prosess_custom||d.prosess||'denne prosessen').toLowerCase()} med ${d.verktoy||'manuelle metoder'}. Tidkrevende og utsatt for feil.`,
-after:(d)=>`Med KI-assistanse: ${Math.round(d.timer*0.5)}t/uke istedenfor ${d.timer}t. Automatisert der mulig, smartere arbeidsflyt.`,
-saving:(d)=>`${Math.round(d.timer*0.5)} timer/uke spart = ${Math.round(d.timer*0.5*800)} kr/uke frigjort`,
-tool:'ChatGPT + tilpasset arbeidsflyt',
-prompt:(d)=>`Du er en effektiviseringsassistent for ${getBedrift()}. Beskriv hvordan KI kan effektivisere prosessen "${d.prosess_custom||d.prosess||'admin'}" som i dag tar ${d.timer} timer per uke. Gi 3 konkrete tiltak med forventet tidsbesparelse.`
-};
-function getBedrift(){return document.getElementById('bedriftsnavn')?.value||'bedriften'}
-
-function toggleHSPanel(btn){
-const card=btn.closest('.process-card');
-let panel=card.querySelector('.hs-panel');
-if(panel){panel.classList.toggle('open');return}
-const d=getCardData(card);
-const tmpl=demoTemplates[d.prosess]||defaultTemplate;
-panel=document.createElement('div');
-panel.className='hs-panel';
-const promptText=tmpl.prompt(d);
-panel.innerHTML=`
-<button class="hs-close" onclick="this.closest('.hs-panel').classList.remove('open')">✕</button>
-<div class="hs-section now"><h4>📍 Nå</h4><p>${tmpl.before(d)}</p></div>
-<div class="hs-section after"><h4>🚀 Med KI</h4><p>${tmpl.after(d)}</p></div>
-<div class="hs-section saving"><h4>💰 Besparelse</h4><p>${tmpl.saving(d)}</p></div>
-<div class="hs-section tool"><h4>🛠️ Anbefalt verktøy</h4><p>${tmpl.tool}</p></div>
-<button class="hs-copy" onclick="navigator.clipboard.writeText(this.dataset.prompt);this.textContent='✅ Kopiert!';setTimeout(()=>this.textContent='📋 Kopier KI-prompt',1500)" data-prompt="${promptText.replace(/"/g,'&quot;')}">📋 Kopier KI-prompt</button>`;
-card.appendChild(panel);
-requestAnimationFrame(()=>panel.classList.add('open'));
-}
-function getCardData(card){
-const d={};
-card.querySelectorAll('[data-pkey]').forEach(el=>{d[el.dataset.pkey]=el.value});
-card.querySelectorAll('input[type=radio]:checked').forEach(el=>{d.frekvens=el.value});
-d.timer=Number(d.timer||0);d.frustrasjon=Number(d.frustrasjon||0);
-return d;
-}
-
 // ====== KI-POTENSIAL BADGE ======
 function updateKIBadge(card){
 const d=getCardData(card);
@@ -753,6 +683,14 @@ if(d.frustrasjon>=4||d.timer>=10){existing.className='ki-badge hoy';existing.tex
 else if(d.frustrasjon>=2||d.timer>=5){existing.className='ki-badge medium';existing.textContent='KI: MEDIUM'}
 else if(d.frustrasjon>0||d.timer>0){existing.className='ki-badge lav';existing.textContent='KI: LAV'}
 else{existing.textContent=''}
+}
+
+function getCardData(card){
+const d={};
+card.querySelectorAll('[data-pkey]').forEach(el=>{d[el.dataset.pkey]=el.value});
+card.querySelectorAll('input[type=radio]:checked').forEach(el=>{d.frekvens=el.value});
+d.timer=Number(d.timer||0);d.frustrasjon=Number(d.frustrasjon||0);
+return d;
 }
 
 const sections=document.querySelectorAll('.section');
@@ -769,10 +707,10 @@ function render(){
 sections.forEach((s,i)=>s.classList.toggle('active',i===current));
 document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current));
 document.getElementById('progress').style.width=((current+1)/totalSections*100)+'%';
-document.getElementById('sectionLabel').textContent=sections[current].dataset.title;
-document.getElementById('sectionNum').textContent=(current+1)+' / '+totalSections;
+document.getElementById('sectionLabel').textContent=sections[current].dataset.title||'';
+document.getElementById('sectionNum').textContent='Seksjon '+(current+1)+' av '+totalSections;
 document.getElementById('btnBack').style.visibility=current===0?'hidden':'visible';
-document.getElementById('btnNext').textContent=current===totalSections-1?'✓ Ferdig':'Neste →';
+document.getElementById('btnNext').textContent=current===totalSections-1?'✓ Send inn':'Neste →';
 if(current===6)buildSummary();
 if(current===7)buildPackageSection();
 const first=sections[current].querySelector('input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=number]),textarea,select');
@@ -780,6 +718,11 @@ if(first)setTimeout(()=>first.focus(),350);
 }
 
 function go(dir){
+if(dir===1&&current===totalSections-1){
+// Last section — submit
+submitAndFinish();
+return;
+}
 const next=current+dir;
 if(next>=0&&next<totalSections){current=next;render();window.scrollTo({top:0,behavior:'smooth'})}
 }
@@ -798,32 +741,27 @@ card.dataset.idx=idx;
 if(data?.sopKey)card.dataset.sopKey=data.sopKey;
 const opts=processOptions.map(o=>`<option ${data&&data.prosess===o?'selected':''}>${o}</option>`).join('')+`<option value="Annet (egendefinert)">Annet (egendefinert)</option>`;
 card.innerHTML=`
-<div class="card-header"><span class="card-num">Prosess ${idx}</span><span class="ki-badge"></span><div class="card-actions"><button class="demo-btn" onclick="toggleHSPanel(this)" title="Holy Shit Demo">⚡</button><button class="remove-card" onclick="removeProcessCard(this)">✕</button></div></div>
+<div class="card-header"><span class="card-num">Prosess ${idx}</span><span class="ki-badge"></span><div class="card-actions"><button class="remove-card" onclick="removeProcessCard(this)">✕</button></div></div>
 <div class="field"><select data-pkey="prosess"><option value="">Velg prosess...</option>${opts}</select></div>
-<div class="field"><input type="text" data-pkey="hvem" placeholder="Hvem gjør dette?" value="${data?.hvem||''}"></div>
+<div class="field"><input type="text" data-pkey="hvem" placeholder="Hvem i bedriften gjør dette? (f.eks. daglig leder, sekretær)" value="${data?.hvem||''}"></div>
 <div class="field"><input type="text" data-pkey="prosess_custom" placeholder="Egendefinert prosessnavn (valgfritt)" value="${data?.prosess_custom||''}" style="margin-top:4px"></div>
 <div class="field"><label style="font-size:.8rem">Frekvens</label>
 <div class="radio-group">${['Daglig','Ukentlig','Månedlig','Ved behov'].map(f=>`<label><input type="radio" name="freq${idx}" value="${f}" ${data?.frekvens===f?'checked':''}><span>${f}</span></label>`).join('')}</div>
-<input type="text" data-pkey="frekvens_detalj" placeholder="Antall ganger? (f.eks. 3x daglig)" value="${data?.frekvens_detalj||''}" style="margin-top:8px">
+<input type="text" data-pkey="frekvens_detalj" placeholder="Antall ganger? (f.eks. 3x daglig, 10 faktura/mnd)" value="${data?.frekvens_detalj||''}" style="margin-top:8px">
 </div>
-<div class="field"><label style="font-size:.8rem">Timer/uke: <strong class="hrs-val">${data?.timer||0}</strong></label>
+<div class="field"><label style="font-size:.8rem">Timer per uke: <strong class="hrs-val">${data?.timer||0}</strong></label>
 <div class="slider-wrap"><input type="range" min="0" max="40" value="${data?.timer||0}" data-pkey="timer" oninput="this.closest('.field').querySelector('.hrs-val').textContent=this.value;updateKIBadge(this.closest('.process-card'));save()"></div></div>
-<div class="field"><input type="text" data-pkey="verktoy" placeholder="Verktøy i dag?" value="${data?.verktoy||''}"></div>
-<div class="field"><label style="font-size:.8rem">Frustrasjon</label>
+<div class="field"><input type="text" data-pkey="verktoy" placeholder="Verktøy eller system dere bruker til dette i dag?" value="${data?.verktoy||''}"></div>
+<div class="field"><label style="font-size:.8rem">Hvor frustrerende er dette? (1=fint, 5=ekstremt)</label>
 <div class="emoji-row">${emojis.map((e,i)=>`<button type="button" onclick="selEmoji(this,${i+1})" ${data?.frustrasjon==i+1?'class=selected':''}>${e}</button>`).join('')}</div>
 <input type="hidden" data-pkey="frustrasjon" value="${data?.frustrasjon||0}"></div>
-<div class="field"><textarea data-pkey="notater" placeholder="Beskriv steg for steg hvordan dere gjør dette i dag..." style="min-height:120px">${data?.notater||''}</textarea></div>`;
+<div class="field"><textarea data-pkey="notater" placeholder="Beskriv steg for steg hvordan dere gjør dette i dag — jo mer detalj, jo bedre KI-anbefaling..." style="min-height:120px">${data?.notater||''}</textarea></div>`;
 document.getElementById('processCards').appendChild(card);
-// Set the select value if data.prosess is provided but not in options, put it in custom
 if(data?.prosess){
 const sel=card.querySelector('select[data-pkey=prosess]');
 const optExists=[...sel.options].some(o=>o.value===data.prosess);
-if(!optExists){
-// Add as custom option
-const opt=document.createElement('option');
-opt.value=data.prosess;opt.textContent=data.prosess;opt.selected=true;
-sel.appendChild(opt);
-}else{sel.value=data.prosess}
+if(!optExists){const opt=document.createElement('option');opt.value=data.prosess;opt.textContent=data.prosess;opt.selected=true;sel.appendChild(opt)}
+else{sel.value=data.prosess}
 }
 if(data)updateKIBadge(card);
 save();
@@ -831,11 +769,7 @@ save();
 function removeProcessCard(btn){
 const card=btn.closest('.process-card');
 const sopKey=card.dataset.sopKey;
-if(sopKey){
-checkedSopProcesses.delete(sopKey);
-const cb=document.querySelector(`input[data-sop-key="${sopKey}"]`);
-if(cb)cb.checked=false;
-}
+if(sopKey){checkedSopProcesses.delete(sopKey);const cb=document.querySelector(`input[data-sop-key="${sopKey}"]`);if(cb)cb.checked=false}
 card.remove();
 save();
 }
@@ -848,7 +782,7 @@ save();
 }
 document.getElementById('addProcess').onclick=()=>makeProcessCard();
 
-// Summary
+// ====== PROCESS DATA ======
 function getProcessData(){
 const cards=document.querySelectorAll('.process-card');
 const data=[];
@@ -861,6 +795,7 @@ if(p.prosess||p.prosess_custom)data.push(p);
 return data;
 }
 
+// ====== SUMMARY ======
 function buildSummary(){
 const d=collectAll();
 const procs=d.prosesser||[];
@@ -868,37 +803,30 @@ const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
 const saving=Math.round(totalH*0.5);
 const kontorPct=Number(d.kontor_pct||30);
 const scored=procs.filter(p=>p.frustrasjon>0).map(p=>({...p,score:p.frustrasjon*p.timer,timer:Number(p.timer)})).sort((a,b)=>b.score-a.score);
-
 const el=document.getElementById('summaryContent');
 let html='';
 
-// Bedriftsprofil
 html+=`<div class="sum-block"><h4>🏢 Bedriftsprofil</h4>
 <table><tbody>
 <tr><td><strong>Bedrift</strong></td><td>${d.bedriftsnavn||'—'}</td></tr>
 <tr><td><strong>Kontakt</strong></td><td>${d.kontaktperson||'—'} (${d.rolle||'—'})</td></tr>
+<tr><td><strong>E-post</strong></td><td>${d.epost||'—'}</td></tr>
 <tr><td><strong>Ansatte</strong></td><td>${d.ansatte||'—'}</td></tr>
 <tr><td><strong>Omsetning</strong></td><td>${d.omsetning||'—'}</td></tr>
 <tr><td><strong>Bransje</strong></td><td>${d.bransje||'—'}</td></tr>
 <tr><td><strong>KI-erfaring</strong></td><td>${d.provd_ki||'—'}</td></tr>
 </tbody></table></div>`;
 
-// Verktøy
 const tools=[];
 const tg={'Regnskap':d.regnskap,'Prosjekt':d.prosjektstyring,'Kunde':d.kundeoppfolging,'Kalkyle':d.kalkulas,'Timer':d.timereg,'SoMe':d.some};
-for(const[k,v] of Object.entries(tg)){
-const vals=Array.isArray(v)?v:v?[v]:[];
-if(vals.length)tools.push(`<strong>${k}:</strong> ${vals.join(', ')}`);
-}
+for(const[k,v] of Object.entries(tg)){const vals=Array.isArray(v)?v:v?[v]:[];if(vals.length)tools.push(`<strong>${k}:</strong> ${vals.join(', ')}`)}
 html+=`<div class="sum-block"><h4>🛠️ Verktøy i bruk</h4><p>${tools.length?tools.join('<br>'):'Ingen registrert'}</p></div>`;
 
-// Prosesser
 if(procs.length){
 html+=`<div class="sum-block"><h4>⚙️ Prosesser (${procs.length} kartlagt)</h4>
 <table><thead><tr><th>Prosess</th><th>Timer/uke</th><th>Frustrasjon</th><th>KI-potensial</th></tr></thead><tbody>`;
 procs.forEach(p=>{
-const f=Number(p.frustrasjon||0);
-const t=Number(p.timer||0);
+const f=Number(p.frustrasjon||0);const t=Number(p.timer||0);
 const pot=f>=4||t>=10?'<span style="color:#ef4444">HØY</span>':f>=2||t>=5?'<span style="color:#f0a500">MEDIUM</span>':'<span style="color:#34d399">LAV</span>';
 html+=`<tr><td>${p.prosess_custom||p.prosess||'—'}</td><td>${t}t</td><td>${f>0?emojis[f-1]:'—'}</td><td>${pot}</td></tr>`;
 });
@@ -908,7 +836,6 @@ html+=`</tbody></table>
 </div>`;
 }
 
-// Admin vs produksjon
 html+=`<div class="sum-block"><h4>⏱️ Tid admin vs produksjon</h4>
 <div style="display:flex;gap:12px;margin-top:8px">
 <div style="flex:1;text-align:center;padding:12px;background:rgba(239,68,68,.1);border-radius:10px">
@@ -921,7 +848,6 @@ html+=`<div class="sum-block"><h4>⏱️ Tid admin vs produksjon</h4>
 </div>
 </div></div>`;
 
-// Mål
 html+=`<div class="sum-block"><h4>🎯 Mål</h4><ul>`;
 if(d.maal_3mnd)html+=`<li><strong>3 mnd:</strong> ${d.maal_3mnd}</li>`;
 if(d.maal_6mnd)html+=`<li><strong>6 mnd:</strong> ${d.maal_6mnd}</li>`;
@@ -930,35 +856,18 @@ if(d.maal_24mnd)html+=`<li><strong>24 mnd:</strong> ${d.maal_24mnd}</li>`;
 if(!d.maal_3mnd&&!d.maal_6mnd&&!d.maal_12mnd&&!d.maal_24mnd)html+='<li>Ikke oppgitt</li>';
 html+=`</ul></div>`;
 
-// Prioriteringer
 const ranking=d.ranking||[];
-if(ranking.length){
-html+=`<div class="sum-block"><h4>📊 Prioriteringer</h4><ol style="padding-left:20px">`;
-ranking.forEach(r=>html+=`<li>${r}</li>`);
-html+=`</ol></div>`;
-}
+if(ranking.length){html+=`<div class="sum-block"><h4>📊 Prioriteringer</h4><ol style="padding-left:20px">`;ranking.forEach(r=>html+=`<li>${r}</li>`);html+=`</ol></div>`}
 
-// Budsjett
 html+=`<div class="sum-block"><h4>💰 Budsjett</h4>
 <p><strong>Årlig:</strong> ${d.budsjett||'Ikke oppgitt'}</p>
-<p><strong>Månedlig (APIer/tokens):</strong> ${d.budsjett_mnd||'Ikke oppgitt'}</p></div>`;
+<p><strong>Månedlig (APIer/abonnementer):</strong> ${d.budsjett_mnd||'Ikke oppgitt'}</p></div>`;
 
-// Top 3 KI-muligheter
 html+=`<div class="sum-block" style="border-left:3px solid var(--green)"><h4>⚡ Topp 3 KI-muligheter</h4>`;
-if(scored.length){
-scored.slice(0,3).forEach((p,i)=>{
-const tmpl=demoTemplates[p.prosess]||defaultTemplate;
-html+=`<div style="margin-bottom:10px;padding:8px 0;${i<2?'border-bottom:1px solid rgba(255,255,255,.05)':''}">
-<strong>${i+1}. ${p.prosess_custom||p.prosess}</strong> <span style="color:var(--muted)">— ${p.timer}t/uke, besparelse ~${Math.round(p.timer*0.5)}t/uke</span><br>
-<span style="font-size:.82rem;color:var(--muted)">Anbefalt: ${tmpl.tool}</span>
-</div>`;
-});
-}else{
-html+='<p style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å se resultater</p>';
-}
+if(scored.length){scored.slice(0,3).forEach((p,i)=>{html+=`<div style="margin-bottom:10px;padding:8px 0;${i<2?'border-bottom:1px solid rgba(255,255,255,.05)':''}"><strong>${i+1}. ${p.prosess_custom||p.prosess}</strong> <span style="color:var(--muted)">— ${p.timer}t/uke, besparelse ~${Math.round(p.timer*0.5)}t/uke</span></div>`})}
+else{html+='<p style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å se resultater</p>'}
 html+=`</div>`;
 
-// Estimert besparelse
 if(totalH>0){
 const yearSaving=saving*800*52;
 html+=`<div class="summary-cards">
@@ -968,7 +877,6 @@ html+=`<div class="summary-cards">
 <div class="summary-card"><div class="big">${(yearSaving/1000).toFixed(0)}k</div><div class="label">Spart kr/år</div></div>
 </div>`;
 }
-
 el.innerHTML=html;
 }
 
@@ -990,9 +898,7 @@ return d;
 }
 function save(){
 const key=getStoreKey();
-if(currentStoreKey&&currentStoreKey!==key){
-try{localStorage.removeItem(currentStoreKey)}catch(e){}
-}
+if(currentStoreKey&&currentStoreKey!==key){try{localStorage.removeItem(currentStoreKey)}catch(e){}}
 currentStoreKey=key;
 try{localStorage.setItem(key,JSON.stringify(collectAll()))}catch(e){}
 }
@@ -1010,14 +916,11 @@ const val=d[g.dataset.key];if(!val)return;
 const vals=Array.isArray(val)?val:[val];
 g.querySelectorAll('input').forEach(i=>{i.checked=vals.includes(i.value)});
 });
-// Restore SOP state
 if(d.activeSopTabs){d.activeSopTabs.forEach(t=>activeSopTabs.add(t))}
 if(d.checkedSopProcesses){d.checkedSopProcesses.forEach(p=>checkedSopProcesses.add(p))}
 buildSopTabs();renderSopProcesses();
-// Restore process cards (non-SOP ones from save, SOP ones already created by renderSopProcesses)
 if(d.prosesser?.length){
 d.prosesser.forEach(p=>{
-// Skip if this process was already created by SOP
 if(p.sopKey&&document.querySelector(`.process-card[data-sop-key="${p.sopKey}"]`))return;
 makeProcessCard(p);
 });
@@ -1026,12 +929,10 @@ const rl=document.getElementById('rankList');
 if(d.ranking){const items=[...document.querySelectorAll('.rank-item')];const sorted=d.ranking.map(r=>items.find(i=>i.dataset.rank===r)).filter(Boolean);sorted.forEach((li,i)=>{rl.appendChild(li);li.querySelector('.rank-num').textContent=i+1})}
 if(d.current!=null){current=d.current}
 if(d.kontor_pct){syncSlider(d.kontor_pct)}
-// Restore kundekanal chips
 if(d.kundekanal_annet&&typeof d.kundekanal_annet==='string'&&d.kundekanal_annet.trim()){
 kanalChips=d.kundekanal_annet.split(',').map(s=>s.trim()).filter(Boolean);
 renderKanalChips();
 }
-// Restore nettside URL visibility
 setTimeout(toggleNettsideUrl,100);
 currentStoreKey=getStoreKey();
 }
@@ -1041,7 +942,6 @@ document.addEventListener('input',save);
 document.addEventListener('change',save);
 
 // ====== EXPORTS ======
-function exportPDF(){window.print()}
 function exportJSON(){
 const d=collectAll();d._exported=new Date().toISOString();d._kartlagt_av='Praktisk Intelligens';
 const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
@@ -1049,293 +949,285 @@ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
 a.download='ki-kartlegging-'+(d.bedriftsnavn||'ukjent').toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.json';
 a.click();
 }
-function exportMD(){
-const d=collectAll();
-const date=new Date().toISOString().slice(0,10);
-const procs=d.prosesser||[];
-const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
-const saving=Math.round(totalH*0.5);
-const frusts=['😀','🙂','😐','😣','🤬'];
-const scored=procs.filter(p=>p.frustrasjon>0).map(p=>({...p,score:p.frustrasjon*p.timer})).sort((a,b)=>b.score-a.score);
 
-let md=`---
-created: ${date}
-tags: [ki-kartlegging, ${(d.bedriftsnavn||'ukjent').toLowerCase().replace(/\s+/g,'-')}]
-kartlagt_av: Praktisk Intelligens
----
-
-# KI-Kartlegging — ${d.bedriftsnavn||'Ukjent bedrift'}
-> Kartlagt: ${date}
-
----
-
-## 1. Bedriftsprofil
-
-| | |
-|---|---|
-| **Bedrift** | ${d.bedriftsnavn||'—'} |
-| **Kontaktperson** | ${d.kontaktperson||'—'} |
-| **Rolle** | ${d.rolle||'—'} |
-| **Ansatte** | ${d.ansatte||'—'} |
-| **Omsetning** | ${d.omsetning||'—'} |
-| **Bransje** | ${d.bransje||'—'} |
-
----
-
-## 2. Digital Modenhet
-
-### Verktøy i bruk
-`;
-const toolGroups={'Regnskap':d.regnskap,'Prosjektstyring':d.prosjektstyring,'Kundeoppfølging':d.kundeoppfolging,'Kalkulasjon/Tilbud':d.kalkulas,'Timeregistrering':d.timereg,'Sosiale medier':d.some};
-for(const[name,vals] of Object.entries(toolGroups)){
-const v=Array.isArray(vals)?vals:vals?[vals]:[];
-md+=`- **${name}:** ${v.length?v.join(', '):'Ikke oppgitt'}\n`;
-}
-md+=`- **Ofte besøkte nettsider:** ${d.brukte_nettsider||'—'}\n`;
-md+=`- **Registrerte tjenester:** ${d.registrerte_tjenester||'—'}\n`;
-md+=`
-### KI-erfaring
-- **Prøvd KI:** ${d.provd_ki||'—'}
-${d.ki_erfaring?'- **Detaljer:** '+d.ki_erfaring:''}
-
----
-
-## 3. Prosessgjennomgang
-
-| Prosess | Hvem | Frekvens | Timer/uke | Verktøy | Frustrasjon | Notater |
-|---------|------|----------|-----------|---------|-------------|---------|
-`;
-procs.forEach(p=>{
-const pNavn=p.prosess_custom||p.prosess||'—';
-const frust=p.frustrasjon>0?frusts[p.frustrasjon-1]:'—';
-md+=`| ${pNavn} | ${p.hvem||'—'} | ${p.frekvens||'—'} | ${p.timer||0} | ${p.verktoy||'—'} | ${frust} | ${p.notater||'—'} |\n`;
+// ====== SUPABASE SUBMIT ======
+async function submitToSupabase(data){
+try{
+await fetch('/api/submit',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+quiz_type:'kartlegging',
+name:data.kontaktperson||'',
+email:data.epost||'',
+phone:data.telefon||'',
+company:data.bedriftsnavn||'',
+total_score:null,
+source:'kartlegging',
+device:/Mobi|Android/i.test(navigator.userAgent)?'mobile':'desktop',
+metadata:{...data}
+})
 });
-md+=`
-**Total admin-tid:** ${totalH} timer/uke
-**Estimert besparelse med KI:** ~${saving} timer/uke
-
----
-
-## 4. Smertepunkter
-
-### Største frustrasjon
-${d.storste_frustrasjon||'Ikke oppgitt'}
-
-### Hvis 10 ekstra timer/uke
-${Array.isArray(d.ekstra_timer)&&d.ekstra_timer.length?d.ekstra_timer.map(t=>'- '+t).join('\n'):'- Ikke oppgitt'}
-
-### Tidsfordeling
-- **Admin:** ${d.kontor_pct||30}%
-- **Produksjon:** ${100-(d.kontor_pct||30)}%
-
-### Tapt kunde-kostnad
-${d.tapt_kunde||'Ikke oppgitt'}
-
----
-
-## 5. Konkurranse og Marked
-
-### Hovedkonkurrenter
-${d.konkurrenter||'Ikke oppgitt'}
-
-### Hvor kommer jobb/leads fra
-${Array.isArray(d.kundekanaer)&&d.kundekanaer.length?d.kundekanaer.map(k=>'- '+k).join('\n'):'- Ikke oppgitt'}
-
-### USP
-${d.usp||'Ikke oppgitt'}
-
-### Mål
-- **3 mnd:** ${d.maal_3mnd||'—'}
-- **6 mnd:** ${d.maal_6mnd||'—'}
-- **12 mnd:** ${d.maal_12mnd||'—'}
-- **24 mnd:** ${d.maal_24mnd||'—'}
-
----
-
-## 6. KI-Interesse
-
-### Forventning
-${d.forventning||'Ikke oppgitt'}
-
-### Prioriteringer
-${(d.ranking||[]).map((r,i)=>(i+1)+'. '+r).join('\n')}
-
-### Budsjett (1 år): ${d.budsjett||'—'}
-### Budsjett (månedlig): ${d.budsjett_mnd||'—'}
-
-### Grenser for KI
-${d.ki_grenser||'Ingen spesifisert'}
-
----
-
-## 7. Topp 3 KI-muligheter
-`;
-scored.slice(0,3).forEach((p,i)=>{
-md+=`${i+1}. **${p.prosess_custom||p.prosess}** — ${p.timer} t/uke, frustrasjon: ${frusts[p.frustrasjon-1]}, besparelse: ~${Math.round(p.timer*.5)} t/uke\n`;
-});
-
-md+=`
----
-> Kartlagt av **Praktisk Intelligens** • ${date}
-`;
-
-const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
-const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-a.download='ki-kartlegging-'+(d.bedriftsnavn||'ukjent').toLowerCase().replace(/\s+/g,'-')+'-'+date+'.md';
-a.click();
+}catch(e){console.log('Submit error (non-fatal):',e)}
 }
 
-// ====== AUTO-RAPPORT GENERATOR ======
+// ====== SUBMIT AND FINISH ======
+async function submitAndFinish(){
+save();
+const data=collectAll();
+await submitToSupabase(data);
+document.getElementById('mainApp').style.display='none';
+const cs=document.getElementById('confirmScreen');
+cs.style.display='flex';
+// Auto-generate rapport after short delay
+setTimeout(()=>generateRapport(),1500);
+}
+
+// ====== PROFESSIONAL PDF RAPPORT ======
 function generateRapport(){
 const d=collectAll();
 const date=new Date().toLocaleDateString('nb-NO',{year:'numeric',month:'long',day:'numeric'});
 const procs=d.prosesser||[];
 const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
 const saving=Math.round(totalH*0.5);
-const scored=procs.filter(p=>p.frustrasjon>0).map(p=>({...p,score:p.frustrasjon*p.timer,timer:Number(p.timer)})).sort((a,b)=>b.score-a.score);
+const kontorPct=Number(d.kontor_pct||30);
+const scored=procs.filter(p=>Number(p.frustrasjon)>0).map(p=>({...p,score:Number(p.frustrasjon)*Number(p.timer),timer:Number(p.timer),frustrasjon:Number(p.frustrasjon)})).sort((a,b)=>b.score-a.score);
+const sortedProcs=[...scored,...procs.filter(p=>Number(p.frustrasjon)===0).map(p=>({...p,timer:Number(p.timer)}))];
 
-function scoreRegnskap(){const v=Array.isArray(d.regnskap)?d.regnskap:[];if(v.some(x=>['Tripletex','Fiken','PowerOffice','Visma'].includes(x)))return 8;return 1}
-function scoreProsjekt(){const v=Array.isArray(d.prosjektstyring)?d.prosjektstyring:[];if(v.some(x=>['Bygglet','Cordel'].includes(x)))return 8;if(v.includes('Excel')||v.includes('Tripletex'))return 4;return 1}
+// Score functions
+function scoreRegnskap(){const v=Array.isArray(d.regnskap)?d.regnskap:[];if(v.some(x=>['Tripletex','Fiken','PowerOffice','Visma'].includes(x)))return 8;return 2}
+function scoreProsjekt(){const v=Array.isArray(d.prosjektstyring)?d.prosjektstyring:[];if(v.some(x=>['Bygglet','Cordel'].includes(x)))return 8;if(v.includes('Excel')||v.includes('Tripletex'))return 5;return 2}
 function scoreKunde(){const v=Array.isArray(d.kundeoppfolging)?d.kundeoppfolging:[];if(v.includes('CRM'))return 8;if(v.includes('Excel'))return 4;return 1}
-function scoreKalk(){const v=Array.isArray(d.kalkulas)?d.kalkulas:[];if(v.includes('Holte Smartkalk'))return 7;if(v.includes('Excel')||v.includes('Word'))return 4;return 1}
+function scoreKalk(){const v=Array.isArray(d.kalkulas)?d.kalkulas:[];if(v.includes('Holte Smartkalk'))return 7;if(v.includes('Excel')||v.includes('Word'))return 4;return 2}
 function scoreMarketing(){const some=Array.isArray(d.some)?d.some.length:0;const nett=Array.isArray(d.nettside)&&d.nettside.includes('Ja')?2:0;return Math.min(10,some+nett+1)}
-function scoreKI(){if(d.provd_ki==='Ja')return 6;if(d.provd_ki==='Vet ikke')return 3;return 0}
+function scoreKI(){if(d.provd_ki==='Ja')return 7;if(d.provd_ki==='Vet ikke')return 3;return 0}
 
 const scores={regnskap:scoreRegnskap(),prosjekt:scoreProsjekt(),kunde:scoreKunde(),kalk:scoreKalk(),marketing:scoreMarketing(),ki:scoreKI()};
 const avgScore=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/6*10)/10;
 const modenhet=avgScore>=6?'Digital Leder':avgScore>=4?'Digital Utforsker':avgScore>=2?'Digital Nybegynner':'Analog Bedrift';
+const modenhetFarge=avgScore>=6?'#34d399':avgScore>=4?'#f0a500':'#ef4444';
 
+// Weekly cost
 const weeklySaving=saving*800;
+const yearlySaving=weeklySaving*52;
 
-function radarSVG(){
-const labels=['Regnskap','Prosjekt','Kunde','Kalkyle','Marked','KI'];
-const vals=[scores.regnskap,scores.prosjekt,scores.kunde,scores.kalk,scores.marketing,scores.ki];
-const cx=150,cy=150,r=120;
-const angles=labels.map((_,i)=>-Math.PI/2+2*Math.PI*i/6);
-let gridLines='';
-for(let ring=2;ring<=10;ring+=2){const pts=angles.map(a=>`${cx+r*(ring/10)*Math.cos(a)},${cy+r*(ring/10)*Math.sin(a)}`).join(' ');gridLines+=`<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`}
-const labelEls=labels.map((l,i)=>{const x=cx+(r+25)*Math.cos(angles[i]);const y=cy+(r+25)*Math.sin(angles[i]);return `<text x="${x}" y="${y}" fill="#8a9bb5" font-size="11" text-anchor="middle" dominant-baseline="middle">${l} (${vals[i]})</text>`}).join('');
-const dataPts=vals.map((v,i)=>`${cx+r*(v/10)*Math.cos(angles[i])},${cy+r*(v/10)*Math.sin(angles[i])}`).join(' ');
-const axisLines=angles.map(a=>`<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`).join('');
-return `<svg viewBox="0 0 300 300" style="max-width:400px;margin:20px auto;display:block">${gridLines}${axisLines}<polygon points="${dataPts}" fill="rgba(240,165,0,0.2)" stroke="#f0a500" stroke-width="2"/>${labelEls}</svg>`;
-}
-
-const procRows=procs.map(p=>{const f=Number(p.frustrasjon||0);const color=f>=4?'#ef4444':f>=2?'#f0a500':'#34d399';return `<tr><td>${p.prosess_custom||p.prosess||'—'}</td><td>${p.hvem||'—'}</td><td>${p.timer||0}t</td><td>${p.verktoy||'—'}</td><td style="color:${color}">●${'●'.repeat(f)}</td></tr>`}).join('');
-
-const html=`<!DOCTYPE html><html lang="no"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>KI-Rapport — ${d.bedriftsnavn||'Bedrift'}</title><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#1a2332;color:#e8ecf1;line-height:1.6}.page{max-width:800px;margin:0 auto;padding:40px}h1,h2,h3{font-family:'DM Serif Display',serif}h1{color:#f0a500;font-size:2.2rem}h2{color:#f0a500;font-size:1.4rem;margin:32px 0 16px;padding-bottom:8px;border-bottom:1px solid rgba(240,165,0,0.2)}table{width:100%;border-collapse:collapse;margin:16px 0}th{background:rgba(240,165,0,0.15);color:#f0a500;padding:10px 12px;text-align:left;font-size:.8rem}td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:.9rem}.cover{text-align:center;padding:80px 40px;min-height:90vh;display:flex;flex-direction:column;justify-content:center}.cover .logo{font-size:3rem;margin-bottom:20px}.cover h1{font-size:2.8rem}.cover .subtitle{color:#8a9bb5;font-size:1.1rem;margin-top:8px}.score-big{text-align:center;margin:30px 0}.score-big .num{font-size:4rem;font-weight:800;color:#f0a500}.score-big .level{font-size:1.2rem;color:#34d399;font-weight:600;margin-top:4px}.roi-box{background:linear-gradient(135deg,rgba(52,211,153,0.1),rgba(240,165,0,0.1));border:1px solid rgba(240,165,0,0.2);border-radius:16px;padding:24px;text-align:center;margin:24px 0}.roi-box .big{font-size:2.4rem;font-weight:800;color:#34d399}.footer{text-align:center;padding:40px 0;color:#8a9bb5;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.05);margin-top:40px}</style></head><body><div class="page">
-<div class="cover"><div class="logo">🧠</div><h1>KI-Kartlegging</h1><div class="subtitle">${d.bedriftsnavn||'Bedrift'}</div><div style="color:#8a9bb5;margin-top:40px">${date}<br>Utarbeidet av <strong>Praktisk Intelligens</strong></div></div>
-<h2>Sammendrag</h2><div class="score-big"><div class="num">${avgScore}/10</div><div style="color:#8a9bb5">Digital Modenhetsscore</div><div class="level">${modenhet}</div></div>
-<p style="text-align:center;color:#8a9bb5;max-width:600px;margin:0 auto">${d.bedriftsnavn||'Bedriften'} bruker totalt <strong>${totalH} timer/uke</strong> på admin. Med KI estimerer vi besparelse på <strong>~${saving} timer/uke</strong> = <strong>${(weeklySaving).toLocaleString('nb-NO')} kr/uke</strong>.</p>
-<h2>Digital Modenhet</h2>${radarSVG()}
-<h2>Prosessanalyse</h2><table><thead><tr><th>Prosess</th><th>Ansvarlig</th><th>Tid/uke</th><th>Verktøy</th><th>Frustrasjon</th></tr></thead><tbody>${procRows}</tbody></table>
-<h2>Mål</h2><ul style="padding-left:20px">${d.maal_3mnd?`<li><strong>3 mnd:</strong> ${d.maal_3mnd}</li>`:''}${d.maal_6mnd?`<li><strong>6 mnd:</strong> ${d.maal_6mnd}</li>`:''}${d.maal_12mnd?`<li><strong>12 mnd:</strong> ${d.maal_12mnd}</li>`:''}${d.maal_24mnd?`<li><strong>24 mnd:</strong> ${d.maal_24mnd}</li>`:''}</ul>
-<h2>ROI-beregning</h2><div class="roi-box"><div class="big">${(weeklySaving*52).toLocaleString('nb-NO')} kr/år</div><p style="color:#8a9bb5;margin-top:4px">Estimert årlig besparelse med KI</p></div>
-<h2>Topp 3 Anbefalinger</h2><ol style="padding-left:20px">${scored.slice(0,3).map(p=>`<li style="margin-bottom:12px"><strong>${p.prosess_custom||p.prosess}</strong> — ${p.timer}t/uke, frustrasjon ${p.frustrasjon}/5</li>`).join('')}</ol>
-<div class="footer"><p>🧠 <strong>Praktisk Intelligens</strong></p><p>${date}</p></div></div></body></html>`;
-
-const w=window.open('','_blank');w.document.write(html);w.document.close();
-}
-
-// ====== PACKAGE SECTION ======
-const pkgPrices={1:20000,2:79000,3:119000,4:149000};
-const pkgNames={1:'Ultra Basic',2:'Basis',3:'Komplett',4:'Premium'};
-let selectedPkg=0;
-
-function buildPackageSection(){
-const procs=getProcessData();
-const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
+// Package recommendation
 const highProcs=procs.filter(p=>Number(p.frustrasjon)>=4||Number(p.timer)>=10);
 const medProcs=procs.filter(p=>(Number(p.frustrasjon)>=2||Number(p.timer)>=5)&&!highProcs.includes(p));
-const kiTried=document.querySelector('input[name=provd_ki]:checked')?.value;
 let recPkg=1;
 if(highProcs.length>=3||(highProcs.length>=2&&totalH>=20)||totalH>=30)recPkg=4;
 else if(highProcs.length>=2||(highProcs.length>=1&&medProcs.length>=2)||totalH>=15)recPkg=3;
-else if(highProcs.length>=1||medProcs.length>=2||kiTried==='Nei'||totalH>=5)recPkg=2;
+else if(highProcs.length>=1||medProcs.length>=2||totalH>=5)recPkg=2;
+const pkgPrices={1:20000,2:79000,3:119000,4:149000};
+const pkgNames={1:'Ultra Basic',2:'Basis',3:'Komplett',4:'Premium'};
+const pkgDesc={
+1:'Perfekt for å komme i gang med KI uten stor investering. Remote oppsett og 1 KI-agent som hjelper deg med de viktigste oppgavene.',
+2:'Komplett KI-oppsett med dedikert maskinvare og 3 skreddersydde KI-agenter. Ideelt for bedrifter som er klare for en reell KI-transformasjon.',
+3:'Full pakke med 5–7 KI-agenter, integrasjoner mot eksisterende systemer og månedlig oppfølging. For bedrifter som vil automatisere store deler av hverdagen.',
+4:'Den ultimate pakken med tale-til-tale KI, iPhone-oppsett og kvartalsvis strategioppfølging. For vekstbedrifter som vil ha KI som første kontaktpunkt.'
+};
+const breakEvenDays=weeklySaving>0?Math.ceil(pkgPrices[recPkg]/(weeklySaving/7)):0;
 
-const recEl=document.getElementById('autoRecommendation');
-if(totalH>0){
-recEl.innerHTML=`<strong style="color:var(--accent)">Basert på kartleggingen:</strong><br>
-Du bruker totalt <strong>${totalH} timer/uke</strong> på ${procs.length} prosesser${highProcs.length>0?' — <strong>'+highProcs.length+' med høyt KI-potensial</strong>':''}.<br>
-👉 <strong>Vi anbefaler: ${pkgNames[recPkg]} (${pkgPrices[recPkg].toLocaleString('nb-NO')} kr)</strong>`;
-}else{recEl.innerHTML='<span style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å se anbefaling.</span>'}
+// Tool inventory
+const toolGroups={
+'Regnskap':Array.isArray(d.regnskap)?d.regnskap:[],
+'Prosjektstyring':Array.isArray(d.prosjektstyring)?d.prosjektstyring:[],
+'Kundeoppfølging':Array.isArray(d.kundeoppfolging)?d.kundeoppfolging:[],
+'Kalkulasjon/Tilbud':Array.isArray(d.kalkulas)?d.kalkulas:[],
+'Timeregistrering':Array.isArray(d.timereg)?d.timereg:[],
+'Sosiale medier':Array.isArray(d.some)?d.some:[]
+};
+const allTools=Object.values(toolGroups).flat();
+const missingTools=[];
+if(!toolGroups['Kundeoppfølging'].includes('CRM'))missingTools.push('CRM-system for kundeoppfølging');
+if(!Array.isArray(d.nettside)||!d.nettside.includes('Ja'))missingTools.push('Profesjonell nettside');
+if(!allTools.some(t=>['Tripletex','Fiken','PowerOffice','Visma'].includes(t)))missingTools.push('Moderne regnskapssystem');
 
-document.querySelectorAll('.pkg-card').forEach(c=>{c.classList.remove('recommended');if(Number(c.dataset.pkg)===recPkg)c.classList.add('recommended')});
+// Score bar helper
+function scorePct(val){return Math.round(val/10*100)}
 
-const saving=Math.round(totalH*0.5);
-const weeklySaving=saving*800;
-const roiEl=document.getElementById('roiContent');
-if(totalH>0){
-roiEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent2)">${totalH}</div><div style="font-size:.75rem;color:var(--muted)">Timer/uke admin</div></div>
-<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent)">${(totalH*800).toLocaleString('nb-NO')} kr</div><div style="font-size:.75rem;color:var(--muted)">Kostnad/uke (800 kr/t)</div></div></div>
-<div style="text-align:center;font-size:.9rem;color:var(--text)">Med KI sparer du ~<strong>${saving} timer/uke</strong> → <strong style="color:var(--green)">${weeklySaving.toLocaleString('nb-NO')} kr/uke</strong> → <strong style="color:var(--green)">${(weeklySaving*52).toLocaleString('nb-NO')} kr/år</strong></div>`;
-}else{roiEl.innerHTML='<span style="color:var(--muted)">Legg inn prosesser for å se ROI.</span>'}
+// Frustration icon
+function frustIcon(f){return f>=4?'🔴':f>=2?'🟡':'🟢'}
 
-const beDays=document.getElementById('breakEvenDays');
-const activePkg=selectedPkg||recPkg;
-if(weeklySaving>0){
-const days=Math.ceil(pkgPrices[activePkg]/(weeklySaving/7));
-beDays.textContent=days+' dager';
-document.getElementById('breakEvenBox').querySelector('div:last-child').textContent=`${pkgNames[activePkg]} (${pkgPrices[activePkg].toLocaleString('nb-NO')} kr) betaler seg på ${days} dager`;
-}else{beDays.textContent='—'}
+// KI potential per process
+const kiPotentials={
+'Tilbudsberegning':'KI kan hjelpe med prissetting og automatisk generering av tilbudstekst basert på prosjektdetaljer. Estimert besparelse: 40–60% av tidsbruken.',
+'Fakturering':'Automatisk fakturaoppretting fra timelister og prosjektdata. KI kan sende purringer og følge opp ubetalte fakturaer. Estimert besparelse: 60–70%.',
+'Kundeoppfølging':'KI-agent som håndterer innkommende forespørsler, sender oppfølgings-e-poster og holder styr på leads. Estimert besparelse: 50–70%.',
+'Prosjektstyring':'Automatisk statusoppdatering, avviksvarsel og fremdriftsrapporter. KI kan analysere avvik og foreslå tiltak. Estimert besparelse: 30–50%.',
+'Timelister':'Automatisk utfylling av timelister basert på GPS-data og oppgaver. Integrasjon med regnskapssystem. Estimert besparelse: 70–80%.',
+'Materialbestilling':'KI analyserer historikk og foreslår bestillinger basert på kommende prosjekter. Unngår lagermangel. Estimert besparelse: 30–50%.',
+'Markedsføring':'KI genererer innlegg, bilder og kampanjer basert på pågående prosjekter. Poster automatisk til SoMe. Estimert besparelse: 60–80%.',
+'HMS/SHA':'Automatisk sjekkliste-generering, dokumentasjon og varsling ved avvik. KI oppdaterer HMS-planer. Estimert besparelse: 40–60%.',
+'Dokumentasjon':'KI transkriberer møter, genererer rapporter og organiserer dokumenter automatisk. Estimert besparelse: 50–70%.',
+'E-post':'KI sorterer, prioriterer og svarer på rutine-e-poster. Estimert besparelse: 40–60% av e-posttiden.'
+};
+function getKIPotential(prosessNavn){
+return kiPotentials[prosessNavn]||`KI kan automatisere og effektivisere "${prosessNavn}" med smart arbeidsflyt og automatiserte påminnelser. Estimert besparelse: 30–50% av tidsbruken.`;
 }
 
-function selectPackage(num){
-selectedPkg=num;
-document.querySelectorAll('.pkg-card').forEach(c=>{c.classList.toggle('selected',Number(c.dataset.pkg)===num)});
-document.getElementById('selectedPkgConfirm').style.display='block';
-document.getElementById('selectedPkgName').textContent=pkgNames[num]+' ('+pkgPrices[num].toLocaleString('nb-NO')+' kr)';
-buildPackageSection();save();
-}
+// Build rapport HTML
+const rapportHTML=`
+<div style="font-family:'Segoe UI',Arial,sans-serif;color:#1a2332;background:#fff">
 
-const _origCollect=collectAll;
-collectAll=function(){const d=_origCollect();d.valgt_pakke=selectedPkg?pkgNames[selectedPkg]+' ('+pkgPrices[selectedPkg].toLocaleString('nb-NO')+' kr)':'';d.valgt_pakke_pris=selectedPkg?pkgPrices[selectedPkg]:0;return d};
+<!-- PAGE 1: FORSIDE -->
+<div style="background:#1a2332;min-height:297mm;padding:60px 50px;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always">
+  <div>
+    <div style="width:60px;height:4px;background:#f0a500;margin-bottom:40px"></div>
+    <div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#f0a500;margin-bottom:16px">Praktisk Intelligens</div>
+    <div style="font-size:52px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:20px">KI-<br>Kartlegging</div>
+    <div style="width:80px;height:3px;background:#f0a500;margin:24px 0"></div>
+    <div style="font-size:32px;font-weight:700;color:#f0a500;margin-bottom:8px">${d.bedriftsnavn||'Din bedrift'}</div>
+    <div style="font-size:16px;color:#8a9bb5;margin-bottom:4px">${d.bransje||''} ${d.ansatte?'• '+d.ansatte+' ansatte':''}</div>
+  </div>
+  <div>
+    <div style="height:1px;background:rgba(255,255,255,.1);margin:40px 0 24px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <div style="font-size:13px;color:#8a9bb5;margin-bottom:4px">Utarbeidet av</div>
+        <div style="font-size:18px;font-weight:700;color:#fff">Praktisk Intelligens</div>
+        <div style="font-size:13px;color:#8a9bb5">praktiski.no</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;color:#8a9bb5;margin-bottom:4px">Dato</div>
+        <div style="font-size:16px;font-weight:600;color:#fff">${date}</div>
+        <div style="font-size:11px;color:#8a9bb5;margin-top:8px;font-style:italic">Konfidensielt</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-// ====== NETTSIDE URL TOGGLE ======
-function toggleNettsideUrl(){
-const jaChecked=document.getElementById('nettsideJa')?.checked;
-const wrap=document.getElementById('nettsideUrlWrap');
-if(wrap)wrap.style.display=jaChecked?'block':'none';
-}
+<!-- PAGE 2: SAMMENDRAG -->
+<div style="padding:50px;page-break-after:always">
+  <div style="font-size:11px;color:#f0a500;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Sammendrag</div>
+  <div style="font-size:28px;font-weight:800;color:#1a2332;margin-bottom:4px">Kartleggingsrapport</div>
+  <div style="font-size:14px;color:#8a9bb5;margin-bottom:32px">${d.bedriftsnavn||'Din bedrift'} · ${date}</div>
 
-// ====== KUNDEKANAL CHIPS ======
-let kanalChips=[];
-function renderKanalChips(){
-const container=document.getElementById('kundekanal_chips');
-if(!container)return;
-container.innerHTML='';
-kanalChips.forEach((chip,i)=>{
-const lbl=document.createElement('label');
-lbl.style.cssText='background:var(--accent);color:var(--navy);border-radius:12px;padding:10px 14px;font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer';
-lbl.innerHTML=`${chip} <span onclick="removeKanalChip(${i})" style="font-size:1.1rem;line-height:1;cursor:pointer;opacity:.7">×</span>`;
-container.appendChild(lbl);
-});
-const hidden=document.getElementById('kundekanal_annet_hidden');
-if(hidden){hidden.value=kanalChips.join(', ')}
-save();
-}
-function addKundeKanalChip(){
-const inp=document.getElementById('kundekanal_annet_input');
-if(!inp||!inp.value.trim())return;
-kanalChips.push(inp.value.trim());
-inp.value='';
-renderKanalChips();
-}
-function removeKanalChip(i){
-kanalChips.splice(i,1);
-renderKanalChips();
-}
-document.addEventListener('keydown',function(e){
-if(e.key==='Enter'&&document.activeElement?.id==='kundekanal_annet_input'){
-e.preventDefault();addKundeKanalChip();
-}
-});
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:32px">
+    <div style="background:#f8f9fa;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:900;color:#1a2332">${d.ansatte||'—'}</div>
+      <div style="font-size:11px;color:#8a9bb5;margin-top:4px">Ansatte</div>
+    </div>
+    <div style="background:#f8f9fa;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:900;color:#1a2332">${procs.length}</div>
+      <div style="font-size:11px;color:#8a9bb5;margin-top:4px">Prosesser kartlagt</div>
+    </div>
+    <div style="background:#f8f9fa;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:900;color:#f0a500">${totalH}t</div>
+      <div style="font-size:11px;color:#8a9bb5;margin-top:4px">Admin timer/uke</div>
+    </div>
+    <div style="background:#1a2332;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:900;color:#f0a500">~${saving}t</div>
+      <div style="font-size:11px;color:#8a9bb5;margin-top:4px">KI-besparelse/uke</div>
+    </div>
+  </div>
 
-// Init
-buildSopTabs();
-loadSaved();
-if(!document.querySelectorAll('.process-card').length){makeProcessCard();makeProcessCard();makeProcessCard()}
-render();
-</script>
-</body>
-</html>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:12px">KI-Modenhetsnivå</div>
+      <div style="background:#f0f0f0;border-radius:8px;height:12px;margin-bottom:8px">
+        <div style="background:${modenhetFarge};height:12px;border-radius:8px;width:${scorePct(avgScore)}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:${modenhetFarge};font-weight:700">${modenhet}</span>
+        <span style="color:#8a9bb5">${avgScore}/10</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:12px">Admin vs Produksjon</div>
+      <div style="background:#f0f0f0;border-radius:8px;height:12px;margin-bottom:8px;overflow:hidden">
+        <div style="background:#ef4444;height:12px;width:${kontorPct}%;display:inline-block;border-radius:8px 0 0 8px"></div>
+        <div style="background:#34d399;height:12px;width:${100-kontorPct}%;display:inline-block"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px">
+        <span style="color:#ef4444;font-weight:600">${kontorPct}% Admin</span>
+        <span style="color:#34d399;font-weight:600">${100-kontorPct}% Produksjon</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#1a2332;border-radius:16px;padding:28px;margin-bottom:24px">
+    <div style="font-size:13px;color:#8a9bb5;margin-bottom:8px">Estimert KI-besparelse per år</div>
+    <div style="font-size:40px;font-weight:900;color:#f0a500">${(yearlySaving).toLocaleString('nb-NO')} kr</div>
+    <div style="font-size:13px;color:#8a9bb5;margin-top:8px">${saving} timer/uke × 800 kr/t × 52 uker = ${(yearlySaving).toLocaleString('nb-NO')} kr</div>
+  </div>
+
+  <div style="background:#f8f9fa;border-radius:12px;padding:20px">
+    <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:8px">Bedriftsinfo</div>
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td style="padding:6px 0;font-size:12px;color:#8a9bb5;width:140px">Kontaktperson</td><td style="font-size:13px;color:#1a2332;font-weight:600">${d.kontaktperson||'—'} (${d.rolle||'—'})</td></tr>
+      <tr><td style="padding:6px 0;font-size:12px;color:#8a9bb5">E-post</td><td style="font-size:13px;color:#1a2332">${d.epost||'—'}</td></tr>
+      <tr><td style="padding:6px 0;font-size:12px;color:#8a9bb5">Omsetning</td><td style="font-size:13px;color:#1a2332">${d.omsetning||'—'}</td></tr>
+      <tr><td style="padding:6px 0;font-size:12px;color:#8a9bb5">KI-erfaring</td><td style="font-size:13px;color:#1a2332">${d.provd_ki||'—'}${d.ki_erfaring?' — '+d.ki_erfaring:''}</td></tr>
+    </table>
+  </div>
+
+  <div style="margin-top:auto;padding-top:24px;border-top:1px solid #eee;font-size:11px;color:#aaa;text-align:center">Praktisk Intelligens | praktiski.no | Konfidensielt</div>
+</div>
+
+<!-- PAGE 3: DIGITAL MODENHET -->
+<div style="padding:50px;page-break-after:always">
+  <div style="font-size:11px;color:#f0a500;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Digital Modenhet</div>
+  <div style="font-size:28px;font-weight:800;color:#1a2332;margin-bottom:24px">Verktøy og digitalt nivå</div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px">
+    ${Object.entries({Regnskap:scores.regnskap,Prosjektstyring:scores.prosjekt,Kundeoppfølging:scores.kunde,Kalkulasjon:scores.kalk,Markedsføring:scores.marketing,'KI-erfaring':scores.ki}).map(([k,v])=>`
+    <div style="background:#f8f9fa;border-radius:10px;padding:16px">
+      <div style="font-size:11px;color:#8a9bb5;margin-bottom:6px">${k}</div>
+      <div style="background:#e0e0e0;border-radius:4px;height:8px;margin-bottom:6px">
+        <div style="background:#f0a500;height:8px;border-radius:4px;width:${scorePct(v)}%"></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#1a2332">${v}/10</div>
+    </div>`).join('')}
+  </div>
+
+  <div style="margin-bottom:24px">
+    <div style="font-size:15px;font-weight:700;color:#1a2332;margin-bottom:16px">Verktøy i bruk</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#1a2332">
+        <th style="padding:10px 14px;text-align:left;font-size:11px;color:#f0a500;font-weight:700">Kategori</th>
+        <th style="padding:10px 14px;text-align:left;font-size:11px;color:#f0a500;font-weight:700">Verktøy</th>
+        <th style="padding:10px 14px;text-align:left;font-size:11px;color:#f0a500;font-weight:700">Vurdering</th>
+      </tr></thead>
+      <tbody>
+        ${Object.entries(toolGroups).map(([k,v],i)=>{
+          const hasGood=v.length>0;
+          const vurd=hasGood?'✅ I bruk':'⚠️ Mangler';
+          return `<tr style="background:${i%2===0?'#f8f9fa':'#fff'}">
+            <td style="padding:10px 14px;font-size:12px;font-weight:600;color:#1a2332">${k}</td>
+            <td style="padding:10px 14px;font-size:12px;color:#444">${v.length?v.join(', '):'Ikke oppgitt'}</td>
+            <td style="padding:10px 14px;font-size:12px;color:${hasGood?'#34d399':'#f0a500'}">${vurd}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  ${missingTools.length?`
+  <div style="background:#fff8e6;border-left:4px solid #f0a500;border-radius:8px;padding:20px;margin-bottom:20px">
+    <div style="font-size:14px;font-weight:700;color:#1a2332;margin-bottom:12px">⚠️ Anbefalte verktøy som mangler</div>
+    ${missingTools.map(t=>`<div style="font-size:13px;color:#555;padding:4px 0">• ${t}</div>`).join('')}
+  </div>`:'<div style="background:#e8f5e9;border-left:4px solid #34d399;border-radius:8px;padding:20px;margin-bottom:20px"><div style="font-size:14px;font-weight:700;color:#1a2332">✅ Dere har et godt digitalt grunnlag</div><div style="font-size:13px;color:#555;margin-top:8px">Bedriften er godt rustet for KI-integrasjon. Fokus bør være på å koble verktøyene sammen og automatisere arbeidsflytene.</div></div>'}
+
+  <div style="margin-top:auto;padding-top:24px;border-top:1px solid #eee;font-size:11px;color:#aaa;text-align:center">Praktisk Intelligens | praktiski.no | Konfidensielt</div>
+</div>
+
+<!-- PAGES 4-5: PROSESSANALYSE -->
+<div style="padding:50px;page-break-after:always">
+  <div style="font-size:11px;color:#f0a500;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Prosessanalyse</div>
+  <div style="font-size:28px;font-weight:800;color:#1a2332;margin-bottom:8px">Kartlagte prosesser</div>
+  <div style="font-size:14px;color:#8a9bb5;margin-bottom:24px">Sortert etter KI-potensial — høyest potensial øverst</div>
+
+  ${sortedProcs.length?sortedProcs.map((p,i)=>{
+    const f=Number(p.frustrasjon||0);
+    const t=Number(p.timer||0);
+    const isHigh=f>=4||t>=10;
+    const isMed=!isHigh&&(f>=2||t>=5);
+    const badge=isHigh?'HØY':isMed?'MEDIUM':'LAV';
+    const badgeColor=isHigh?'#ef4444':isMed?'#f0a500':'#34d399';
+    const estSaving=Math.round(t*0.5);
+    return `<div style="border:1px solid #e5e7eb;border-left:4px solid ${badgeColor};border-radius:12px;padding:20px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#1a2332">${i+1}. ${p.prosess_custom||p.prosess||'—'}</div>
+          <div style="font-size:12px;color:#8a9bb5;margin-top:2
