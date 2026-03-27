@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KI-Kartlegging — Praktisk Intelligens</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1a2332;--slate:#2d3a4a;--card:#354357;--accent:#f0a500;--accent2:#ff6b35;--text:#e8ecf1;--muted:#8a9bb5;--green:#34d399;--red:#ef4444;--radius:14px;--shadow:0 4px 20px rgba(0,0,0,.3)}
+html{font-size:18px;touch-action:manipulation}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--navy);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+.header{position:sticky;top:0;z-index:100;background:var(--navy);padding:12px 16px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.brand h1{font-size:1.1rem;font-weight:700;color:var(--accent)}
+.brand small{font-size:.7rem;color:var(--muted)}
+.timer-bar{display:flex;align-items:center;gap:10px;font-size:.72rem;color:var(--muted);margin-bottom:6px}
+.timer-bar .elapsed{font-weight:700;color:var(--accent);font-size:.8rem}
+.timer-bar .pace{opacity:.8}
+.timer-bar .start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;min-height:32px}
+.progress-bar{height:4px;background:var(--slate);border-radius:2px;margin-bottom:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .4s ease}
+.section-title-bar{font-size:.75rem;color:var(--muted);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.section-title-bar .coaching-toggle{background:none;border:none;font-size:1rem;cursor:pointer;padding:4px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
+.coaching-hint{background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:var(--accent);display:none;animation:fadeIn .3s ease}
+.coaching-hint.visible{display:block}
+.container{padding:20px;padding-bottom:160px}
+.section{display:none;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{max-height:0;opacity:0}to{max-height:800px;opacity:1}}
+.field{margin-bottom:24px}
+.field label{display:block;font-size:.85rem;font-weight:600;margin-bottom:8px;color:var(--text)}
+.field .hint{font-size:.75rem;color:var(--muted);margin-bottom:6px}
+input[type=text],input[type=number],input[type=date],textarea,select{width:100%;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px 18px;font-size:1.05rem;color:var(--text);outline:none;transition:border .2s;min-height:56px}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{min-height:80px;resize:vertical}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238a9bb5' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.radio-group,.check-group{display:flex;flex-wrap:wrap;gap:8px}
+.radio-group label,.check-group label{background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px 20px;font-size:.95rem;font-weight:500;cursor:pointer;transition:all .15s;min-height:58px;display:flex;align-items:center;user-select:none}
+.radio-group label:active,.check-group label:active{transform:scale(.96);opacity:.85}
+.radio-group input,.check-group input{display:none}
+.radio-group input:checked+span,.check-group input:checked+span{color:var(--navy)}
+.radio-group label:has(input:checked),.check-group label:has(input:checked){background:var(--accent);border-color:var(--accent);color:var(--navy)}
+.check-group label{flex:1 1 45%}
+.check-group.full label{flex:1 1 100%}
+.tool-group{margin-bottom:16px}
+.tool-group h3{font-size:.8rem;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.process-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow);border-left:3px solid var(--accent);position:relative}
+.process-card .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.process-card .card-num{font-size:.75rem;color:var(--accent);font-weight:700}
+.ki-badge{font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
+.ki-badge.hoy{background:rgba(239,68,68,.2);color:#ef4444}
+.ki-badge.medium{background:rgba(240,165,0,.2);color:#f0a500}
+.ki-badge.lav{background:rgba(52,211,153,.2);color:#34d399}
+.card-actions{display:flex;gap:4px;align-items:center}
+.remove-card,.demo-btn{background:none;border:none;font-size:1.4rem;cursor:pointer;padding:10px;min-width:56px;min-height:56px;display:flex;align-items:center;justify-content:center;border-radius:12px}
+.remove-card:active,.demo-btn:active{background:rgba(255,255,255,.08)}
+.remove-card{color:var(--red)}
+.demo-btn{color:var(--accent);font-size:1.4rem}
+.emoji-row{display:flex;gap:4px}
+.emoji-row button{font-size:2rem;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:62px;height:62px;cursor:pointer;transition:all .15s}
+.emoji-row button:active{transform:scale(.9)}
+.emoji-row button.selected{background:var(--accent);border-color:var(--accent);transform:scale(1.15)}
+.slider-wrap{position:relative;padding:8px 0}
+.slider-wrap input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;background:var(--slate);outline:none}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:56px;height:56px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.slider-wrap input[type=range]::-moz-range-thumb{width:56px;height:56px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
+.slider-wrap input[type=range]{height:16px}
+.slider-val{text-align:center;font-size:1.8rem;font-weight:700;color:var(--accent);margin-top:4px}
+.add-btn{width:100%;padding:20px;background:transparent;border:2px dashed var(--muted);border-radius:var(--radius);color:var(--muted);font-size:1.05rem;font-weight:600;cursor:pointer;min-height:64px;transition:all .2s}
+.add-btn:active{border-color:var(--accent);color:var(--accent)}
+.quick-add-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.quick-add-btn{background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 18px;font-size:.88rem;font-weight:600;color:var(--accent);cursor:pointer;min-height:54px;transition:all .15s}
+.quick-add-btn:active{background:var(--accent);color:var(--navy)}
+.rank-list{list-style:none}
+.rank-item{background:var(--slate);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;gap:14px;user-select:none;min-height:62px;transition:transform .15s}
+.rank-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.rank-text{font-size:.9rem;flex:1}
+.rank-arrows{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.rank-arrows button{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:8px;width:40px;height:34px;font-size:1rem;cursor:pointer;color:var(--accent);display:flex;align-items:center;justify-content:center}
+.rank-arrows button:active{background:var(--accent);color:var(--navy)}
+.summary-card{background:linear-gradient(135deg,var(--card),var(--slate));border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);text-align:center}
+.summary-card .big{font-size:2.2rem;font-weight:800;color:var(--accent);line-height:1.1}
+.summary-card .label{font-size:.8rem;color:var(--muted);margin-top:4px}
+.summary-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.qw-card{background:var(--card);border-left:3px solid var(--green);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.qw-card h4{color:var(--green);font-size:.85rem;margin-bottom:4px}
+.qw-card p{font-size:.85rem;color:var(--muted)}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:1px solid rgba(255,255,255,.08);padding:12px 16px;display:flex;gap:10px;z-index:100}
+.nav button{flex:1;padding:20px;border:none;border-radius:var(--radius);font-size:1.1rem;font-weight:600;cursor:pointer;min-height:64px;transition:all .15s}
+.nav button:active{transform:scale(.96)}
+.btn-back{background:var(--slate);color:var(--text)}
+.btn-next{background:var(--accent);color:var(--navy)}
+.dots{display:flex;justify-content:center;gap:8px;padding:8px 0}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--slate);transition:all .3s;cursor:pointer;padding:4px}
+.dot.active{background:var(--accent);transform:scale(1.3)}
+.actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.actions button{flex:1;padding:14px;border:2px solid var(--accent);border-radius:var(--radius);background:transparent;color:var(--accent);font-size:.95rem;font-weight:600;cursor:pointer;min-height:52px}
+.actions button:active{background:var(--accent);color:var(--navy)}
+.footer{text-align:center;padding:20px 0 8px;font-size:.7rem;color:var(--muted)}
+/* Holy Shit Panel */
+.hs-panel{overflow:hidden;max-height:0;opacity:0;transition:max-height .4s ease,opacity .3s ease;background:#0f1923;border-radius:0 0 var(--radius) var(--radius);margin:-4px -16px -16px;padding:0 16px}
+.hs-panel.open{max-height:900px;opacity:1;padding:16px}
+.hs-panel .hs-close{float:right;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:4px 8px;min-width:40px;min-height:40px}
+.hs-section{margin-bottom:12px}
+.hs-section h4{font-size:.78rem;margin-bottom:4px}
+.hs-section.now h4{color:#ef4444}
+.hs-section.after h4{color:var(--green)}
+.hs-section.saving h4{color:var(--accent)}
+.hs-section.tool h4{color:#60a5fa}
+.hs-section p{font-size:.82rem;color:var(--muted);line-height:1.4}
+.hs-copy{background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 16px;font-size:.8rem;color:var(--accent);cursor:pointer;width:100%;text-align:center;margin-top:8px;min-height:44px;font-weight:600}
+.hs-copy:active{background:var(--accent);color:var(--navy)}
+/* SOP Tabs */
+.sop-tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.sop-tabs::-webkit-scrollbar{display:none}
+.sop-tab{background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;min-height:48px;display:flex;align-items:center;transition:all .15s;flex-shrink:0}
+.sop-tab:active{transform:scale(.96)}
+.sop-tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
+.sop-processes{margin-bottom:16px;animation:fadeIn .2s ease}
+.sop-processes label{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--slate);border:1px solid rgba(255,255,255,.1);border-radius:12px;margin-bottom:6px;cursor:pointer;min-height:56px;font-size:.92rem;transition:all .15s}
+.sop-processes label:active{transform:scale(.97)}
+.sop-processes input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent);flex-shrink:0}
+.sop-processes label:has(input:checked){background:rgba(240,165,0,.12);border-color:rgba(240,165,0,.3)}
+/* Slider+input combo */
+.slider-combo{display:flex;align-items:center;gap:12px}
+.slider-combo input[type=range]{flex:1}
+.slider-combo input[type=number]{width:80px;min-height:48px;text-align:center;font-size:1.1rem;font-weight:700;color:var(--accent);flex-shrink:0}
+/* Summary section detail blocks */
+.sum-block{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.sum-block h4{font-size:.85rem;color:var(--accent);margin-bottom:8px}
+.sum-block p,.sum-block li{font-size:.85rem;color:var(--muted);line-height:1.5}
+.sum-block ul{padding-left:16px}
+.sum-block table{width:100%;border-collapse:collapse;margin-top:8px}
+.sum-block th{text-align:left;font-size:.75rem;color:var(--accent);padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sum-block td{font-size:.82rem;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pkg-card:active{transform:scale(.97)}
+.pkg-card.recommended{border-color:var(--accent)!important;box-shadow:0 0 20px rgba(240,165,0,.25),var(--shadow);position:relative}
+.pkg-card.recommended::before{content:'⭐ Anbefalt';position:absolute;top:-10px;right:16px;background:var(--accent);color:var(--navy);font-size:.65rem;font-weight:700;padding:2px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
+.pkg-card.selected{border-color:var(--green)!important;box-shadow:0 0 16px rgba(52,211,153,.2),var(--shadow)}
+@media print{
+.header,.nav,.actions,.add-btn,.remove-card,.dots,.demo-btn,.hs-panel,.quick-add-row,.coaching-hint,.timer-bar,.ki-badge,.coaching-toggle,.sop-tabs,.sop-processes,.rank-arrows{display:none!important}
+body{background:#fff;color:#111;font-size:12px}
+.section{display:block!important;page-break-inside:avoid;margin-bottom:20px}
+.process-card,.summary-card,.qw-card,.sum-block{border:1px solid #ccc;box-shadow:none;background:#f9f9f9}
+input,textarea,select{border:1px solid #ccc;background:#fff;color:#111}
+.container{padding:10px}
+.summary-card .big{color:#c77800}
+}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="brand">
+<h1 onclick="current=0;render();window.scrollTo({top:0,behavior:'smooth'})" style="cursor:pointer">🧠 Praktisk Intelligens</h1>
+<small>KI-Kartlegging</small>
+</div>
+<div class="timer-bar" id="timerBar">
+<button class="start-btn" id="timerBtn" onclick="toggleTimer()">▶ Start</button>
+<span class="elapsed" id="timerElapsed">00:00</span>
+<span class="pace" id="timerPace"></span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="section-title-bar">
+<span id="sectionLabel"></span>
+<div style="display:flex;align-items:center;gap:4px">
+<span id="sectionNum"></span>
+<button class="coaching-toggle" id="coachToggle" onclick="toggleCoaching()" title="Coaching-hint">🎯</button>
+</div>
+</div>
+</div>
+
+<div class="container" id="app">
+
+<!-- Section 1 -->
+<div class="section" data-section="0" data-title="Bedriftsprofil">
+<div class="coaching-hint" data-coach="0">💡 Start med small talk. Bruk Chase Hughes' controlled stillness. Ikke rush gjennom dette.</div>
+<div class="field"><label>Bedriftsnavn</label><input type="text" data-key="bedriftsnavn" placeholder="Fyll inn bedriftsnavn..." id="bedriftsnavn"></div>
+<div class="field"><label>Org.nummer</label><input type="text" data-key="orgnummer" placeholder="F.eks. 912 345 678"></div>
+<div class="field"><label>Kontaktperson</label><input type="text" data-key="kontaktperson" placeholder="Navn"></div>
+<div class="field"><label>Rolle</label><input type="text" data-key="rolle" placeholder="Daglig leder, prosjektleder..."></div>
+<div class="field"><label>E-post</label><input type="email" data-key="epost" placeholder="din@bedrift.no"></div>
+<div class="field"><label>Telefonnummer</label><input type="tel" data-key="telefon" placeholder="F.eks. 900 00 000"></div>
+<div class="field"><label>Antall ansatte</label>
+<div class="radio-group" data-key="ansatte">
+<label><input type="radio" name="ansatte" value="1-5"><span>1–5</span></label>
+<label><input type="radio" name="ansatte" value="5-10"><span>5–10</span></label>
+<label><input type="radio" name="ansatte" value="10-25"><span>10–25</span></label>
+</div></div>
+<div class="field"><label>Omsetning ca.</label>
+<div class="radio-group" data-key="omsetning">
+<label><input type="radio" name="omsetning" value="0–1M"><span>0–1M</span></label>
+<label><input type="radio" name="omsetning" value="1–5M"><span>1–5M</span></label>
+<label><input type="radio" name="omsetning" value="5–10M"><span>5–10M</span></label>
+<label><input type="radio" name="omsetning" value="10–20M"><span>10–20M</span></label>
+<label><input type="radio" name="omsetning" value="20M+"><span>20M+</span></label>
+<label><input type="radio" name="omsetning" value="Vil ikke oppgi"><span>Vil ikke oppgi</span></label>
+</div></div>
+<div class="field"><label>Bransje</label><input type="text" data-key="bransje" placeholder="F.eks. Bygg og anlegg"></div>
+</div>
+
+<!-- Section 2 -->
+<div class="section" data-section="1" data-title="Digital Modenhet">
+<div class="coaching-hint" data-coach="1">💡 Ikke døm verktøyene deres. Anerkjenn det som funker (f.eks. Tripletex = bra valg!).</div>
+<div class="tool-group"><h3>Regnskap</h3>
+<div class="check-group" data-key="regnskap">
+<label><input type="checkbox" value="Fiken"><span>Fiken</span></label>
+<label><input type="checkbox" value="PowerOffice"><span>PowerOffice</span></label>
+<label><input type="checkbox" value="Visma"><span>Visma</span></label>
+<label><input type="checkbox" value="Tripletex"><span>Tripletex</span></label>
+</div>
+<input type="text" data-key="regnskap_annet" placeholder="Andre regnskapssystemer?" style="margin-top:8px">
+</div>
+<div class="tool-group"><h3>Prosjektstyring</h3>
+<div class="check-group" data-key="prosjektstyring">
+<label><input type="checkbox" value="Excel"><span>Excel</span></label>
+<label><input type="checkbox" value="Bygglet"><span>Bygglet</span></label>
+<label><input type="checkbox" value="Cordel"><span>Cordel</span></label>
+<label><input type="checkbox" value="Tripletex"><span>Tripletex</span></label>
+<label><input type="checkbox" value="Manuelt"><span>Manuelt</span></label>
+</div>
+<input type="text" data-key="prosjektstyring_annet" placeholder="Andre verktøy?" style="margin-top:8px">
+</div>
+<div class="tool-group"><h3>Kundeoppfølging</h3>
+<div class="check-group" data-key="kundeoppfolging">
+<label><input type="checkbox" value="Excel"><span>Excel</span></label>
+<label><input type="checkbox" value="CRM"><span>CRM</span></label>
+<label><input type="checkbox" value="Notater"><span>Notater</span></label>
+<label><input type="checkbox" value="Ingenting"><span>Ingenting</span></label>
+</div>
+<input type="text" data-key="kundeoppfolging_annet" placeholder="Annet system?" style="margin-top:8px">
+</div>
+<div class="tool-group"><h3>Kalkulasjon / Tilbud</h3>
+<div class="check-group" data-key="kalkulas">
+<label><input type="checkbox" value="Excel"><span>Excel</span></label>
+<label><input type="checkbox" value="Word"><span>Word</span></label>
+<label><input type="checkbox" value="Holte Smartkalk"><span>Holte Smartkalk</span></label>
+<label><input type="checkbox" value="Manuelt"><span>Manuelt</span></label>
+</div>
+<input type="text" data-key="kalkulas_annet" placeholder="Andre kalkulasjonsverktøy?" style="margin-top:8px">
+</div>
+<div class="tool-group"><h3>Timeregistrering</h3>
+<div class="check-group" data-key="timereg">
+<label><input type="checkbox" value="Manuelt"><span>Manuelt</span></label>
+<label><input type="checkbox" value="App"><span>App</span></label>
+<label><input type="checkbox" value="Regnskapssystem"><span>Regnskapssystem</span></label>
+</div>
+<input type="text" data-key="timereg_annet" placeholder="Hvilken app/system?" style="margin-top:8px">
+</div>
+<div class="tool-group"><h3>Sosiale Medier</h3>
+<div class="check-group" data-key="some">
+<label><input type="checkbox" value="Facebook"><span>Facebook</span></label>
+<label><input type="checkbox" value="Instagram"><span>Instagram</span></label>
+<label><input type="checkbox" value="LinkedIn"><span>LinkedIn</span></label>
+<label><input type="checkbox" value="TikTok"><span>TikTok</span></label>
+<label><input type="checkbox" value="Snapchat"><span>Snapchat</span></label>
+<label><input type="checkbox" value="YouTube"><span>YouTube</span></label>
+</div>
+<input type="text" data-key="some_annet" placeholder="Andre plattformer?" style="margin-top:8px">
+</div>
+<div class="tool-group"><h3>Nettside</h3>
+<div class="check-group" data-key="nettside" id="nettsideCheckGroup">
+<label><input type="checkbox" value="Ja" id="nettsideJa" onchange="toggleNettsideUrl()"><span>Ja</span></label>
+<label><input type="checkbox" value="Nei" onchange="if(this.checked){document.getElementById('nettsideJa').checked=false;toggleNettsideUrl()}"><span>Nei</span></label>
+</div>
+<div id="nettsideUrlWrap" style="display:none;margin-top:8px">
+<input type="text" data-key="nettside_url" placeholder="https://dinbedrift.no">
+</div>
+<input type="text" data-key="nettside_drift" placeholder="Hvem drifter nettsiden?" style="margin-top:8px">
+</div>
+<div class="field"><label>Andre verktøy</label><input type="text" data-key="andre_verktoy" placeholder="Noe annet dere bruker?"></div>
+<div class="field"><label>Ofte brukte/besøkte nettsider i bedriftssammenheng</label>
+<textarea data-key="brukte_nettsider" placeholder="F.eks. Optimera.no, Finn.no, yr.no, Google Maps..."></textarea></div>
+<div class="field"><label>Nettsider/tjenester bedriften har registrert bruker på</label>
+<textarea data-key="registrerte_tjenester" placeholder="F.eks. Byggmakker, Proff.no, Finn.no, Brønnøysund, Altinn, etc."></textarea></div>
+<div class="field"><label>Har noen i bedriften prøvd KI?</label>
+<div class="radio-group" data-key="provd_ki">
+<label><input type="radio" name="provd_ki" value="Ja"><span>Ja</span></label>
+<label><input type="radio" name="provd_ki" value="Nei"><span>Nei</span></label>
+<label><input type="radio" name="provd_ki" value="Vet ikke"><span>Vet ikke</span></label>
+</div></div>
+<div class="field"><label>Hvis ja — hva og hvordan gikk det?</label><textarea data-key="ki_erfaring" placeholder="Fortell om erfaringen..."></textarea></div>
+</div>
+
+<!-- Section 3 -->
+<div class="section" data-section="2" data-title="Daglig Arbeid">
+<div class="coaching-hint" data-coach="2">💡 DETTE er hoveddelen. Bruk «Beskriv for meg hvordan dere gjør X i dag» — la de snakke.</div>
+<p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Velg bransje(r) og huk av prosessene dere bruker tid på. Avhukede prosesser blir til kort du kan fylle ut.</p>
+
+<div class="sop-tabs" id="sopTabs"></div>
+<div id="sopProcessList"></div>
+
+<div id="processCards"></div>
+<button class="add-btn" id="addProcess">+ Legg til egendefinert prosess</button>
+</div>
+
+<!-- Section 4 -->
+<div class="section" data-section="3" data-title="Smertepunkter">
+<div class="coaching-hint" data-coach="3">💡 Chris Voss: «Det høres ut som [frustrasjon] tar mye energi?» — label their emotions.</div>
+<div class="field"><label>Hva er den STØRSTE frustrasjonen i arbeidshverdagen?</label><textarea data-key="storste_frustrasjon" placeholder="Vær ærlig — dette hjelper oss å finne de beste løsningene..." style="min-height:120px"></textarea></div>
+<div class="field"><label>Hvis DU hadde 10 ekstra timer i uka — hva ville du gjort?</label>
+<div class="check-group full" data-key="ekstra_timer">
+<label><input type="checkbox" value="Flere kunder/salg"><span>Flere kunder/salg</span></label>
+<label><input type="checkbox" value="Bedre kundeoppfølging"><span>Bedre kundeoppfølging</span></label>
+<label><input type="checkbox" value="Mer produserende arbeid"><span>Mer produserende arbeid</span></label>
+<label><input type="checkbox" value="Bedre prosjektplanlegging"><span>Bedre prosjektplanlegging</span></label>
+<label><input type="checkbox" value="Mer ferie/fritid"><span>Mer ferie/fritid</span></label>
+<label><input type="checkbox" value="Opplæring/kursing ansatte"><span>Opplæring/kursing ansatte</span></label>
+</div>
+<input type="text" data-key="ekstra_timer_annet" placeholder="Annet..." style="margin-top:8px">
+</div>
+<div class="field"><label>Tid på admin vs produksjon</label>
+<div class="slider-combo">
+<input type="range" min="0" max="100" value="30" data-key="kontor_pct" id="kontorSlider">
+<input type="number" min="0" max="100" value="30" id="kontorInput" style="border-radius:var(--radius)">
+</div>
+<div class="slider-val"><span id="kontorVal">30</span>% admin — <span id="prodVal">70</span>% produksjon</div>
+</div>
+<div class="field"><label>Hva koster en tapt kunde for dere?</label>
+<div class="radio-group" data-key="tapt_kunde">
+<label><input type="radio" name="tapt_kunde" value="Under 10k"><span>Under 10k</span></label>
+<label><input type="radio" name="tapt_kunde" value="10-50k"><span>10–50k</span></label>
+<label><input type="radio" name="tapt_kunde" value="50-100k"><span>50–100k</span></label>
+<label><input type="radio" name="tapt_kunde" value="100-150k"><span>100–150k</span></label>
+<label><input type="radio" name="tapt_kunde" value="150-300k"><span>150–300k</span></label>
+<label><input type="radio" name="tapt_kunde" value="300k+"><span>300k+</span></label>
+</div></div>
+</div>
+
+<!-- Section 5 -->
+<div class="section" data-section="4" data-title="Konkurranse og Marked">
+<div class="coaching-hint" data-coach="4">💡 Ikke nevn Ninja Bygg. Fokuser på DERES marked og muligheter.</div>
+<div class="field"><label>Hvem ser dere på som hovedkonkurrenter?</label><textarea data-key="konkurrenter" placeholder="Andre bedrifter i området..."></textarea></div>
+<div class="field"><label>Hvor får dere mest jobb/leads fra?</label>
+<div class="check-group" data-key="kundekanaer">
+<label><input type="checkbox" value="Muntlig anbefaling"><span>Muntlig anbefaling</span></label>
+<label><input type="checkbox" value="Finn.no"><span>Finn.no</span></label>
+<label><input type="checkbox" value="Mittanbud"><span>Mittanbud</span></label>
+<label><input type="checkbox" value="Facebook/SoMe"><span>Facebook/SoMe</span></label>
+<label><input type="checkbox" value="Google-søk"><span>Google-søk</span></label>
+<label><input type="checkbox" value="Nettside"><span>Nettside</span></label>
+<label><input type="checkbox" value="Tilbudsportaler"><span>Tilbudsportaler</span></label>
+</div>
+<div id="kundekanal_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<input type="text" id="kundekanal_annet_input" placeholder="Annet — skriv og trykk Enter eller +" style="flex:1">
+<button type="button" onclick="addKundeKanalChip()" style="background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:0 18px;font-size:1.2rem;font-weight:700;cursor:pointer;min-height:56px">+</button>
+</div>
+<input type="hidden" data-key="kundekanal_annet" id="kundekanal_annet_hidden">
+</div>
+<div class="field"><label>Hva skiller dere fra konkurrentene?</label><textarea data-key="usp" placeholder="Hva gjør dere bedre/annerledes?"></textarea></div>
+<div class="field"><label>Hva er målet for de neste...</label>
+<div style="margin-bottom:12px">
+<label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">📌 3 måneder — Kortsiktig, hva haster?</label>
+<textarea data-key="maal_3mnd" placeholder="Hva må løses NÅ? Akutte utfordringer, raske gevinster..."></textarea>
+</div>
+<div style="margin-bottom:12px">
+<label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">📅 6 måneder — Halvårsplan</label>
+<textarea data-key="maal_6mnd" placeholder="Halvårsplaner, prosjekter som bør være i gang..."></textarea>
+</div>
+<div style="margin-bottom:12px">
+<label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">🎯 12 måneder — Årsmål</label>
+<textarea data-key="maal_12mnd" placeholder="Vekst, nye ansatte, nye tjenester, omsetning..."></textarea>
+</div>
+<div>
+<label style="font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;display:block">🚀 24 måneder — Langsiktig visjon</label>
+<textarea data-key="maal_24mnd" placeholder="Hvor vil dere være om 2 år? Drømmescenario..."></textarea>
+</div>
+</div>
+</div>
+
+<!-- Section 6 -->
+<div class="section" data-section="5" data-title="KI-Interesse">
+<div class="coaching-hint" data-coach="5">💡 Soft close: «Basert på alt vi har snakket om — hva tror du er det viktigste første steget?»</div>
+<div class="field"><label>Hva håper dere å få ut av denne kartleggingen?</label><textarea data-key="forventning" placeholder="Hva ville vært det beste utfallet for dere?"></textarea></div>
+<div class="field"><label>Hvilke områder er dere MEST interessert i å forbedre?</label>
+<p class="hint">Bruk pilene for å sortere — viktigst øverst</p>
+<ul class="rank-list" id="rankList">
+<li class="rank-item" data-rank="Spare tid på admin/kontor"><span class="rank-num">1</span><span class="rank-text">Spare tid på admin/kontor</span><span class="rank-arrows"><button onclick="moveRank(this,-1)">▲</button><button onclick="moveRank(this,1)">▼</button></span></li>
+<li class="rank-item" data-rank="Bedre markedsføring/synlighet"><span class="rank-num">2</span><span class="rank-text">Bedre markedsføring/synlighet</span><span class="rank-arrows"><button onclick="moveRank(this,-1)">▲</button><button onclick="moveRank(this,1)">▼</button></span></li>
+<li class="rank-item" data-rank="Smartere tilbudsberegning"><span class="rank-num">3</span><span class="rank-text">Smartere tilbudsberegning</span><span class="rank-arrows"><button onclick="moveRank(this,-1)">▲</button><button onclick="moveRank(this,1)">▼</button></span></li>
+<li class="rank-item" data-rank="Bedre kundeoppfølging"><span class="rank-num">4</span><span class="rank-text">Bedre kundeoppfølging</span><span class="rank-arrows"><button onclick="moveRank(this,-1)">▲</button><button onclick="moveRank(this,1)">▼</button></span></li>
+<li class="rank-item" data-rank="Dokumentasjon og HMS"><span class="rank-num">5</span><span class="rank-text">Dokumentasjon og HMS</span><span class="rank-arrows"><button onclick="moveRank(this,-1)">▲</button><button onclick="moveRank(this,1)">▼</button></span></li>
+</ul>
+</div>
+<div class="field"><label>Budsjett for digitalisering/KI neste 1 år?</label>
+<div class="radio-group" data-key="budsjett">
+<label><input type="radio" name="budsjett" value="1–10k"><span>1–10k</span></label>
+<label><input type="radio" name="budsjett" value="10–50k"><span>10–50k</span></label>
+<label><input type="radio" name="budsjett" value="50–100k"><span>50–100k</span></label>
+<label><input type="radio" name="budsjett" value="100–150k+"><span>100–150k+</span></label>
+</div></div>
+<div class="field"><label>Budsjett for digitalisering/KI per måned (APIer, credits, tokens)</label>
+<div class="radio-group" data-key="budsjett_mnd">
+<label><input type="radio" name="budsjett_mnd" value="0 kr"><span>0 kr</span></label>
+<label><input type="radio" name="budsjett_mnd" value="Under 500 kr/mnd"><span>Under 500 kr/mnd</span></label>
+<label><input type="radio" name="budsjett_mnd" value="500-2000 kr/mnd"><span>500–2000 kr/mnd</span></label>
+<label><input type="radio" name="budsjett_mnd" value="2000-5000 kr/mnd"><span>2000–5000 kr/mnd</span></label>
+<label><input type="radio" name="budsjett_mnd" value="5000+ kr/mnd"><span>5000+ kr/mnd</span></label>
+</div></div>
+<div class="field"><label>Er det noe dere IKKE vil at KI skal gjøre?</label><textarea data-key="ki_grenser" placeholder="Noe som er viktig å bevare manuelt?"></textarea></div>
+</div>
+
+<!-- Section 7 -->
+<div class="section" data-section="6" data-title="Oppsummering">
+<div class="coaching-hint" data-coach="6">💡 Vis tallene. La dem synke inn. Still: «Hva tenker du om det?»</div>
+<h2 style="font-size:1.2rem;margin-bottom:16px;text-align:center">📊 Komplett Kartleggingsoppsummering</h2>
+
+<div id="summaryContent"></div>
+
+<div class="actions" style="margin-top:24px">
+<button onclick="generateRapport()">📊 Generer Rapport</button>
+<button onclick="exportPDF()">📄 PDF</button>
+<button onclick="exportJSON()">💾 JSON</button>
+</div>
+<div class="footer">Kartlagt av Praktisk Intelligens</div>
+</div>
+
+<!-- Section 8 -->
+<div class="section" data-section="7" data-title="Anbefaling og Pakker">
+<div class="coaching-hint" data-coach="7">💡 La tallene snakke. Vis ROI-kalkulatoren, pek på break-even. «Hva tenker du?» — ikke push.</div>
+
+<h2 style="font-size:1.2rem;margin-bottom:8px;text-align:center">📦 Anbefaling</h2>
+<div id="autoRecommendation" style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:16px;margin-bottom:20px;font-size:.88rem;color:var(--text);line-height:1.5"></div>
+
+<h3 style="font-size:1rem;margin-bottom:14px;color:var(--accent);text-align:center">Velg pakke</h3>
+<div id="packageCards" style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
+
+<div class="pkg-card" data-pkg="1" onclick="selectPackage(1)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<strong style="font-size:1.05rem;color:var(--text)">Ultra Basic</strong>
+<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">20 000 kr</span>
+</div>
+<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
+✅ Remote oppsett på kundens PC<br>
+✅ 1 Master-agent (OpenClaw)<br>
+✅ Tilpasset AGENTS.md, SOUL.md og MEMORY.md<br>
+✅ 2–3 CRONjobs<br>
+✅ 30 min opplæring (remote)<br>
+✅ 2 ukers e-post support
+</div>
+<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Liten bedrift som vil teste KI uten stor investering</div>
+</div>
+
+<div class="pkg-card" data-pkg="2" onclick="selectPackage(2)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<strong style="font-size:1.05rem;color:var(--text)">Basis</strong>
+<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">79 000 kr</span>
+</div>
+<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
+✅ Mac Mini M4 Pro 64GB inkludert<br>
+✅ OpenClaw-installasjon og konfigurasjon<br>
+✅ 3 Hermes-agenter (tilpasset bedriften)<br>
+✅ Agent-Constitution per agent<br>
+✅ 4 ukers support og opplæring<br>
+✅ 2 × 1-times opplæringsøkter (remote)<br>
+✅ 3 måneders e-post support etter levering
+</div>
+<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Bedrift klar for dedikert KI-løsning</div>
+</div>
+
+<div class="pkg-card" data-pkg="3" onclick="selectPackage(3)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<strong style="font-size:1.05rem;color:var(--text)">Komplett</strong>
+<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">119 000 kr</span>
+</div>
+<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
+✅ Alt i Basis<br>
+✅ 5–7 Hermes-agenter (skreddersydd)<br>
+✅ Individuelle Agent-Constitutions<br>
+✅ Integrasjoner: CRM, regnskap, e-post, kalender<br>
+✅ 8 ukers support og opplæring<br>
+✅ Månedlig oppfølgingsmøte (første kvartal)<br>
+✅ Enkel workflow-automatisering
+</div>
+<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Bedrift som vil automatisere store deler av hverdagen</div>
+</div>
+
+<div class="pkg-card" data-pkg="4" onclick="selectPackage(4)" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:2px solid transparent;cursor:pointer;transition:all .25s;min-height:56px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<strong style="font-size:1.05rem;color:var(--text)">Premium</strong>
+<span style="font-size:1.1rem;font-weight:800;color:var(--accent)">149 000 kr</span>
+</div>
+<div style="font-size:.82rem;color:var(--muted);line-height:1.6">
+✅ Alt i Komplett<br>
+✅ Tale-til-tale (agent svarer innkommende anrop)<br>
+✅ iPhone med forhåndskonfigurert oppsett<br>
+✅ Individuelle Agent-Constitutions + kvartalsvise revisjoner<br>
+✅ 6 måneders prioritert support<br>
+✅ Kvartalsvise strategimøter<br>
+✅ Proaktiv optimalisering og upsell-vurdering
+</div>
+<div style="margin-top:8px;font-size:.78rem;color:var(--accent);font-style:italic">Best for: Vekstbedrift som vil ha KI som første kontaktpunkt</div>
+</div>
+
+</div>
+
+<!-- Tilbakemeldinger på kartleggingen -->
+<div style="background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:20px;box-shadow:var(--shadow)">
+<h3 style="font-size:.95rem;color:var(--accent);margin-bottom:14px;text-align:center">💬 Tilbakemelding på kartleggingen</h3>
+<div class="field"><label style="font-size:.85rem">Hva kunne vært bedre med denne kartleggingen?</label><textarea data-key="fb_bedre" placeholder="Dine tanker..."></textarea></div>
+<div class="field"><label style="font-size:.85rem">Var det noe som manglet?</label><textarea data-key="fb_manglet" placeholder="Noe du savnet å bli spurt om?"></textarea></div>
+<div class="field"><label style="font-size:.85rem">Hva ville gjort kartleggingen mer komplett?</label><textarea data-key="fb_komplett" placeholder="F.eks. flere bransjer, andre spørsmål..."></textarea></div>
+<div class="field"><label style="font-size:.85rem">Andre tanker eller tilbakemeldinger?</label><textarea data-key="fb_annet" placeholder="Fritt felt..."></textarea></div>
+</div>
+
+<div id="selectedPkgConfirm" style="display:none;text-align:center;margin-bottom:20px">
+<div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);border-radius:var(--radius);padding:14px;font-size:.9rem;color:var(--green)">
+✅ <strong id="selectedPkgName">Pakke X</strong> valgt og lagret i kartleggingen
+</div>
+</div>
+
+<h3 style="font-size:1rem;margin:20px 0 12px;color:var(--green);text-align:center">💰 Live ROI-kalkulator</h3>
+<div id="roiCalc" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:20px">
+<div id="roiContent" style="font-size:.88rem;color:var(--muted);line-height:1.8"></div>
+</div>
+
+<div id="breakEvenBox" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(240,165,0,.1));border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:20px">
+<div id="breakEvenDays" style="font-size:2.2rem;font-weight:800;color:var(--green)"></div>
+<div style="color:var(--muted);font-size:.82rem;margin-top:4px">Tid til break-even</div>
+</div>
+
+<div class="footer">Kartlagt av Praktisk Intelligens</div>
+</div>
+</div>
+
+<div class="nav">
+<button class="btn-back" id="btnBack" onclick="go(-1)">← Tilbake</button>
+<div class="dots" id="dots"></div>
+<button class="btn-next" id="btnNext" onclick="go(1)">Neste →</button>
+</div>
+
+<script>
+// ====== SOP DATA ======
+const sopData={
+'Bygg & Anlegg':['Tilbudsberegning','Kundeoppfølging','Materialbestilling','Prosjektstyring','HMS/SHA','Timelister','Fakturering','Dokumentasjon','Markedsføring','Rekruttering'],
+'Rørlegger':['Servicebestilling','Kundeoppfølging','Delebestilling','Fakturering','HMS','Befaring','Timelister','Markedsføring'],
+'Elektriker':['Prosjektkalkyle','NEK-dokumentasjon','Kundeoppfølging','Fakturering','Materialbestilling','Timelister','HMS'],
+'Maler':['Prisestimat','Kundeoppfølging','Materialinnkjøp','Fakturering','Befaring','Markedsføring'],
+'Renhold':['Ruteplanlegging','Kundeoppfølging','Utstyrsbestilling','Fakturering','Kvalitetskontroll','HMS'],
+'Transport':['Ruteoptimalisering','Kjøretøyadmin','Kundeoppfølging','Fakturering','HMS','Timelister'],
+'Restaurant/Café':['Varelager','Bestilling','Meny','Markedsføring','Personal','Regnskap','Bookingsystem'],
+'Kontor/Admin':['E-post','Kundeservice','Dokumenthåndtering','Møtebooking','CRM','Rapportering'],
+'Annet':[]
+};
+let activeSopTabs=new Set();
+let checkedSopProcesses=new Set();
+
+function buildSopTabs(){
+const container=document.getElementById('sopTabs');
+container.innerHTML='';
+Object.keys(sopData).forEach(bransje=>{
+const tab=document.createElement('div');
+tab.className='sop-tab'+(activeSopTabs.has(bransje)?' active':'');
+tab.textContent=bransje;
+tab.onclick=()=>{
+if(activeSopTabs.has(bransje)){activeSopTabs.delete(bransje)}else{activeSopTabs.add(bransje)}
+tab.classList.toggle('active');
+renderSopProcesses();
+// Show/hide "Annet" custom input
+const annetInput=document.getElementById('sopAnnetInput');
+if(annetInput){annetInput.style.display=activeSopTabs.has('Annet')?'block':'none'}
+};
+container.appendChild(tab);
+});
+// Add "Annet" custom bransje input after tabs
+let annetWrap=document.getElementById('sopAnnetWrap');
+if(!annetWrap){
+annetWrap=document.createElement('div');
+annetWrap.id='sopAnnetWrap';
+annetWrap.style.marginTop='8px';
+const inp=document.createElement('input');
+inp.type='text';inp.id='sopAnnetInput';inp.data_key='sop_annet_bransje';
+inp.placeholder='Skriv inn bransje...';inp.dataset.key='sop_annet_bransje';
+inp.style.display=activeSopTabs.has('Annet')?'block':'none';
+annetWrap.appendChild(inp);
+container.parentNode.insertBefore(annetWrap,container.nextSibling);
+}
+}
+
+function renderSopProcesses(){
+const container=document.getElementById('sopProcessList');
+container.innerHTML='';
+activeSopTabs.forEach(bransje=>{
+const procs=sopData[bransje];
+if(!procs.length)return;
+const div=document.createElement('div');
+div.className='sop-processes';
+div.innerHTML=`<h4 style="font-size:.82rem;color:var(--accent);margin:12px 0 8px">${bransje}</h4>`;
+procs.forEach(p=>{
+const key=bransje+'::'+p;
+const lbl=document.createElement('label');
+lbl.innerHTML=`<input type="checkbox" ${checkedSopProcesses.has(key)?'checked':''} data-sop-key="${key}"><span>${p}</span>`;
+lbl.querySelector('input').onchange=function(){
+if(this.checked){
+checkedSopProcesses.add(key);
+addSopProcessCard(p,bransje);
+}else{
+checkedSopProcesses.delete(key);
+removeSopProcessCard(key);
+}
+save();
+};
+div.appendChild(lbl);
+});
+container.appendChild(div);
+});
+}
+
+function addSopProcessCard(processName,bransje){
+// Check if card already exists
+const existing=document.querySelector(`.process-card[data-sop-key="${bransje}::${processName}"]`);
+if(existing)return;
+makeProcessCard({prosess:processName,prosess_custom:'',sopKey:bransje+'::'+processName});
+}
+function removeSopProcessCard(sopKey){
+const card=document.querySelector(`.process-card[data-sop-key="${sopKey}"]`);
+if(card)card.remove();
+save();
+}
+
+// ====== DYNAMIC STORAGE KEY ======
+function getStoreKey(){
+const name=(document.getElementById('bedriftsnavn')?.value||'').trim().toLowerCase().replace(/[^a-zæøå0-9]/g,'_');
+return name?'ki_kartlegging_'+name:'ki_kartlegging_default';
+}
+let currentStoreKey=null;
+
+// ====== TIMER ======
+let timerStart=null,timerInterval=null;
+function toggleTimer(){
+if(timerInterval){clearInterval(timerInterval);timerInterval=null;document.getElementById('timerBtn').textContent='▶ Start';return}
+timerStart=Date.now();
+document.getElementById('timerBtn').textContent='⏸ Pause';
+timerInterval=setInterval(updateTimer,1000);
+}
+function updateTimer(){
+if(!timerStart)return;
+const s=Math.floor((Date.now()-timerStart)/1000);
+const m=Math.floor(s/60),sec=s%60;
+document.getElementById('timerElapsed').textContent=String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+const paceEl=document.getElementById('timerPace');
+if(m<10)paceEl.textContent='Oppvarming — ta det rolig';
+else if(m<20)paceEl.textContent='På skjema ✅';
+else if(m<40)paceEl.textContent='Hoveddel — gå i dybden';
+else if(m<60)paceEl.textContent='Mot oppsummering';
+else if(m<75)paceEl.textContent='Avrunding — neste steg';
+else paceEl.textContent='⏰ Over tid — avslutt snart';
+}
+
+// ====== COACHING ======
+let coachingVisible=false;
+function toggleCoaching(){coachingVisible=!coachingVisible;document.querySelectorAll('.coaching-hint').forEach(h=>h.classList.toggle('visible',coachingVisible))}
+
+// ====== SLIDER + INPUT SYNC ======
+const ks=document.getElementById('kontorSlider');
+const ki=document.getElementById('kontorInput');
+function syncSlider(val){
+val=Math.max(0,Math.min(100,Number(val)||0));
+ks.value=val;ki.value=val;
+document.getElementById('kontorVal').textContent=val;
+document.getElementById('prodVal').textContent=100-val;
+save();
+}
+if(ks)ks.oninput=()=>syncSlider(ks.value);
+if(ki)ki.oninput=()=>syncSlider(ki.value);
+
+// ====== RANK MOVE ======
+function moveRank(btn,dir){
+const li=btn.closest('.rank-item');
+const list=li.parentElement;
+if(dir===-1&&li.previousElementSibling){list.insertBefore(li,li.previousElementSibling)}
+else if(dir===1&&li.nextElementSibling){list.insertBefore(li.nextElementSibling,li)}
+list.querySelectorAll('.rank-item').forEach((item,i)=>item.querySelector('.rank-num').textContent=i+1);
+save();
+}
+
+// ====== HOLY SHIT TEMPLATES ======
+const demoTemplates={
+'Kundeoppfølging':{
+before:(d)=>`${d.hvem||'Daglig leder'} bruker ${d.timer}t/uke på å følge opp kunder via ${d.verktoy||'telefon/e-post'}. Leads faller mellom stolene, og det koster 50-200k per tapt kunde.`,
+after:(d)=>`Med CRM + KI auto-oppfølging: ${d.hvem||'Daglig leder'} bruker ${Math.round(d.timer*0.3)}t/uke. Systemet sender påminnelser, følger opp automatisk, og ingen leads glipper.`,
+saving:(d)=>`${Math.round(d.timer*0.7)} timer/uke spart = ${Math.round(d.timer*0.7*800)} kr/uke frigjort`,
+tool:'HubSpot Free CRM + ChatGPT for e-postmaler',
+prompt:(d)=>`Du er en kundeoppfølgingsassistent for ${getBedrift()}. Skriv en vennlig oppfølgingsmelding til en kunde som ba om tilbud for 2 uker siden men ikke har svart. Vær profesjonell men uformell.`
+},
+'Tilbudsberegning':{
+before:(d)=>`Tilbud beregnes manuelt — risiko for feil, tar ${d.timer}t/uke, og inkonsistente priser mellom prosjekter.`,
+after:(d)=>`KI-assistert kalkyle med maler: standardpriser auto-fylt, KI foreslår justeringer basert på prosjekttype. ${Math.round(d.timer*0.4)}t/uke istedenfor ${d.timer}t.`,
+saving:(d)=>`${Math.round(d.timer*0.6)} timer/uke spart + færre feilkalkyler`,
+tool:'Excel/Smartkalk + ChatGPT for beskrivelser',
+prompt:(d)=>`Du er en kalkulasjonsassistent for ${getBedrift()}. Lag et detaljert tilbud. Inkluder materialer, arbeidstimer, og påslag. Formater som en profesjonell tilbudstekst.`
+},
+'Fakturering':{
+before:(d)=>`Fakturaer lages manuelt, ${d.timer}t/uke. Risiko for feil, manglende oppfølging av ubetalte fakturaer.`,
+after:(d)=>`Automatisert via regnskapssystem + KI-genererte beskrivelser. Purringer sendes automatisk.`,
+saving:(d)=>`${Math.round(d.timer*0.7)} timer/uke + bedre likviditet`,
+tool:'Tripletex/Fiken + automatiske purringer',
+prompt:(d)=>`Skriv en profesjonell men vennlig purring for en faktura som er 14 dager over forfall. Tonen skal være hyggelig men tydelig.`
+},
+'Markedsføring':{
+before:(d)=>`Poster sporadisk på SoMe. Ingen plan, ingen konsistens. ${d.timer}t/uke når det skjer.`,
+after:(d)=>`KI genererer ukeplan med poster basert på pågående prosjekter. Tekst ferdig på 5 min.`,
+saving:(d)=>`Konsistent posting uten ekstra tid + bedre synlighet`,
+tool:'ChatGPT for tekst + Canva for bilder',
+prompt:(d)=>`Lag 5 Instagram/Facebook-poster for ${getBedrift()}. Inkluder hashtags og engasjerende tekst.`
+}
+};
+const defaultTemplate={
+before:(d)=>`${d.hvem||'Ansatt'} bruker ${d.timer}t/uke på ${(d.prosess_custom||d.prosess||'denne prosessen').toLowerCase()} med ${d.verktoy||'manuelle metoder'}. Tidkrevende og utsatt for feil.`,
+after:(d)=>`Med KI-assistanse: ${Math.round(d.timer*0.5)}t/uke istedenfor ${d.timer}t. Automatisert der mulig, smartere arbeidsflyt.`,
+saving:(d)=>`${Math.round(d.timer*0.5)} timer/uke spart = ${Math.round(d.timer*0.5*800)} kr/uke frigjort`,
+tool:'ChatGPT + tilpasset arbeidsflyt',
+prompt:(d)=>`Du er en effektiviseringsassistent for ${getBedrift()}. Beskriv hvordan KI kan effektivisere prosessen "${d.prosess_custom||d.prosess||'admin'}" som i dag tar ${d.timer} timer per uke. Gi 3 konkrete tiltak med forventet tidsbesparelse.`
+};
+function getBedrift(){return document.getElementById('bedriftsnavn')?.value||'bedriften'}
+
+function toggleHSPanel(btn){
+const card=btn.closest('.process-card');
+let panel=card.querySelector('.hs-panel');
+if(panel){panel.classList.toggle('open');return}
+const d=getCardData(card);
+const tmpl=demoTemplates[d.prosess]||defaultTemplate;
+panel=document.createElement('div');
+panel.className='hs-panel';
+const promptText=tmpl.prompt(d);
+panel.innerHTML=`
+<button class="hs-close" onclick="this.closest('.hs-panel').classList.remove('open')">✕</button>
+<div class="hs-section now"><h4>📍 Nå</h4><p>${tmpl.before(d)}</p></div>
+<div class="hs-section after"><h4>🚀 Med KI</h4><p>${tmpl.after(d)}</p></div>
+<div class="hs-section saving"><h4>💰 Besparelse</h4><p>${tmpl.saving(d)}</p></div>
+<div class="hs-section tool"><h4>🛠️ Anbefalt verktøy</h4><p>${tmpl.tool}</p></div>
+<button class="hs-copy" onclick="navigator.clipboard.writeText(this.dataset.prompt);this.textContent='✅ Kopiert!';setTimeout(()=>this.textContent='📋 Kopier KI-prompt',1500)" data-prompt="${promptText.replace(/"/g,'&quot;')}">📋 Kopier KI-prompt</button>`;
+card.appendChild(panel);
+requestAnimationFrame(()=>panel.classList.add('open'));
+}
+function getCardData(card){
+const d={};
+card.querySelectorAll('[data-pkey]').forEach(el=>{d[el.dataset.pkey]=el.value});
+card.querySelectorAll('input[type=radio]:checked').forEach(el=>{d.frekvens=el.value});
+d.timer=Number(d.timer||0);d.frustrasjon=Number(d.frustrasjon||0);
+return d;
+}
+
+// ====== KI-POTENSIAL BADGE ======
+function updateKIBadge(card){
+const d=getCardData(card);
+let existing=card.querySelector('.ki-badge');
+if(!existing){existing=document.createElement('span');existing.className='ki-badge';card.querySelector('.card-header').insertBefore(existing,card.querySelector('.card-actions'))}
+if(d.frustrasjon>=4||d.timer>=10){existing.className='ki-badge hoy';existing.textContent='KI: HØY'}
+else if(d.frustrasjon>=2||d.timer>=5){existing.className='ki-badge medium';existing.textContent='KI: MEDIUM'}
+else if(d.frustrasjon>0||d.timer>0){existing.className='ki-badge lav';existing.textContent='KI: LAV'}
+else{existing.textContent=''}
+}
+
+const sections=document.querySelectorAll('.section');
+const totalSections=sections.length;
+let current=0;
+let processCount=0;
+const processOptions=['Tilbudsberegning','Fakturering','Kundeoppfølging','Prosjektstyring','Timelister','Materialbestilling','HMS/SHA','Markedsføring','Dokumentasjon','Rekruttering','Servicebestilling','Ruteplanlegging','Varelager','E-post','Møtereferat','Annet'];
+const emojis=['😀','🙂','😐','😣','🤬'];
+
+const dotsEl=document.getElementById('dots');
+for(let i=0;i<totalSections;i++){const d=document.createElement('div');d.className='dot';d.onclick=()=>{current=i;render()};dotsEl.appendChild(d)}
+
+function render(){
+sections.forEach((s,i)=>s.classList.toggle('active',i===current));
+document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current));
+document.getElementById('progress').style.width=((current+1)/totalSections*100)+'%';
+document.getElementById('sectionLabel').textContent=sections[current].dataset.title;
+document.getElementById('sectionNum').textContent=(current+1)+' / '+totalSections;
+document.getElementById('btnBack').style.visibility=current===0?'hidden':'visible';
+document.getElementById('btnNext').textContent=current===totalSections-1?'✓ Ferdig':'Neste →';
+if(current===6)buildSummary();
+if(current===7)buildPackageSection();
+const first=sections[current].querySelector('input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=number]),textarea,select');
+if(first)setTimeout(()=>first.focus(),350);
+}
+
+function go(dir){
+const next=current+dir;
+if(next>=0&&next<totalSections){current=next;render();window.scrollTo({top:0,behavior:'smooth'})}
+}
+
+let tx=0;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60){dx<0?go(1):go(-1)}});
+
+function makeProcessCard(data){
+processCount++;
+if(processCount>15)return;
+const idx=processCount;
+const card=document.createElement('div');
+card.className='process-card';
+card.dataset.idx=idx;
+if(data?.sopKey)card.dataset.sopKey=data.sopKey;
+const opts=processOptions.map(o=>`<option ${data&&data.prosess===o?'selected':''}>${o}</option>`).join('')+`<option value="Annet (egendefinert)">Annet (egendefinert)</option>`;
+card.innerHTML=`
+<div class="card-header"><span class="card-num">Prosess ${idx}</span><span class="ki-badge"></span><div class="card-actions"><button class="demo-btn" onclick="toggleHSPanel(this)" title="Holy Shit Demo">⚡</button><button class="remove-card" onclick="removeProcessCard(this)">✕</button></div></div>
+<div class="field"><select data-pkey="prosess"><option value="">Velg prosess...</option>${opts}</select></div>
+<div class="field"><input type="text" data-pkey="hvem" placeholder="Hvem gjør dette?" value="${data?.hvem||''}"></div>
+<div class="field"><input type="text" data-pkey="prosess_custom" placeholder="Egendefinert prosessnavn (valgfritt)" value="${data?.prosess_custom||''}" style="margin-top:4px"></div>
+<div class="field"><label style="font-size:.8rem">Frekvens</label>
+<div class="radio-group">${['Daglig','Ukentlig','Månedlig','Ved behov'].map(f=>`<label><input type="radio" name="freq${idx}" value="${f}" ${data?.frekvens===f?'checked':''}><span>${f}</span></label>`).join('')}</div>
+<input type="text" data-pkey="frekvens_detalj" placeholder="Antall ganger? (f.eks. 3x daglig)" value="${data?.frekvens_detalj||''}" style="margin-top:8px">
+</div>
+<div class="field"><label style="font-size:.8rem">Timer/uke: <strong class="hrs-val">${data?.timer||0}</strong></label>
+<div class="slider-wrap"><input type="range" min="0" max="40" value="${data?.timer||0}" data-pkey="timer" oninput="this.closest('.field').querySelector('.hrs-val').textContent=this.value;updateKIBadge(this.closest('.process-card'));save()"></div></div>
+<div class="field"><input type="text" data-pkey="verktoy" placeholder="Verktøy i dag?" value="${data?.verktoy||''}"></div>
+<div class="field"><label style="font-size:.8rem">Frustrasjon</label>
+<div class="emoji-row">${emojis.map((e,i)=>`<button type="button" onclick="selEmoji(this,${i+1})" ${data?.frustrasjon==i+1?'class=selected':''}>${e}</button>`).join('')}</div>
+<input type="hidden" data-pkey="frustrasjon" value="${data?.frustrasjon||0}"></div>
+<div class="field"><textarea data-pkey="notater" placeholder="Beskriv steg for steg hvordan dere gjør dette i dag..." style="min-height:120px">${data?.notater||''}</textarea></div>`;
+document.getElementById('processCards').appendChild(card);
+// Set the select value if data.prosess is provided but not in options, put it in custom
+if(data?.prosess){
+const sel=card.querySelector('select[data-pkey=prosess]');
+const optExists=[...sel.options].some(o=>o.value===data.prosess);
+if(!optExists){
+// Add as custom option
+const opt=document.createElement('option');
+opt.value=data.prosess;opt.textContent=data.prosess;opt.selected=true;
+sel.appendChild(opt);
+}else{sel.value=data.prosess}
+}
+if(data)updateKIBadge(card);
+save();
+}
+function removeProcessCard(btn){
+const card=btn.closest('.process-card');
+const sopKey=card.dataset.sopKey;
+if(sopKey){
+checkedSopProcesses.delete(sopKey);
+const cb=document.querySelector(`input[data-sop-key="${sopKey}"]`);
+if(cb)cb.checked=false;
+}
+card.remove();
+save();
+}
+function selEmoji(btn,val){
+btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('selected'));
+btn.classList.add('selected');
+btn.parentElement.nextElementSibling.value=val;
+updateKIBadge(btn.closest('.process-card'));
+save();
+}
+document.getElementById('addProcess').onclick=()=>makeProcessCard();
+
+// Summary
+function getProcessData(){
+const cards=document.querySelectorAll('.process-card');
+const data=[];
+cards.forEach(c=>{
+const p={};
+c.querySelectorAll('[data-pkey]').forEach(el=>{p[el.dataset.pkey]=el.value});
+c.querySelectorAll('input[type=radio]:checked').forEach(el=>{p.frekvens=el.value});
+if(p.prosess||p.prosess_custom)data.push(p);
+});
+return data;
+}
+
+function buildSummary(){
+const d=collectAll();
+const procs=d.prosesser||[];
+const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
+const saving=Math.round(totalH*0.5);
+const kontorPct=Number(d.kontor_pct||30);
+const scored=procs.filter(p=>p.frustrasjon>0).map(p=>({...p,score:p.frustrasjon*p.timer,timer:Number(p.timer)})).sort((a,b)=>b.score-a.score);
+
+const el=document.getElementById('summaryContent');
+let html='';
+
+// Bedriftsprofil
+html+=`<div class="sum-block"><h4>🏢 Bedriftsprofil</h4>
+<table><tbody>
+<tr><td><strong>Bedrift</strong></td><td>${d.bedriftsnavn||'—'}</td></tr>
+<tr><td><strong>Kontakt</strong></td><td>${d.kontaktperson||'—'} (${d.rolle||'—'})</td></tr>
+<tr><td><strong>Ansatte</strong></td><td>${d.ansatte||'—'}</td></tr>
+<tr><td><strong>Omsetning</strong></td><td>${d.omsetning||'—'}</td></tr>
+<tr><td><strong>Bransje</strong></td><td>${d.bransje||'—'}</td></tr>
+<tr><td><strong>KI-erfaring</strong></td><td>${d.provd_ki||'—'}</td></tr>
+</tbody></table></div>`;
+
+// Verktøy
+const tools=[];
+const tg={'Regnskap':d.regnskap,'Prosjekt':d.prosjektstyring,'Kunde':d.kundeoppfolging,'Kalkyle':d.kalkulas,'Timer':d.timereg,'SoMe':d.some};
+for(const[k,v] of Object.entries(tg)){
+const vals=Array.isArray(v)?v:v?[v]:[];
+if(vals.length)tools.push(`<strong>${k}:</strong> ${vals.join(', ')}`);
+}
+html+=`<div class="sum-block"><h4>🛠️ Verktøy i bruk</h4><p>${tools.length?tools.join('<br>'):'Ingen registrert'}</p></div>`;
+
+// Prosesser
+if(procs.length){
+html+=`<div class="sum-block"><h4>⚙️ Prosesser (${procs.length} kartlagt)</h4>
+<table><thead><tr><th>Prosess</th><th>Timer/uke</th><th>Frustrasjon</th><th>KI-potensial</th></tr></thead><tbody>`;
+procs.forEach(p=>{
+const f=Number(p.frustrasjon||0);
+const t=Number(p.timer||0);
+const pot=f>=4||t>=10?'<span style="color:#ef4444">HØY</span>':f>=2||t>=5?'<span style="color:#f0a500">MEDIUM</span>':'<span style="color:#34d399">LAV</span>';
+html+=`<tr><td>${p.prosess_custom||p.prosess||'—'}</td><td>${t}t</td><td>${f>0?emojis[f-1]:'—'}</td><td>${pot}</td></tr>`;
+});
+html+=`</tbody></table>
+<p style="margin-top:8px"><strong>Total admin-tid:</strong> ${totalH} timer/uke</p>
+<p><strong>Estimert besparelse:</strong> ~${saving} timer/uke (~${(saving*800).toLocaleString('nb-NO')} kr/uke)</p>
+</div>`;
+}
+
+// Admin vs produksjon
+html+=`<div class="sum-block"><h4>⏱️ Tid admin vs produksjon</h4>
+<div style="display:flex;gap:12px;margin-top:8px">
+<div style="flex:1;text-align:center;padding:12px;background:rgba(239,68,68,.1);border-radius:10px">
+<div style="font-size:1.5rem;font-weight:700;color:var(--accent2)">${kontorPct}%</div>
+<div style="font-size:.78rem;color:var(--muted)">Admin</div>
+</div>
+<div style="flex:1;text-align:center;padding:12px;background:rgba(52,211,153,.1);border-radius:10px">
+<div style="font-size:1.5rem;font-weight:700;color:var(--green)">${100-kontorPct}%</div>
+<div style="font-size:.78rem;color:var(--muted)">Produksjon</div>
+</div>
+</div></div>`;
+
+// Mål
+html+=`<div class="sum-block"><h4>🎯 Mål</h4><ul>`;
+if(d.maal_3mnd)html+=`<li><strong>3 mnd:</strong> ${d.maal_3mnd}</li>`;
+if(d.maal_6mnd)html+=`<li><strong>6 mnd:</strong> ${d.maal_6mnd}</li>`;
+if(d.maal_12mnd)html+=`<li><strong>12 mnd:</strong> ${d.maal_12mnd}</li>`;
+if(d.maal_24mnd)html+=`<li><strong>24 mnd:</strong> ${d.maal_24mnd}</li>`;
+if(!d.maal_3mnd&&!d.maal_6mnd&&!d.maal_12mnd&&!d.maal_24mnd)html+='<li>Ikke oppgitt</li>';
+html+=`</ul></div>`;
+
+// Prioriteringer
+const ranking=d.ranking||[];
+if(ranking.length){
+html+=`<div class="sum-block"><h4>📊 Prioriteringer</h4><ol style="padding-left:20px">`;
+ranking.forEach(r=>html+=`<li>${r}</li>`);
+html+=`</ol></div>`;
+}
+
+// Budsjett
+html+=`<div class="sum-block"><h4>💰 Budsjett</h4>
+<p><strong>Årlig:</strong> ${d.budsjett||'Ikke oppgitt'}</p>
+<p><strong>Månedlig (APIer/tokens):</strong> ${d.budsjett_mnd||'Ikke oppgitt'}</p></div>`;
+
+// Top 3 KI-muligheter
+html+=`<div class="sum-block" style="border-left:3px solid var(--green)"><h4>⚡ Topp 3 KI-muligheter</h4>`;
+if(scored.length){
+scored.slice(0,3).forEach((p,i)=>{
+const tmpl=demoTemplates[p.prosess]||defaultTemplate;
+html+=`<div style="margin-bottom:10px;padding:8px 0;${i<2?'border-bottom:1px solid rgba(255,255,255,.05)':''}">
+<strong>${i+1}. ${p.prosess_custom||p.prosess}</strong> <span style="color:var(--muted)">— ${p.timer}t/uke, besparelse ~${Math.round(p.timer*0.5)}t/uke</span><br>
+<span style="font-size:.82rem;color:var(--muted)">Anbefalt: ${tmpl.tool}</span>
+</div>`;
+});
+}else{
+html+='<p style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å se resultater</p>';
+}
+html+=`</div>`;
+
+// Estimert besparelse
+if(totalH>0){
+const yearSaving=saving*800*52;
+html+=`<div class="summary-cards">
+<div class="summary-card"><div class="big">${totalH}</div><div class="label">Timer/uke admin</div></div>
+<div class="summary-card"><div class="big">~${saving}</div><div class="label">Timer spart med KI</div></div>
+<div class="summary-card"><div class="big">${(saving*800).toLocaleString('nb-NO')}</div><div class="label">Spart kr/uke</div></div>
+<div class="summary-card"><div class="big">${(yearSaving/1000).toFixed(0)}k</div><div class="label">Spart kr/år</div></div>
+</div>`;
+}
+
+el.innerHTML=html;
+}
+
+// ====== SAVE / LOAD ======
+function collectAll(){
+const d={_ts:new Date().toISOString(),_by:'Praktisk Intelligens'};
+document.querySelectorAll('[data-key]').forEach(el=>{
+if(el.classList.contains('radio-group')||el.classList.contains('check-group')){
+const checked=[...el.querySelectorAll('input:checked')].map(i=>i.value);
+d[el.dataset.key]=el.classList.contains('radio-group')?checked[0]||'':checked;
+}else{d[el.dataset.key]=el.value}
+});
+d.prosesser=getProcessData();
+d.ranking=[...document.querySelectorAll('.rank-item')].map(li=>li.dataset.rank);
+d.current=current;
+d.activeSopTabs=[...activeSopTabs];
+d.checkedSopProcesses=[...checkedSopProcesses];
+return d;
+}
+function save(){
+const key=getStoreKey();
+if(currentStoreKey&&currentStoreKey!==key){
+try{localStorage.removeItem(currentStoreKey)}catch(e){}
+}
+currentStoreKey=key;
+try{localStorage.setItem(key,JSON.stringify(collectAll()))}catch(e){}
+}
+
+function loadSaved(){
+let d;
+const key=getStoreKey();
+currentStoreKey=key;
+try{d=JSON.parse(localStorage.getItem(key))}catch(e){}
+if(!d){try{d=JSON.parse(localStorage.getItem('ki_kartlegging_default'))}catch(e){}}
+if(!d)return;
+document.querySelectorAll('input[data-key],textarea[data-key],select[data-key]').forEach(el=>{if(d[el.dataset.key]!=null)el.value=d[el.dataset.key]});
+document.querySelectorAll('.radio-group[data-key],.check-group[data-key]').forEach(g=>{
+const val=d[g.dataset.key];if(!val)return;
+const vals=Array.isArray(val)?val:[val];
+g.querySelectorAll('input').forEach(i=>{i.checked=vals.includes(i.value)});
+});
+// Restore SOP state
+if(d.activeSopTabs){d.activeSopTabs.forEach(t=>activeSopTabs.add(t))}
+if(d.checkedSopProcesses){d.checkedSopProcesses.forEach(p=>checkedSopProcesses.add(p))}
+buildSopTabs();renderSopProcesses();
+// Restore process cards (non-SOP ones from save, SOP ones already created by renderSopProcesses)
+if(d.prosesser?.length){
+d.prosesser.forEach(p=>{
+// Skip if this process was already created by SOP
+if(p.sopKey&&document.querySelector(`.process-card[data-sop-key="${p.sopKey}"]`))return;
+makeProcessCard(p);
+});
+}
+const rl=document.getElementById('rankList');
+if(d.ranking){const items=[...document.querySelectorAll('.rank-item')];const sorted=d.ranking.map(r=>items.find(i=>i.dataset.rank===r)).filter(Boolean);sorted.forEach((li,i)=>{rl.appendChild(li);li.querySelector('.rank-num').textContent=i+1})}
+if(d.current!=null){current=d.current}
+if(d.kontor_pct){syncSlider(d.kontor_pct)}
+// Restore kundekanal chips
+if(d.kundekanal_annet&&typeof d.kundekanal_annet==='string'&&d.kundekanal_annet.trim()){
+kanalChips=d.kundekanal_annet.split(',').map(s=>s.trim()).filter(Boolean);
+renderKanalChips();
+}
+// Restore nettside URL visibility
+setTimeout(toggleNettsideUrl,100);
+currentStoreKey=getStoreKey();
+}
+
+document.getElementById('bedriftsnavn').addEventListener('blur',save);
+document.addEventListener('input',save);
+document.addEventListener('change',save);
+
+// ====== EXPORTS ======
+function exportPDF(){window.print()}
+function exportJSON(){
+const d=collectAll();d._exported=new Date().toISOString();d._kartlagt_av='Praktisk Intelligens';
+const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+a.download='ki-kartlegging-'+(d.bedriftsnavn||'ukjent').toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.json';
+a.click();
+}
+function exportMD(){
+const d=collectAll();
+const date=new Date().toISOString().slice(0,10);
+const procs=d.prosesser||[];
+const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
+const saving=Math.round(totalH*0.5);
+const frusts=['😀','🙂','😐','😣','🤬'];
+const scored=procs.filter(p=>p.frustrasjon>0).map(p=>({...p,score:p.frustrasjon*p.timer})).sort((a,b)=>b.score-a.score);
+
+let md=`---
+created: ${date}
+tags: [ki-kartlegging, ${(d.bedriftsnavn||'ukjent').toLowerCase().replace(/\s+/g,'-')}]
+kartlagt_av: Praktisk Intelligens
+---
+
+# KI-Kartlegging — ${d.bedriftsnavn||'Ukjent bedrift'}
+> Kartlagt: ${date}
+
+---
+
+## 1. Bedriftsprofil
+
+| | |
+|---|---|
+| **Bedrift** | ${d.bedriftsnavn||'—'} |
+| **Kontaktperson** | ${d.kontaktperson||'—'} |
+| **Rolle** | ${d.rolle||'—'} |
+| **Ansatte** | ${d.ansatte||'—'} |
+| **Omsetning** | ${d.omsetning||'—'} |
+| **Bransje** | ${d.bransje||'—'} |
+
+---
+
+## 2. Digital Modenhet
+
+### Verktøy i bruk
+`;
+const toolGroups={'Regnskap':d.regnskap,'Prosjektstyring':d.prosjektstyring,'Kundeoppfølging':d.kundeoppfolging,'Kalkulasjon/Tilbud':d.kalkulas,'Timeregistrering':d.timereg,'Sosiale medier':d.some};
+for(const[name,vals] of Object.entries(toolGroups)){
+const v=Array.isArray(vals)?vals:vals?[vals]:[];
+md+=`- **${name}:** ${v.length?v.join(', '):'Ikke oppgitt'}\n`;
+}
+md+=`- **Ofte besøkte nettsider:** ${d.brukte_nettsider||'—'}\n`;
+md+=`- **Registrerte tjenester:** ${d.registrerte_tjenester||'—'}\n`;
+md+=`
+### KI-erfaring
+- **Prøvd KI:** ${d.provd_ki||'—'}
+${d.ki_erfaring?'- **Detaljer:** '+d.ki_erfaring:''}
+
+---
+
+## 3. Prosessgjennomgang
+
+| Prosess | Hvem | Frekvens | Timer/uke | Verktøy | Frustrasjon | Notater |
+|---------|------|----------|-----------|---------|-------------|---------|
+`;
+procs.forEach(p=>{
+const pNavn=p.prosess_custom||p.prosess||'—';
+const frust=p.frustrasjon>0?frusts[p.frustrasjon-1]:'—';
+md+=`| ${pNavn} | ${p.hvem||'—'} | ${p.frekvens||'—'} | ${p.timer||0} | ${p.verktoy||'—'} | ${frust} | ${p.notater||'—'} |\n`;
+});
+md+=`
+**Total admin-tid:** ${totalH} timer/uke
+**Estimert besparelse med KI:** ~${saving} timer/uke
+
+---
+
+## 4. Smertepunkter
+
+### Største frustrasjon
+${d.storste_frustrasjon||'Ikke oppgitt'}
+
+### Hvis 10 ekstra timer/uke
+${Array.isArray(d.ekstra_timer)&&d.ekstra_timer.length?d.ekstra_timer.map(t=>'- '+t).join('\n'):'- Ikke oppgitt'}
+
+### Tidsfordeling
+- **Admin:** ${d.kontor_pct||30}%
+- **Produksjon:** ${100-(d.kontor_pct||30)}%
+
+### Tapt kunde-kostnad
+${d.tapt_kunde||'Ikke oppgitt'}
+
+---
+
+## 5. Konkurranse og Marked
+
+### Hovedkonkurrenter
+${d.konkurrenter||'Ikke oppgitt'}
+
+### Hvor kommer jobb/leads fra
+${Array.isArray(d.kundekanaer)&&d.kundekanaer.length?d.kundekanaer.map(k=>'- '+k).join('\n'):'- Ikke oppgitt'}
+
+### USP
+${d.usp||'Ikke oppgitt'}
+
+### Mål
+- **3 mnd:** ${d.maal_3mnd||'—'}
+- **6 mnd:** ${d.maal_6mnd||'—'}
+- **12 mnd:** ${d.maal_12mnd||'—'}
+- **24 mnd:** ${d.maal_24mnd||'—'}
+
+---
+
+## 6. KI-Interesse
+
+### Forventning
+${d.forventning||'Ikke oppgitt'}
+
+### Prioriteringer
+${(d.ranking||[]).map((r,i)=>(i+1)+'. '+r).join('\n')}
+
+### Budsjett (1 år): ${d.budsjett||'—'}
+### Budsjett (månedlig): ${d.budsjett_mnd||'—'}
+
+### Grenser for KI
+${d.ki_grenser||'Ingen spesifisert'}
+
+---
+
+## 7. Topp 3 KI-muligheter
+`;
+scored.slice(0,3).forEach((p,i)=>{
+md+=`${i+1}. **${p.prosess_custom||p.prosess}** — ${p.timer} t/uke, frustrasjon: ${frusts[p.frustrasjon-1]}, besparelse: ~${Math.round(p.timer*.5)} t/uke\n`;
+});
+
+md+=`
+---
+> Kartlagt av **Praktisk Intelligens** • ${date}
+`;
+
+const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+a.download='ki-kartlegging-'+(d.bedriftsnavn||'ukjent').toLowerCase().replace(/\s+/g,'-')+'-'+date+'.md';
+a.click();
+}
+
+// ====== AUTO-RAPPORT GENERATOR ======
+function generateRapport(){
+const d=collectAll();
+const date=new Date().toLocaleDateString('nb-NO',{year:'numeric',month:'long',day:'numeric'});
+const procs=d.prosesser||[];
+const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
+const saving=Math.round(totalH*0.5);
+const scored=procs.filter(p=>p.frustrasjon>0).map(p=>({...p,score:p.frustrasjon*p.timer,timer:Number(p.timer)})).sort((a,b)=>b.score-a.score);
+
+function scoreRegnskap(){const v=Array.isArray(d.regnskap)?d.regnskap:[];if(v.some(x=>['Tripletex','Fiken','PowerOffice','Visma'].includes(x)))return 8;return 1}
+function scoreProsjekt(){const v=Array.isArray(d.prosjektstyring)?d.prosjektstyring:[];if(v.some(x=>['Bygglet','Cordel'].includes(x)))return 8;if(v.includes('Excel')||v.includes('Tripletex'))return 4;return 1}
+function scoreKunde(){const v=Array.isArray(d.kundeoppfolging)?d.kundeoppfolging:[];if(v.includes('CRM'))return 8;if(v.includes('Excel'))return 4;return 1}
+function scoreKalk(){const v=Array.isArray(d.kalkulas)?d.kalkulas:[];if(v.includes('Holte Smartkalk'))return 7;if(v.includes('Excel')||v.includes('Word'))return 4;return 1}
+function scoreMarketing(){const some=Array.isArray(d.some)?d.some.length:0;const nett=Array.isArray(d.nettside)&&d.nettside.includes('Ja')?2:0;return Math.min(10,some+nett+1)}
+function scoreKI(){if(d.provd_ki==='Ja')return 6;if(d.provd_ki==='Vet ikke')return 3;return 0}
+
+const scores={regnskap:scoreRegnskap(),prosjekt:scoreProsjekt(),kunde:scoreKunde(),kalk:scoreKalk(),marketing:scoreMarketing(),ki:scoreKI()};
+const avgScore=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/6*10)/10;
+const modenhet=avgScore>=6?'Digital Leder':avgScore>=4?'Digital Utforsker':avgScore>=2?'Digital Nybegynner':'Analog Bedrift';
+
+const weeklySaving=saving*800;
+
+function radarSVG(){
+const labels=['Regnskap','Prosjekt','Kunde','Kalkyle','Marked','KI'];
+const vals=[scores.regnskap,scores.prosjekt,scores.kunde,scores.kalk,scores.marketing,scores.ki];
+const cx=150,cy=150,r=120;
+const angles=labels.map((_,i)=>-Math.PI/2+2*Math.PI*i/6);
+let gridLines='';
+for(let ring=2;ring<=10;ring+=2){const pts=angles.map(a=>`${cx+r*(ring/10)*Math.cos(a)},${cy+r*(ring/10)*Math.sin(a)}`).join(' ');gridLines+=`<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`}
+const labelEls=labels.map((l,i)=>{const x=cx+(r+25)*Math.cos(angles[i]);const y=cy+(r+25)*Math.sin(angles[i]);return `<text x="${x}" y="${y}" fill="#8a9bb5" font-size="11" text-anchor="middle" dominant-baseline="middle">${l} (${vals[i]})</text>`}).join('');
+const dataPts=vals.map((v,i)=>`${cx+r*(v/10)*Math.cos(angles[i])},${cy+r*(v/10)*Math.sin(angles[i])}`).join(' ');
+const axisLines=angles.map(a=>`<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`).join('');
+return `<svg viewBox="0 0 300 300" style="max-width:400px;margin:20px auto;display:block">${gridLines}${axisLines}<polygon points="${dataPts}" fill="rgba(240,165,0,0.2)" stroke="#f0a500" stroke-width="2"/>${labelEls}</svg>`;
+}
+
+const procRows=procs.map(p=>{const f=Number(p.frustrasjon||0);const color=f>=4?'#ef4444':f>=2?'#f0a500':'#34d399';return `<tr><td>${p.prosess_custom||p.prosess||'—'}</td><td>${p.hvem||'—'}</td><td>${p.timer||0}t</td><td>${p.verktoy||'—'}</td><td style="color:${color}">●${'●'.repeat(f)}</td></tr>`}).join('');
+
+const html=`<!DOCTYPE html><html lang="no"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>KI-Rapport — ${d.bedriftsnavn||'Bedrift'}</title><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#1a2332;color:#e8ecf1;line-height:1.6}.page{max-width:800px;margin:0 auto;padding:40px}h1,h2,h3{font-family:'DM Serif Display',serif}h1{color:#f0a500;font-size:2.2rem}h2{color:#f0a500;font-size:1.4rem;margin:32px 0 16px;padding-bottom:8px;border-bottom:1px solid rgba(240,165,0,0.2)}table{width:100%;border-collapse:collapse;margin:16px 0}th{background:rgba(240,165,0,0.15);color:#f0a500;padding:10px 12px;text-align:left;font-size:.8rem}td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:.9rem}.cover{text-align:center;padding:80px 40px;min-height:90vh;display:flex;flex-direction:column;justify-content:center}.cover .logo{font-size:3rem;margin-bottom:20px}.cover h1{font-size:2.8rem}.cover .subtitle{color:#8a9bb5;font-size:1.1rem;margin-top:8px}.score-big{text-align:center;margin:30px 0}.score-big .num{font-size:4rem;font-weight:800;color:#f0a500}.score-big .level{font-size:1.2rem;color:#34d399;font-weight:600;margin-top:4px}.roi-box{background:linear-gradient(135deg,rgba(52,211,153,0.1),rgba(240,165,0,0.1));border:1px solid rgba(240,165,0,0.2);border-radius:16px;padding:24px;text-align:center;margin:24px 0}.roi-box .big{font-size:2.4rem;font-weight:800;color:#34d399}.footer{text-align:center;padding:40px 0;color:#8a9bb5;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.05);margin-top:40px}</style></head><body><div class="page">
+<div class="cover"><div class="logo">🧠</div><h1>KI-Kartlegging</h1><div class="subtitle">${d.bedriftsnavn||'Bedrift'}</div><div style="color:#8a9bb5;margin-top:40px">${date}<br>Utarbeidet av <strong>Praktisk Intelligens</strong></div></div>
+<h2>Sammendrag</h2><div class="score-big"><div class="num">${avgScore}/10</div><div style="color:#8a9bb5">Digital Modenhetsscore</div><div class="level">${modenhet}</div></div>
+<p style="text-align:center;color:#8a9bb5;max-width:600px;margin:0 auto">${d.bedriftsnavn||'Bedriften'} bruker totalt <strong>${totalH} timer/uke</strong> på admin. Med KI estimerer vi besparelse på <strong>~${saving} timer/uke</strong> = <strong>${(weeklySaving).toLocaleString('nb-NO')} kr/uke</strong>.</p>
+<h2>Digital Modenhet</h2>${radarSVG()}
+<h2>Prosessanalyse</h2><table><thead><tr><th>Prosess</th><th>Ansvarlig</th><th>Tid/uke</th><th>Verktøy</th><th>Frustrasjon</th></tr></thead><tbody>${procRows}</tbody></table>
+<h2>Mål</h2><ul style="padding-left:20px">${d.maal_3mnd?`<li><strong>3 mnd:</strong> ${d.maal_3mnd}</li>`:''}${d.maal_6mnd?`<li><strong>6 mnd:</strong> ${d.maal_6mnd}</li>`:''}${d.maal_12mnd?`<li><strong>12 mnd:</strong> ${d.maal_12mnd}</li>`:''}${d.maal_24mnd?`<li><strong>24 mnd:</strong> ${d.maal_24mnd}</li>`:''}</ul>
+<h2>ROI-beregning</h2><div class="roi-box"><div class="big">${(weeklySaving*52).toLocaleString('nb-NO')} kr/år</div><p style="color:#8a9bb5;margin-top:4px">Estimert årlig besparelse med KI</p></div>
+<h2>Topp 3 Anbefalinger</h2><ol style="padding-left:20px">${scored.slice(0,3).map(p=>`<li style="margin-bottom:12px"><strong>${p.prosess_custom||p.prosess}</strong> — ${p.timer}t/uke, frustrasjon ${p.frustrasjon}/5</li>`).join('')}</ol>
+<div class="footer"><p>🧠 <strong>Praktisk Intelligens</strong></p><p>${date}</p></div></div></body></html>`;
+
+const w=window.open('','_blank');w.document.write(html);w.document.close();
+}
+
+// ====== PACKAGE SECTION ======
+const pkgPrices={1:20000,2:79000,3:119000,4:149000};
+const pkgNames={1:'Ultra Basic',2:'Basis',3:'Komplett',4:'Premium'};
+let selectedPkg=0;
+
+function buildPackageSection(){
+const procs=getProcessData();
+const totalH=procs.reduce((s,p)=>s+Number(p.timer||0),0);
+const highProcs=procs.filter(p=>Number(p.frustrasjon)>=4||Number(p.timer)>=10);
+const medProcs=procs.filter(p=>(Number(p.frustrasjon)>=2||Number(p.timer)>=5)&&!highProcs.includes(p));
+const kiTried=document.querySelector('input[name=provd_ki]:checked')?.value;
+let recPkg=1;
+if(highProcs.length>=3||(highProcs.length>=2&&totalH>=20)||totalH>=30)recPkg=4;
+else if(highProcs.length>=2||(highProcs.length>=1&&medProcs.length>=2)||totalH>=15)recPkg=3;
+else if(highProcs.length>=1||medProcs.length>=2||kiTried==='Nei'||totalH>=5)recPkg=2;
+
+const recEl=document.getElementById('autoRecommendation');
+if(totalH>0){
+recEl.innerHTML=`<strong style="color:var(--accent)">Basert på kartleggingen:</strong><br>
+Du bruker totalt <strong>${totalH} timer/uke</strong> på ${procs.length} prosesser${highProcs.length>0?' — <strong>'+highProcs.length+' med høyt KI-potensial</strong>':''}.<br>
+👉 <strong>Vi anbefaler: ${pkgNames[recPkg]} (${pkgPrices[recPkg].toLocaleString('nb-NO')} kr)</strong>`;
+}else{recEl.innerHTML='<span style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å se anbefaling.</span>'}
+
+document.querySelectorAll('.pkg-card').forEach(c=>{c.classList.remove('recommended');if(Number(c.dataset.pkg)===recPkg)c.classList.add('recommended')});
+
+const saving=Math.round(totalH*0.5);
+const weeklySaving=saving*800;
+const roiEl=document.getElementById('roiContent');
+if(totalH>0){
+roiEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent2)">${totalH}</div><div style="font-size:.75rem;color:var(--muted)">Timer/uke admin</div></div>
+<div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent)">${(totalH*800).toLocaleString('nb-NO')} kr</div><div style="font-size:.75rem;color:var(--muted)">Kostnad/uke (800 kr/t)</div></div></div>
+<div style="text-align:center;font-size:.9rem;color:var(--text)">Med KI sparer du ~<strong>${saving} timer/uke</strong> → <strong style="color:var(--green)">${weeklySaving.toLocaleString('nb-NO')} kr/uke</strong> → <strong style="color:var(--green)">${(weeklySaving*52).toLocaleString('nb-NO')} kr/år</strong></div>`;
+}else{roiEl.innerHTML='<span style="color:var(--muted)">Legg inn prosesser for å se ROI.</span>'}
+
+const beDays=document.getElementById('breakEvenDays');
+const activePkg=selectedPkg||recPkg;
+if(weeklySaving>0){
+const days=Math.ceil(pkgPrices[activePkg]/(weeklySaving/7));
+beDays.textContent=days+' dager';
+document.getElementById('breakEvenBox').querySelector('div:last-child').textContent=`${pkgNames[activePkg]} (${pkgPrices[activePkg].toLocaleString('nb-NO')} kr) betaler seg på ${days} dager`;
+}else{beDays.textContent='—'}
+}
+
+function selectPackage(num){
+selectedPkg=num;
+document.querySelectorAll('.pkg-card').forEach(c=>{c.classList.toggle('selected',Number(c.dataset.pkg)===num)});
+document.getElementById('selectedPkgConfirm').style.display='block';
+document.getElementById('selectedPkgName').textContent=pkgNames[num]+' ('+pkgPrices[num].toLocaleString('nb-NO')+' kr)';
+buildPackageSection();save();
+}
+
+const _origCollect=collectAll;
+collectAll=function(){const d=_origCollect();d.valgt_pakke=selectedPkg?pkgNames[selectedPkg]+' ('+pkgPrices[selectedPkg].toLocaleString('nb-NO')+' kr)':'';d.valgt_pakke_pris=selectedPkg?pkgPrices[selectedPkg]:0;return d};
+
+// ====== NETTSIDE URL TOGGLE ======
+function toggleNettsideUrl(){
+const jaChecked=document.getElementById('nettsideJa')?.checked;
+const wrap=document.getElementById('nettsideUrlWrap');
+if(wrap)wrap.style.display=jaChecked?'block':'none';
+}
+
+// ====== KUNDEKANAL CHIPS ======
+let kanalChips=[];
+function renderKanalChips(){
+const container=document.getElementById('kundekanal_chips');
+if(!container)return;
+container.innerHTML='';
+kanalChips.forEach((chip,i)=>{
+const lbl=document.createElement('label');
+lbl.style.cssText='background:var(--accent);color:var(--navy);border-radius:12px;padding:10px 14px;font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer';
+lbl.innerHTML=`${chip} <span onclick="removeKanalChip(${i})" style="font-size:1.1rem;line-height:1;cursor:pointer;opacity:.7">×</span>`;
+container.appendChild(lbl);
+});
+const hidden=document.getElementById('kundekanal_annet_hidden');
+if(hidden){hidden.value=kanalChips.join(', ')}
+save();
+}
+function addKundeKanalChip(){
+const inp=document.getElementById('kundekanal_annet_input');
+if(!inp||!inp.value.trim())return;
+kanalChips.push(inp.value.trim());
+inp.value='';
+renderKanalChips();
+}
+function removeKanalChip(i){
+kanalChips.splice(i,1);
+renderKanalChips();
+}
+document.addEventListener('keydown',function(e){
+if(e.key==='Enter'&&document.activeElement?.id==='kundekanal_annet_input'){
+e.preventDefault();addKundeKanalChip();
+}
+});
+
+// Init
+buildSopTabs();
+loadSaved();
+if(!document.querySelectorAll('.process-card').length){makeProcessCard();makeProcessCard();makeProcessCard()}
+render();
+</script>
+</body>
+</html>
