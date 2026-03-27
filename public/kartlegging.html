@@ -1425,12 +1425,12 @@ body::after {
 <div class="section" data-section="6" data-title="Oppsummering">
 <h2 style="font-size:1.2rem;margin-bottom:16px;text-align:center">📊 Komplett Kartleggingsoppsummering</h2>
 
-<div id="summaryContent"></div>
-
 <h3 style="font-size:1.1rem;margin:24px 0 12px;color:var(--green);text-align:center">💰 ROI-kalkulator</h3>
 <div id="roiCalc" style="background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:20px">
 <div id="roiContent" style="font-size:.88rem;color:var(--muted);line-height:1.8"></div>
 </div>
+
+<div id="summaryContent"></div>
 
 <div class="actions" style="margin-top:24px">
 <button onclick="generateRapport()">📊 Generer Rapport (PDF)</button>
@@ -1848,12 +1848,12 @@ else{html+='<p style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å s
 html+=`</div>`;
 
 if(totalH>0){
-const yearSaving=saving*800*52;
+const yearSaving=saving*800*47;
 html+=`<div class="summary-cards">
 <div class="summary-card"><div class="big">${totalH}</div><div class="label">Timer/uke admin</div></div>
 <div class="summary-card"><div class="big">~${saving}</div><div class="label">Timer spart med KI</div></div>
 <div class="summary-card"><div class="big">${(saving*800).toLocaleString('nb-NO')}</div><div class="label">Spart kr/uke</div></div>
-<div class="summary-card"><div class="big">${(yearSaving/1000).toFixed(0)}k</div><div class="label">Spart kr/år</div></div>
+<div class="summary-card"><div class="big">${(yearSaving/1000).toFixed(0)}k</div><div class="label">Spart kr/år (47 uker)</div></div>
 </div>`;
 }
 el.innerHTML=html;
@@ -1988,7 +1988,7 @@ const modenhetFarge=avgScore>=6?'#34d399':avgScore>=4?'#f0a500':'#ef4444';
 
 // Weekly cost
 const weeklySaving=saving*800;
-const yearlySaving=weeklySaving*52;
+const yearlySaving=weeklySaving*47;
 
 // Package recommendation
 const highProcs=procs.filter(p=>Number(p.frustrasjon)>=4||Number(p.timer)>=10);
@@ -2305,8 +2305,8 @@ const rapportHTML=`
       <th style="padding:12px 16px;text-align:right;font-size:11px;color:#f0a500">Per år</th>
     </tr></thead>
     <tbody>
-      <tr style="background:#f8f9fa"><td style="padding:12px 16px;font-size:13px">Admin-timer i dag</td><td style="padding:12px 16px;text-align:right;font-size:13px">${totalH}t × 800 kr = ${(totalH*800).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700">${(totalH*800*52).toLocaleString('nb-NO')} kr</td></tr>
-      <tr><td style="padding:12px 16px;font-size:13px">Med KI (~50% reduksjon)</td><td style="padding:12px 16px;text-align:right;font-size:13px">${Math.round(totalH*0.5)}t × 800 kr = ${(Math.round(totalH*0.5)*800).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px">${(Math.round(totalH*0.5)*800*52).toLocaleString('nb-NO')} kr</td></tr>
+      <tr style="background:#f8f9fa"><td style="padding:12px 16px;font-size:13px">Admin-timer i dag</td><td style="padding:12px 16px;text-align:right;font-size:13px">${totalH}t × 800 kr = ${(totalH*800).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700">${(totalH*800*47).toLocaleString('nb-NO')} kr</td></tr>
+      <tr><td style="padding:12px 16px;font-size:13px">Med KI (~50% reduksjon)</td><td style="padding:12px 16px;text-align:right;font-size:13px">${Math.round(totalH*0.5)}t × 800 kr = ${(Math.round(totalH*0.5)*800).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:13px">${(Math.round(totalH*0.5)*800*47).toLocaleString('nb-NO')} kr</td></tr>
       <tr style="background:#e8f5e9"><td style="padding:12px 16px;font-size:13px;font-weight:700;color:#1a2332">Netto besparelse</td><td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:700;color:#34d399">${(weeklySaving).toLocaleString('nb-NO')} kr</td><td style="padding:12px 16px;text-align:right;font-size:15px;font-weight:800;color:#34d399">${(yearlySaving).toLocaleString('nb-NO')} kr</td></tr>
     </tbody>
   </table>
@@ -2420,7 +2420,7 @@ if(totalH>0){
 roiEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 <div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent2)">${totalH}</div><div style="font-size:.75rem;color:var(--muted)">Timer/uke admin</div></div>
 <div style="text-align:center;padding:12px;background:rgba(255,255,255,.03);border-radius:10px"><div style="font-size:1.5rem;font-weight:800;color:var(--accent)">${(totalH*800).toLocaleString('nb-NO')} kr</div><div style="font-size:.75rem;color:var(--muted)">Kostnad/uke (800 kr/t)</div></div></div>
-<div style="text-align:center;font-size:.9rem;color:var(--text)">Med KI sparer du ~<strong>${saving} timer/uke</strong> → <strong style="color:var(--green)">${weeklySaving.toLocaleString('nb-NO')} kr/uke</strong> → <strong style="color:var(--green)">${(weeklySaving*52).toLocaleString('nb-NO')} kr/år</strong></div>`;
+<div style="text-align:center;font-size:.9rem;color:var(--text)">Med KI sparer du ~<strong>${saving} timer/uke</strong> → <strong style="color:var(--green)">${weeklySaving.toLocaleString('nb-NO')} kr/uke</strong> → <strong style="color:var(--green)">${(weeklySaving*47).toLocaleString('nb-NO')} kr/år (47 uker)</strong></div>`;
 }else{roiEl.innerHTML='<span style="color:var(--muted)">Legg inn prosesser for å se ROI.</span>'}
 
 const beDays=document.getElementById('breakEvenDays');
