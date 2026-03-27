@@ -2374,8 +2374,9 @@ else if(highProcs.length>=1||medProcs.length>=2||kiTried==='Nei'||totalH>=5)recP
 
 const recEl=document.getElementById('autoRecommendation');
 if(totalH>0){
+const savedH=Number(document.getElementById('roiSavedHours')?.value)||saving;
 recEl.innerHTML=`<strong style="color:var(--accent)">Basert på kartleggingen:</strong><br>
-Du bruker totalt <strong>${totalH} timer/uke</strong> på ${procs.length} prosesser${highProcs.length>0?' — <strong>'+highProcs.length+' med høyt KI-potensial</strong>':''}.<br>
+KI kan spare deg ~<strong>${savedH} timer/uke</strong> fordelt på ${procs.length} prosesser${highProcs.length>0?' — <strong>'+highProcs.length+' med høyt KI-potensial</strong>':''}.<br>
 👉 <strong>Vi anbefaler: ${pkgNames[recPkg]} (${pkgPrices[recPkg].toLocaleString('nb-NO')} kr)</strong>`;
 }else{recEl.innerHTML='<span style="color:var(--muted)">Fyll ut prosesser i seksjon 3 for å se anbefaling.</span>'}
 
