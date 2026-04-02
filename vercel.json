@@ -1,40 +1,27 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "public/**/*",
-      "use": "@vercel/static"
-    }
+    { "src": "api/generate-rapport.js", "use": "@vercel/node", "config": { "maxDuration": 60 } },
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/quiz",
-      "dest": "/public/quiz.html"
-    },
-    {
-      "src": "/test",
-      "dest": "/public/test.html"
-    },
-    {
-      "src": "/dashboard",
-      "dest": "/public/dashboard.html"
-    },
-    {
-      "src": "/",
-      "dest": "/public/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
-  ],
-  "env": {}
+    { "src": "/api/debug-env", "dest": "/api/debug-env.js" },
+    { "src": "/api/test-secret", "dest": "/api/test-secret.js" },
+    { "src": "/api/test-anthropic", "dest": "/api/test-anthropic.js" },
+    { "src": "/api/generate-rapport", "dest": "/api/generate-rapport.js" },
+    { "src": "/api/approve-rapport", "dest": "/api/approve-rapport.js" },
+    { "src": "/api/discord-notify", "dest": "/api/discord-notify.js" },
+    { "src": "/api/supabase-webhook", "dest": "/api/supabase-webhook.js" },
+    { "src": "/api/submit", "dest": "/api/submit.js" },
+    { "src": "/api/chat-kartlegging", "dest": "/api/chat-kartlegging.js" },
+    { "src": "/kartlegging", "dest": "/public/kartlegging.html" },
+    { "src": "/kartlegging-v4", "dest": "/public/kartlegging-v4.html" },
+    { "src": "/kartlegging-ai", "dest": "/public/kartlegging-v6-ai.html" },
+    { "src": "/quiz", "dest": "/public/quiz.html" },
+    { "src": "/test", "dest": "/public/test.html" },
+    { "src": "/dashboard", "dest": "/public/dashboard.html" },
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ]
 }
