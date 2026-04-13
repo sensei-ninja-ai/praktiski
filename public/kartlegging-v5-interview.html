@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KI-Kartlegging — Praktisk Intelligens</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1a2332;--slate:#2d3a4a;--card:#354357;--accent:#f0a500;--accent2:#ff6b35;--text:#e8ecf1;--muted:#8a9bb5;--green:#34d399;--red:#ef4444;--radius:14px;--shadow:0 4px 20px rgba(0,0,0,.3)}
+html{font-size:18px;touch-action:manipulation}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--navy);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+
+/* INTRO */
+#introScreen{position:fixed;inset:0;z-index:999;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;overflow-y:auto;
+background-image:linear-gradient(rgba(79,195,247,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,195,247,0.04) 1px,transparent 1px);background-size:40px 40px}
+.intro-logo{width:72px;height:72px;background:linear-gradient(135deg,rgba(79,195,247,.15),rgba(240,165,0,.1));border:2px solid rgba(79,195,247,.5);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 16px;box-shadow:0 0 20px rgba(79,195,247,.3)}
+.intro-brand{font-size:.85rem;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.intro-title{font-size:1.55rem;font-weight:800;line-height:1.25;margin-bottom:12px}
+.intro-title span{color:var(--accent)}
+.intro-sub{font-size:.9rem;color:var(--muted);line-height:1.6;margin-bottom:24px;max-width:420px}
+.intro-bullets{background:rgba(79,195,247,.04);border:1px solid rgba(79,195,247,.25);border-radius:var(--radius);padding:18px 22px;margin-bottom:24px;text-align:left;max-width:420px;width:100%}
+.intro-bullets li{list-style:none;font-size:.88rem;color:var(--text);padding:6px 0;line-height:1.4}
+.intro-bullets li+li{border-top:1px solid rgba(255,255,255,.05)}
+.intro-start-btn{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:20px 40px;font-size:1.1rem;font-weight:800;cursor:pointer;width:100%;max-width:420px;min-height:64px;box-shadow:0 0 20px rgba(240,165,0,.4);animation:btnPulse 2s ease-in-out infinite}
+@keyframes btnPulse{0%,100%{box-shadow:0 0 20px rgba(240,165,0,.4)}50%{box-shadow:0 0 30px rgba(240,165,0,.65)}}
+.intro-footer{margin-top:16px;font-size:.72rem;color:var(--muted)}
+
+/* MAIN */
+#mainApp{display:none;max-width:600px;margin:0 auto;padding:24px 20px 160px}
+
+/* HEADER */
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.hdr-brand{font-size:.95rem;font-weight:700;color:var(--accent)}
+.hdr-badge{font-size:.72rem;color:var(--muted)}
+
+/* CONFIDENCE METER */
+.conf-wrap{margin-bottom:28px}
+.conf-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.82rem}
+.conf-pct{font-size:1.3rem;font-weight:800;color:var(--accent)}
+.conf-bar{height:10px;background:var(--slate);border-radius:5px;overflow:hidden}
+.conf-fill{height:100%;background:linear-gradient(90deg,#4fc3f7,var(--accent),#ff6b35);border-radius:5px;transition:width .8s cubic-bezier(.4,0,.2,1);box-shadow:0 0 10px rgba(240,165,0,.5)}
+.conf-status{font-size:.78rem;color:var(--muted);margin-top:6px;font-style:italic}
+
+/* CHAT BUBBLES */
+.chat{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.bubble-agent{align-self:flex-start;max-width:88%}
+.bubble-user{align-self:flex-end;max-width:88%}
+.bubble-agent .btext{background:var(--card);border:1px solid rgba(79,195,247,.2);border-radius:4px 18px 18px 18px;padding:14px 18px;font-size:.92rem;line-height:1.55;color:var(--text)}
+.bubble-user .btext{background:var(--accent);color:var(--navy);border-radius:18px 4px 18px 18px;padding:14px 18px;font-size:.92rem;line-height:1.55;font-weight:500}
+.bubble-label{font-size:.68rem;color:var(--muted);margin-bottom:4px;padding:0 4px}
+.bubble-user .bubble-label{text-align:right}
+.typing{display:flex;align-items:center;gap:4px;padding:14px 18px;background:var(--card);border:1px solid rgba(79,195,247,.2);border-radius:4px 18px 18px 18px;width:64px}
+.dot-typing{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:typing 1.2s infinite}
+.dot-typing:nth-child(2){animation-delay:.2s}
+.dot-typing:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,80%,100%{transform:scale(1);opacity:.5}40%{transform:scale(1.2);opacity:1}}
+
+/* INPUT AREA */
+.input-wrap{position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:1px solid rgba(79,195,247,.12);padding:14px 16px;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+.input-inner{max-width:600px;margin:0 auto;display:flex;gap:10px;align-items:flex-end}
+.input-inner textarea{flex:1;background:var(--slate);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:14px 16px;font-size:1rem;color:var(--text);resize:none;outline:none;min-height:54px;max-height:160px;overflow-y:auto;line-height:1.4;transition:border .2s}
+.input-inner textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(240,165,0,.15)}
+.send-btn{background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);width:54px;height:54px;font-size:1.4rem;cursor:pointer;flex-shrink:0;transition:opacity .15s;box-shadow:0 0 12px rgba(240,165,0,.3)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn:active{opacity:.8}
+
+/* SUMMARY */
+.summary-box{background:var(--card);border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.summary-box h3{color:var(--accent);font-size:.95rem;margin-bottom:12px}
+.summary-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.85rem;line-height:1.5}
+.summary-item:last-child{border:none}
+.summary-item strong{color:var(--accent);display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+
+/* CONTACT FORM */
+.contact-section{background:var(--slate);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.contact-section h3{color:var(--accent);font-size:.95rem;margin-bottom:16px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.82rem;font-weight:600;margin-bottom:6px;color:var(--text)}
+.field input{width:100%;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:14px 16px;font-size:1rem;color:var(--text);outline:none;min-height:52px}
+.field input:focus{border-color:var(--accent)}
+
+/* SUBMIT BTN */
+.submit-btn{width:100%;background:var(--accent);color:var(--navy);border:none;border-radius:var(--radius);padding:20px;font-size:1.05rem;font-weight:800;cursor:pointer;min-height:64px;box-shadow:0 0 20px rgba(240,165,0,.4);margin-bottom:12px}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* CONFIRM */
+#confirmScreen{display:none;position:fixed;inset:0;background:var(--navy);flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;z-index:999}
+.confirm-icon{font-size:4rem;margin-bottom:20px}
+.confirm-h1{font-size:1.8rem;font-weight:800;margin-bottom:12px}
+.confirm-h1 span{color:var(--accent)}
+.confirm-sub{font-size:.9rem;color:var(--muted);line-height:1.6;max-width:400px}
+
+/* STEP INDICATOR */
+.steps{display:flex;gap:6px;margin-bottom:20px;justify-content:center}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--slate);transition:all .3s}
+.step-dot.done{background:var(--green)}
+.step-dot.active{background:var(--accent);transform:scale(1.4)}
+
+@media(max-width:480px){
+  #mainApp{padding:20px 14px 160px}
+  .bubble-agent .btext,.bubble-user .btext{font-size:.88rem;padding:12px 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="introScreen">
+  <div class="intro-logo">🧠</div>
+  <div class="intro-brand">Praktisk Intelligens</div>
+  <h1 class="intro-title">Finn ut hva <span>KI kan gjøre</span><br>for din bedrift</h1>
+  <p class="intro-sub">En samtale — ikke et skjema. Vi stiller deg 5–6 spørsmål og bygger et bilde av hvor KI kan hjelpe deg mest.</p>
+  <ul class="intro-bullets">
+    <li>💬 Svar fritt med egne ord</li>
+    <li>⚡ Tar under 5 minutter</li>
+    <li>📊 Du får en personlig oppsummering</li>
+    <li>📬 Vi sender deg en KI-analyse på e-post</li>
+  </ul>
+  <button class="intro-start-btn" onclick="startInterview()">Start samtalen →</button>
+  <p class="intro-footer">100% gratis · Ingen forpliktelser · Konfidensielt</p>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp">
+  <div class="hdr">
+    <span class="hdr-brand">🧠 Praktisk Intelligens</span>
+    <span class="hdr-badge">KI-kartlegging</span>
+  </div>
+
+  <div class="conf-wrap">
+    <div class="conf-label">
+      <span style="color:var(--muted);font-size:.78rem">Forståelsesnivå</span>
+      <span class="conf-pct" id="confPct">0%</span>
+    </div>
+    <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
+    <div class="conf-status" id="confStatus">Fortell meg litt om deg selv…</div>
+  </div>
+
+  <div class="steps" id="stepDots"></div>
+
+  <div class="chat" id="chat"></div>
+
+  <!-- Summary + contact shown at end -->
+  <div id="summarySection" style="display:none">
+    <div class="summary-box">
+      <h3>📊 Oppsummering</h3>
+      <div id="summaryItems"></div>
+    </div>
+    <div class="contact-section">
+      <h3>📬 Send meg analysen på e-post</h3>
+      <div class="field"><label>Navn <span style="color:var(--red)">★</span></label><input type="text" id="c_navn" placeholder="Ditt fulle navn"></div>
+      <div class="field"><label>E-post <span style="color:var(--red)">★</span></label><input type="email" id="c_epost" placeholder="din@bedrift.no"></div>
+      <div class="field"><label>Telefon</label><input type="tel" id="c_tlf" placeholder="900 12 345"></div>
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="submitInterview()">Send inn og få analysen 🚀</button>
+    <p style="font-size:.7rem;color:var(--muted);text-align:center">Konfidensielt · Ingen forpliktelser</p>
+  </div>
+</div>
+
+<!-- INPUT AREA -->
+<div class="input-wrap" id="inputWrap" style="display:none">
+  <div class="input-inner">
+    <textarea id="userInput" placeholder="Skriv svaret ditt her…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendAnswer()">➤</button>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirmScreen">
+  <div class="confirm-icon">🎉</div>
+  <h2 class="confirm-h1">Takk, <span id="confirmNavn">!</span></h2>
+  <p class="confirm-sub">Vi har mottatt svarene dine og setter sammen en KI-analyse tilpasset din bedrift. Du hører fra oss innen 24 timer.</p>
+</div>
+
+<script>
+// ====== STATE ======
+const answers = {};
+let currentQ = 0;
+let confidence = 0;
+let interviewDone = false;
+
+const CONF_STEPS = [0, 20, 45, 65, 80, 95];
+
+// ====== QUESTION POOL ======
+// q0: always first (open start)
+// q1-q5: follow-up pool (pick based on q0 answer)
+// qLast: always last
+const Q_START = {
+  id: 'start',
+  text: 'Beskriv med dine egne ord — hva tror du KI kan hjelpe deg med i hverdagen?',
+  hint: 'Skriv fritt, det finnes ingen feil svar'
+};
+
+const Q_FOLLOWUP_POOL = [
+  {id:'tid',     text:'Sparte du tid i løpet av forrige uke? Hva tok lengst?'},
+  {id:'ansatte', text:'Har du ansatte? Hvem i bedriften bruker mest tid på repetitive oppgaver?'},
+  {id:'admin',   text:'Hva ville du gjort mer av hvis all admin forsvant i morgen?'},
+  {id:'frust',   text:'Hvilken del av arbeidsdagen er mest frustrerende for deg?'},
+  {id:'kierfar', text:'Har du prøvd noen KI-verktøy tidligere? Hva skjedde?'},
+];
+
+const Q_LAST = {
+  id: 'prioritet',
+  text: 'Siste spørsmål: Hva er viktigst for deg — spare tid, spare penger, eller gjøre noe som ikke er mulig i dag?'
+};
+
+// Spørsmål-rekkefølge: start + 3 utvalgte followup + last = 5 totalt
+let questionSequence = [];
+let qIdx = 0;
+
+// ====== HELPERS ======
+function addBubble(role, text, animated = false) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-' + role;
+  const lbl = document.createElement('div');
+  lbl.className = 'bubble-label';
+  lbl.textContent = role === 'agent' ? '🧠 Sensei' : '👤 Deg';
+  const btext = document.createElement('div');
+  btext.className = 'btext';
+  if (animated && role === 'agent') {
+    btext.textContent = '';
+    wrap.appendChild(lbl);
+    wrap.appendChild(btext);
+    chat.appendChild(wrap);
+    scrollBottom();
+    animateText(btext, text);
+  } else {
+    btext.textContent = text;
+    wrap.appendChild(lbl);
+    wrap.appendChild(btext);
+    chat.appendChild(wrap);
+    scrollBottom();
+  }
+}
+
+function animateText(el, text) {
+  let i = 0;
+  const speed = Math.max(8, Math.min(20, 600 / text.length));
+  const iv = setInterval(() => {
+    el.textContent += text[i++];
+    scrollBottom();
+    if (i >= text.length) clearInterval(iv);
+  }, speed);
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-agent';
+  wrap.id = 'typingBubble';
+  const lbl = document.createElement('div');
+  lbl.className = 'bubble-label';
+  lbl.textContent = '🧠 Sensei';
+  const t = document.createElement('div');
+  t.className = 'typing';
+  t.innerHTML = '<div class="dot-typing"></div><div class="dot-typing"></div><div class="dot-typing"></div>';
+  wrap.appendChild(lbl);
+  wrap.appendChild(t);
+  chat.appendChild(wrap);
+  scrollBottom();
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingBubble');
+  if (t) t.remove();
+}
+
+function scrollBottom() {
+  window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+}
+
+function setConf(pct, status) {
+  confidence = pct;
+  document.getElementById('confPct').textContent = pct + '%';
+  document.getElementById('confFill').style.width = pct + '%';
+  if (status) document.getElementById('confStatus').textContent = status;
+  updateStepDots();
+}
+
+function updateStepDots() {
+  const container = document.getElementById('stepDots');
+  const total = questionSequence.length;
+  container.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i < qIdx ? ' done' : i === qIdx ? ' active' : '');
+    container.appendChild(d);
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendAnswer();
+  }
+}
+
+// ====== PICK FOLLOWUP QUESTIONS ======
+function pickFollowups(startAnswer) {
+  const a = startAnswer.toLowerCase();
+  let pool = [...Q_FOLLOWUP_POOL];
+  
+  // Simple keyword-based priority
+  const scored = pool.map(q => {
+    let score = Math.random() * 2; // base randomness
+    if (q.id === 'tid' && (a.includes('tid') || a.includes('lang') || a.includes('sakte'))) score += 3;
+    if (q.id === 'ansatte' && (a.includes('ansatt') || a.includes('team') || a.includes('kollega') || a.includes('medarbeider'))) score += 3;
+    if (q.id === 'admin' && (a.includes('admin') || a.includes('papir') || a.includes('skjema') || a.includes('faktura') || a.includes('rapport'))) score += 3;
+    if (q.id === 'frust' && (a.includes('frustrert') || a.includes('irriter') || a.includes('kjedelig') || a.includes('trøtt'))) score += 3;
+    if (q.id === 'kierfar' && (a.includes('chatgpt') || a.includes('ki ') || a.includes('ai ') || a.includes('prøv'))) score += 3;
+    return { ...q, score };
+  });
+  
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 3).map(q => ({ id: q.id, text: q.text }));
+}
+
+// ====== INTERVIEW FLOW ======
+function startInterview() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('inputWrap').style.display = 'block';
+  
+  // Build initial sequence (placeholder, real followups set after q0 answer)
+  questionSequence = [Q_START, null, null, null, Q_LAST]; // 5 slots
+  updateStepDots();
+  
+  setTimeout(() => {
+    addBubble('agent', 'Hei! 👋 Jeg er her for å finne ut hvor KI kan gjøre størst nytte for akkurat din bedrift.', true);
+    setTimeout(() => {
+      showTyping();
+      setTimeout(() => {
+        removeTyping();
+        addBubble('agent', Q_START.text, true);
+        enableInput(Q_START.hint);
+      }, 1000);
+    }, 1800);
+  }, 300);
+}
+
+function enableInput(placeholder) {
+  const inp = document.getElementById('userInput');
+  const btn = document.getElementById('sendBtn');
+  inp.placeholder = placeholder || 'Skriv svaret ditt her…';
+  inp.disabled = false;
+  btn.disabled = false;
+  setTimeout(() => inp.focus(), 400);
+}
+
+function disableInput() {
+  document.getElementById('userInput').disabled = true;
+  document.getElementById('sendBtn').disabled = true;
+}
+
+function sendAnswer() {
+  const inp = document.getElementById('userInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  
+  disableInput();
+  inp.value = '';
+  inp.style.height = 'auto';
+  
+  addBubble('user', text);
+  
+  const q = questionSequence[qIdx];
+  if (q) answers[q.id] = text;
+  
+  // After q0, pick followups
+  if (qIdx === 0) {
+    const followups = pickFollowups(text);
+    questionSequence = [Q_START, ...followups, Q_LAST];
+    updateStepDots();
+  }
+  
+  qIdx++;
+  const confPct = CONF_STEPS[Math.min(qIdx, CONF_STEPS.length - 1)];
+  const statuses = [
+    'Bra start! Jeg begynner å forstå situasjonen din…',
+    'Interessant — vi nærmer oss noe konkret…',
+    'Bildet blir klarere for meg nå…',
+    'Jeg ser tydelig hvilke muligheter du har…',
+    'Nesten der — ett siste spørsmål…',
+    '95% sikkerhet nådd! Oppsummerer nå…'
+  ];
+  setConf(confPct, statuses[Math.min(qIdx - 1, statuses.length - 1)]);
+  
+  if (qIdx >= questionSequence.length) {
+    // Interview done
+    setTimeout(() => showSummary(), 600);
+  } else {
+    const nextQ = questionSequence[qIdx];
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      addBubble('agent', nextQ.text, true);
+      enableInput();
+    }, 1200 + Math.random() * 600);
+  }
+}
+
+// ====== SUMMARY ======
+function showSummary() {
+  setConf(95, 'Analyse fullført — 95% confidence oppnådd ✅');
+  interviewDone = true;
+  
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    addBubble('agent', 'Perfekt! Jeg har nok til å lage en god analyse. Her er hva jeg har lært om deg:', true);
+    
+    setTimeout(() => {
+      document.getElementById('inputWrap').style.display = 'none';
+      const summarySection = document.getElementById('summarySection');
+      summarySection.style.display = 'block';
+      buildSummaryItems();
+      scrollBottom();
+    }, 1500);
+  }, 1000);
+}
+
+function buildSummaryItems() {
+  const container = document.getElementById('summaryItems');
+  const labels = {
+    start: 'Hva du tror KI kan hjelpe med',
+    tid: 'Tid og tidstyver',
+    ansatte: 'Team og repetitive oppgaver',
+    admin: 'Drømmescenario uten admin',
+    frust: 'Største frustrasjon',
+    kierfar: 'KI-erfaring',
+    prioritet: 'Viktigst for deg'
+  };
+  
+  container.innerHTML = '';
+  for (const [key, val] of Object.entries(answers)) {
+    if (!val) continue;
+    const div = document.createElement('div');
+    div.className = 'summary-item';
+    div.innerHTML = `<strong>${labels[key] || key}</strong>${val}`;
+    container.appendChild(div);
+  }
+}
+
+// ====== SUBMIT ======
+const SUPABASE_URL = 'https://qfbdwqqebnhdlwqsvgea.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmYmR3cXFlYm5oZGx3cXN2Z2VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzcyNzAsImV4cCI6MjA4OTYxMzI3MH0.y0l7QXnS9wV8ZND5LVB3tg8aCKh05xf-1YGpeVqhTok';
+
+async function submitInterview() {
+  const navn = document.getElementById('c_navn').value.trim();
+  const epost = document.getElementById('c_epost').value.trim();
+  const tlf = document.getElementById('c_tlf').value.trim();
+  
+  if (!navn || !epost) {
+    alert('Fyll inn navn og e-post for å motta analysen.');
+    return;
+  }
+  
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sender…';
+  
+  const payload = {
+    navn,
+    epost,
+    telefon: tlf || null,
+    confidence_score: confidence,
+    smertepunkter: answers.frust || answers.start || null,
+    drommescenario: answers.admin || null,
+    ki_erfaring: answers.kierfar || null,
+    notat: JSON.stringify({
+      version: 'v5-interview',
+      timestamp: new Date().toISOString(),
+      answers,
+      confidence,
+      question_sequence: questionSequence.map(q => q?.id)
+    }),
+    status: 'ny'
+  };
+  
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/kartlegginger', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!res.ok) console.warn('Supabase error:', res.status, await res.text());
+    
+    // Discord notify (fire-and-forget)
+    fetch('/api/discord-notify', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        bedrift: navn,
+        navn,
+        epost,
+        score: confidence,
+        modenhet: 'v5-interview',
+        bransje: '—',
+        ansatte: '—',
+        roi: 0,
+        pakke: '—'
+      })
+    }).catch(() => {});
+    
+  } catch (e) {
+    console.warn('Submit error (non-fatal):', e);
+  }
+  
+  // Show confirm
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('inputWrap').style.display = 'none';
+  document.getElementById('confirmNavn').textContent = navn.split(' ')[0] + '!';
+  const cs = document.getElementById('confirmScreen');
+  cs.style.display = 'flex';
+}
+</script>
+</body>
+</html>

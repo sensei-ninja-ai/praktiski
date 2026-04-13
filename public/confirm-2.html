@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant 2 — Split Layout</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#1a2332;color:#e8ecf1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.wrap{max-width:500px;width:100%}
+
+.logo{font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:rgba(240,165,0,.7);margin-bottom:48px;text-align:center}
+
+.icon-line{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:36px}
+.step{display:flex;flex-direction:column;align-items:center;gap:6px}
+.step-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700}
+.step-dot.done{background:#f0a500;color:#1a2332}
+.step-dot.active{background:rgba(240,165,0,.15);border:2px solid #f0a500;color:#f0a500}
+.step-dot.idle{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);color:#4a5568}
+.step-label{font-size:.62rem;color:#5a6a7e;text-transform:uppercase;letter-spacing:1px;text-align:center;max-width:60px}
+.step-line{width:40px;height:2px;background:rgba(255,255,255,.08);margin-top:-22px;align-self:center}
+.step-line.done{background:rgba(240,165,0,.4)}
+
+h1{font-family:'DM Serif Display',serif;font-size:2.4rem;line-height:1.2;text-align:center;margin-bottom:6px}
+h1 em{font-style:italic;color:#f0a500}
+
+.sub{text-align:center;font-size:.95rem;color:#8a9bb5;line-height:1.7;margin-bottom:36px;max-width:400px;margin-left:auto;margin-right:auto}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
+.box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:20px 16px}
+.box-icon{font-size:1.4rem;margin-bottom:8px}
+.box strong{display:block;font-size:.88rem;font-weight:600;margin-bottom:4px}
+.box span{font-size:.78rem;color:#6a7a8e;line-height:1.4}
+.box.highlight{background:rgba(240,165,0,.06);border-color:rgba(240,165,0,.2)}
+.box.highlight strong{color:#f0a500}
+
+.btn{width:100%;background:linear-gradient(135deg,#f0a500,#e09500);color:#1a2332;border:none;border-radius:8px;padding:18px;font-size:.95rem;font-weight:700;cursor:pointer;letter-spacing:.3px;font-family:'DM Sans',sans-serif;margin-bottom:10px}
+.btn2{width:100%;background:transparent;color:#4a5568;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+.fine{font-size:.72rem;color:#3a4a5e;text-align:center;margin-top:20px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Praktisk Intelligens</div>
+
+  <div class="icon-line">
+    <div class="step">
+      <div class="step-dot done">✓</div>
+      <div class="step-label">Kartlegging</div>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step">
+      <div class="step-dot active">2</div>
+      <div class="step-label">Analyse</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-dot idle">3</div>
+      <div class="step-label">Rapport</div>
+    </div>
+  </div>
+
+  <h1>Godt gjort.<br><em>Rapporten</em> er på vei.</h1>
+  <p class="sub">Vi analyserer nå svarene dine og setter sammen en rapport skreddersydd for din bedrift. Den lander i innboksen din innen 24 timer.</p>
+
+  <div class="grid">
+    <div class="box highlight">
+      <div class="box-icon">📊</div>
+      <strong>KI-analyse</strong>
+      <span>Hvilke prosesser som egner seg best for automatisering</span>
+    </div>
+    <div class="box highlight">
+      <div class="box-icon">💰</div>
+      <strong>ROI-estimat</strong>
+      <span>Estimert tidsbesparelse og verdi per uke for din bedrift</span>
+    </div>
+    <div class="box">
+      <div class="box-icon">🎯</div>
+      <strong>Topp 3 tiltak</strong>
+      <span>Konkrete KI-grep du kan starte med neste uke</span>
+    </div>
+    <div class="box">
+      <div class="box-icon">📦</div>
+      <strong>Anbefalt pakke</strong>
+      <span>Løsning tilpasset ditt behov og budsjett</span>
+    </div>
+  </div>
+
+  <button class="btn" onclick="location.href='/quiz'">Ta bedriftsquizen →</button>
+  <button class="btn2" onclick="location.reload()">Analyser en ny bedrift</button>
+  <p class="fine">100% konfidensielt · Dataene anonymiseres<br>© 2026 Praktisk Intelligens</p>
+</div>
+</body>
+</html>

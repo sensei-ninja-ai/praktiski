@@ -105,10 +105,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
 <!-- SCREEN: Intro -->
 <div class="screen active" id="screen-intro">
-  <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> 3 minutter</div>
-  <h1 class="hero-title">Hvor god er <span>du</span> med KI?</h1>
-  <p class="hero-sub">12 spørsmål som avslører ditt KI-nivå — fra KI-turist til KI-sensei. Ingen fagsjargong, bare ærlige spørsmål om hvordan du bruker KI i hverdagen.</p>
-  <button class="btn" onclick="showScreen('screen-quiz');renderQuestion()">Ta quizen →</button>
+  <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> 3 minutter · 12 spørsmål</div>
+  <h1 class="hero-title">Er du foran eller bak <span>KI-kurven?</span></h1>
+  <p class="hero-sub">90% av nordmenn tror de er bedre med KI enn de er. Denne quizen avslører nøyaktig hvor du faktisk ligger — og hva som skal til for å nå neste nivå.</p>
+  <button class="btn" onclick="showScreen('screen-quiz');renderQuestion()">Finn ut nå →</button>
 </div>
 
 <!-- SCREEN: Quiz -->
@@ -131,7 +131,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="loading-screen">
     <div class="spinner"></div>
     <p class="loading-text">Beregner KI-nivået ditt<span class="loading-dots"></span></p>
-    <p style="color:var(--muted);font-size:.85rem;margin-top:.75rem">Analyserer svarene dine</p>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:.75rem">Sammenligner med norske gjennomsnittet...</p>
   </div>
 </div>
 
@@ -145,7 +145,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
       </svg>
       <div class="score-value">
         <div class="score-number mono" id="score-num">0</div>
-        <div class="score-label">av 36</div>
+        <div class="score-label">av 100</div>
       </div>
     </div>
     <div class="level-badge" id="level-badge"></div>
@@ -166,9 +166,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
   <!-- CTA -->
   <div class="cta-box">
-    <h3>🧠 Vil du bli bedre?</h3>
-    <p>Bli med i Praktisk Intelligens-fellesskapet på Skool — Norges mest hands-on KI-community. Her lærer du prompting, verktøy og automatisering med folk som deg.</p>
+    <h3>🚀 Ta det til neste nivå</h3>
+    <p>Bli med i Praktisk Intelligens på Skool — Norges mest praktiske KI-community. Ingen buzzwords. Bare konkrete verktøy, prompts og triks du kan bruke fra dag én.</p>
     <button class="btn" onclick="window.open('https://www.skool.com/praktisere-kunstig-intelligens-9038','_blank')">Bli med gratis →</button>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Over 200 nordmenn har allerede blitt med</p>
   </div>
 
   <div id="expert-cta" style="display:none;margin-top:1rem">
@@ -217,11 +218,11 @@ const categories = [
 ];
 
 const levels = [
-  {min:0,max:7,name:"KI-turisten",emoji:"🫣",color:"var(--red)",desc:"Du har sett KI fra utsiden, men aldri egentlig sjekket inn. Null stress — alle starter her. Det viktigste er at du er nysgjerrig nok til å ta denne quizen."},
-  {min:8,max:15,name:"Copy-pasteren",emoji:"📋",color:"var(--orange)",desc:"Du bruker KI som en fancy Google. Det funker, men du utnytter kanskje 10% av potensialet. Med noen enkle grep kan du gå fra å spørre KI til å samarbeide med den."},
-  {min:16,max:23,name:"KI-brukeren",emoji:"🎯",color:"var(--accent)",desc:"Du er i gang og vet mer enn de fleste. Men det er noen smarte triks du går glipp av som kan spare deg timer i uka."},
-  {min:24,max:30,name:"Prompt-ninjaen",emoji:"🥷",color:"var(--green)",desc:"Du vet hva du gjør. KI er en del av hverdagen din, og du sparer seriøs tid. Du er blant de som faktisk forstår kraften i gode prompts."},
-  {min:31,max:36,name:"KI-sensei",emoji:"🧠",color:"var(--green)",desc:"Du er blant de 1% som virkelig forstår og bruker KI effektivt. Folk burde lære av deg — og kanskje du burde lære dem?"}
+  {min:0,max:20,name:"KI-turisten",emoji:"🫣",color:"var(--red)",desc:"Du har sett KI fra utsiden, men aldri egentlig sjekket inn — og det er OK. De fleste starter her. Det som teller er at du tok dette steget. Med et par grep denne uka kan du allerede spare 2–3 timer."},
+  {min:21,max:42,name:"Copy-pasteren",emoji:"📋",color:"var(--orange)",desc:"Du bruker KI som en fancy Google — og det funker, men du utnytter kanskje 15% av potensialet. Du er et kurs unna å bruke KI som en assistent som faktisk leverer. Det er lettere enn du tror."},
+  {min:43,max:64,name:"KI-brukeren",emoji:"🎯",color:"var(--accent)",desc:"Du er godt i gang og ligger foran 70% av norske bedriftseiere. Men det er noen smarte grep du mangler — de som skiller brukeren fra eksperten. Du er tett på neste nivå."},
+  {min:65,max:83,name:"Prompt-ninjaen",emoji:"🥷",color:"var(--green)",desc:"Imponerende. KI er en naturlig del av arbeidsdagen din, og du vet nøyaktig hva du gjør. Du er blant de 10% som faktisk henter ut verdien. Neste steg: hjelp bedriften din å nå samme nivå."},
+  {min:84,max:100,name:"KI-sensei",emoji:"🧠",color:"var(--green)",desc:"Du er blant de 1% av nordmenn som virkelig mestrer KI. Ikke bare bruker det — men tenker i systemer, workflows og automatisering. Spørsmålet nå er: hva gjør du med det forspranget?"}
 ];
 
 const levelTips = [
@@ -313,10 +314,11 @@ document.addEventListener('keydown',e=>{
 function showResults(){
   const catScores = categories.map(()=>0);
   questions.forEach((q,i)=>{catScores[q.catIdx]+=answers[i]});
-  const total = catScores.reduce((a,b)=>a+b,0);
+  const rawTotal = catScores.reduce((a,b)=>a+b,0);
+  const total = Math.round((rawTotal/36)*100); // konvertert til 0-100
   const catPcts = categories.map((c,i)=>Math.round((catScores[i]/c.max)*100));
 
-  const levelIdx = total<=7?0:total<=15?1:total<=23?2:total<=30?3:4;
+  const levelIdx = total<=20?0:total<=42?1:total<=64?2:total<=83?3:4;
   const level = levels[levelIdx];
 
   showScreen('screen-results');
@@ -324,17 +326,17 @@ function showResults(){
   // Score arc
   const arc = document.getElementById('score-arc');
   const circumference = 553;
-  const offset = circumference - (total/36)*circumference;
+  const offset = circumference - (total/100)*circumference;
   setTimeout(()=>{arc.style.strokeDashoffset=offset;arc.style.stroke=level.color},100);
 
   // Count up
   let count=0;
   const numEl=document.getElementById('score-num');
   const counter=setInterval(()=>{
-    count++;
+    count+=2;
     if(count>=total){count=total;clearInterval(counter)}
     numEl.textContent=count;
-  },50);
+  },20);
 
   // Level badge
   const badge=document.getElementById('level-badge');

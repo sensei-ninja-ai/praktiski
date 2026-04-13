@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant 1 — Profesjonell Kvittering</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f5f4f0;color:#1a1a2e;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.card{background:#fff;border-radius:4px;max-width:520px;width:100%;box-shadow:0 2px 40px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);overflow:hidden}
+
+.card-top{background:#1a2332;padding:48px 40px 40px;text-align:center;position:relative}
+.card-top::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f0a500,#ff6b35)}
+
+.check-wrap{width:64px;height:64px;border-radius:50%;border:2px solid rgba(240,165,0,.6);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;background:rgba(240,165,0,.08)}
+.check-wrap svg{width:28px;height:28px;stroke:#f0a500;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.top-label{font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(240,165,0,.8);margin-bottom:10px}
+.top-title{font-family:'DM Serif Display',serif;font-size:2rem;color:#fff;line-height:1.2;margin-bottom:8px}
+.top-sub{font-size:.9rem;color:rgba(200,216,232,.7);line-height:1.6}
+
+.card-body{padding:36px 40px}
+
+.timeline{margin-bottom:32px}
+.tl-row{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid #f0f0ec}
+.tl-row:last-child{border:none}
+.tl-icon{width:40px;height:40px;border-radius:4px;background:#f5f4f0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.tl-icon.done{background:#f0f9f4;color:#16a34a}
+.tl-text{display:flex;flex-direction:column;justify-content:center}
+.tl-text strong{font-size:.92rem;font-weight:600;color:#1a1a2e;margin-bottom:2px}
+.tl-text span{font-size:.78rem;color:#888}
+
+.divider{height:1px;background:#f0f0ec;margin-bottom:28px}
+
+.note{background:#fafaf8;border-left:3px solid #f0a500;padding:16px 18px;border-radius:0 4px 4px 0;margin-bottom:28px}
+.note p{font-size:.85rem;color:#555;line-height:1.65}
+.note strong{color:#1a1a2e}
+
+.btn{width:100%;background:#1a2332;color:#fff;border:none;border-radius:4px;padding:18px;font-size:.95rem;font-weight:600;cursor:pointer;letter-spacing:.3px;margin-bottom:10px;font-family:'DM Sans',sans-serif}
+.btn:hover{background:#243448}
+.btn2{width:100%;background:transparent;color:#999;border:1px solid #e5e5e0;border-radius:4px;padding:14px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+.footer{text-align:center;padding-top:20px;font-size:.72rem;color:#bbb;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-top">
+    <div class="check-wrap">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="top-label">Kartlegging mottatt</div>
+    <h1 class="top-title">Rapporten er<br>på vei til deg</h1>
+    <p class="top-sub">Vi setter nå sammen din personlige KI-analyse</p>
+  </div>
+
+  <div class="card-body">
+    <div class="timeline">
+      <div class="tl-row">
+        <div class="tl-icon done">✓</div>
+        <div class="tl-text"><strong>Kartlegging fullført</strong><span>Alle svar er registrert og lagret</span></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-icon">📊</div>
+        <div class="tl-text"><strong>Personlig KI-rapport</strong><span>Sendes til din e-post innen 24 timer</span></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-icon">🎯</div>
+        <div class="tl-text"><strong>Konkrete anbefalinger</strong><span>Topp 3 KI-muligheter tilpasset din bransje</span></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Hva rapporten inneholder:</strong> En analyse av hvilke prosesser i bedriften din som egner seg best for KI-automatisering, estimert tidsbesparelse per uke, og en anbefalt pakke tilpasset ditt behov og budsjett.</p>
+    </div>
+
+    <button class="btn" onclick="location.href='/quiz'">Ta bedriftsquizen →</button>
+    <button class="btn2" onclick="location.reload()">Start ny kartlegging</button>
+    <p class="footer">100% konfidensielt · All informasjon anonymiseres<br>Praktisk Intelligens · praktiski.no</p>
+  </div>
+</div>
+</body>
+</html>

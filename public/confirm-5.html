@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant 5 — Lys Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a2e;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.wrap{max-width:500px;width:100%}
+
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:56px}
+.top-bar-brand{font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;color:#aaa;font-weight:600}
+.top-bar-status{display:flex;align-items:center;gap:6px;font-size:.75rem;color:#16a34a;font-weight:600}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#16a34a;animation:statusPulse 2s infinite}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.headline-area{margin-bottom:44px}
+.number{font-size:.75rem;color:#ddd;font-weight:600;letter-spacing:1px;margin-bottom:10px}
+h1{font-family:'Playfair Display',serif;font-size:2.8rem;line-height:1.1;margin-bottom:14px;color:#0f1923;font-weight:800}
+h1 span{color:#c8860a}
+.sub{font-size:.95rem;color:#666;line-height:1.75;max-width:400px}
+
+.divider{height:1px;background:#f0ece4;margin:40px 0}
+
+.deliverables{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+.dl{border:1px solid #ede9e0;border-radius:6px;padding:20px}
+.dl-icon{font-size:1.3rem;margin-bottom:10px}
+.dl strong{display:block;font-size:.88rem;font-weight:700;color:#1a1a2e;margin-bottom:4px}
+.dl span{font-size:.76rem;color:#888;line-height:1.5}
+.dl.primary{background:#1e2b3c;border-color:#1e2b3c}
+.dl.primary strong{color:#fff}
+.dl.primary span{color:rgba(255,255,255,.5)}
+
+.timeline-small{margin-bottom:36px}
+.tl-mini{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f5f2ec}
+.tl-mini:last-child{border:none}
+.tl-mini-dot{width:8px;height:8px;border-radius:50%;background:#ddd;flex-shrink:0}
+.tl-mini-dot.done{background:#16a34a}
+.tl-mini-dot.next{background:#f0a500}
+.tl-mini-txt{font-size:.82rem;color:#888}
+.tl-mini-txt b{color:#1a1a2e;font-weight:600}
+
+.btn{width:100%;background:#0f1923;color:#fff;border:none;border-radius:6px;padding:18px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;letter-spacing:.2px}
+.btn:hover{background:#1e2b3c}
+.btn2{width:100%;background:transparent;color:#bbb;border:1px solid #ede9e0;border-radius:6px;padding:13px;font-size:.82rem;cursor:pointer;font-family:'Inter',sans-serif}
+
+.fine{font-size:.7rem;color:#ccc;text-align:center;margin-top:20px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar">
+    <span class="top-bar-brand">Praktisk Intelligens</span>
+    <div class="top-bar-status"><div class="status-dot"></div>Kartlegging fullført</div>
+  </div>
+
+  <div class="headline-area">
+    <div class="number">01 / Neste steg</div>
+    <h1>Din KI-rapport<br>er <span>underveis.</span></h1>
+    <p class="sub">Basert på kartleggingen din setter vi nå sammen en analyse som viser konkret hva KI kan gjøre for akkurat din bedrift.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="deliverables">
+    <div class="dl primary">
+      <div class="dl-icon">📊</div>
+      <strong>KI-analyse</strong>
+      <span>Prosesser med høyest potensial for automatisering</span>
+    </div>
+    <div class="dl">
+      <div class="dl-icon">💰</div>
+      <strong>ROI-estimat</strong>
+      <span>Estimert tids- og kostnadsbesparelse per uke</span>
+    </div>
+    <div class="dl">
+      <div class="dl-icon">🎯</div>
+      <strong>Topp 3 tiltak</strong>
+      <span>Konkrete grep klare for implementering</span>
+    </div>
+    <div class="dl">
+      <div class="dl-icon">📦</div>
+      <strong>Pakkeforslag</strong>
+      <span>Tilpasset ditt budsjett og behov</span>
+    </div>
+  </div>
+
+  <div class="timeline-small">
+    <div class="tl-mini"><div class="tl-mini-dot done"></div><div class="tl-mini-txt"><b>Kartlegging fullført</b> — svar registrert</div></div>
+    <div class="tl-mini"><div class="tl-mini-dot next"></div><div class="tl-mini-txt"><b>Rapport sendes</b> innen 24 timer</div></div>
+    <div class="tl-mini"><div class="tl-mini-dot"></div><div class="tl-mini-txt">Eventuell oppfølging etter ønske</div></div>
+  </div>
+
+  <button class="btn" onclick="location.href='/quiz'">Ta bedriftsquizen →</button>
+  <button class="btn2" onclick="location.reload()">Start ny kartlegging</button>
+  <p class="fine">100% konfidensielt · All informasjon anonymiseres · Ingen forpliktelser<br>Praktisk Intelligens · praktiski.no</p>
+</div>
+</body>
+</html>

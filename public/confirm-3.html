@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant 3 — Varm Navy Serif</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f7f5f0;color:#2a2a2a;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.card{background:#fff;border-radius:3px;max-width:540px;width:100%;box-shadow:0 4px 60px rgba(0,0,0,.07)}
+.card-header{background:#1e2b3c;padding:52px 48px;position:relative;overflow:hidden}
+.card-header::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(240,165,0,.06)}
+.card-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:#f0a500}
+
+.brand{font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:32px}
+
+.confirm-icon{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.circle{width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(240,165,0,.5);display:flex;align-items:center;justify-content:center}
+.circle svg{width:22px;height:22px;stroke:#f0a500;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.confirm-tag{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:#f0a500;font-weight:600}
+
+h1{font-family:'Playfair Display',serif;font-size:2.4rem;color:#fff;line-height:1.15;font-weight:800;margin-bottom:12px}
+.header-sub{font-size:.9rem;color:rgba(200,215,230,.65);line-height:1.65;max-width:360px}
+
+.card-body{padding:40px 48px}
+
+.what-next{margin-bottom:32px}
+.what-next h3{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:16px;font-weight:600}
+
+.step-item{display:flex;gap:18px;padding:18px 0;border-bottom:1px solid #f3f3f0}
+.step-item:last-child{border:none;padding-bottom:0}
+.step-num{width:36px;height:36px;border-radius:3px;background:#f7f5f0;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#888;flex-shrink:0}
+.step-num.done{background:#e8f5ec;color:#16a34a}
+.step-info strong{display:block;font-size:.9rem;font-weight:600;color:#1a1a2e;margin-bottom:3px}
+.step-info span{font-size:.78rem;color:#888;line-height:1.5}
+
+.quote{background:#faf9f6;border:1px solid #ede9e0;border-radius:3px;padding:20px 22px;margin-bottom:28px}
+.quote p{font-size:.85rem;color:#555;line-height:1.7;font-style:italic}
+.quote cite{display:block;font-size:.72rem;color:#999;margin-top:8px;font-style:normal;font-weight:600}
+
+.btn{width:100%;background:#1e2b3c;color:#fff;border:none;border-radius:3px;padding:18px;font-size:.92rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;letter-spacing:.2px}
+.btn2{width:100%;background:transparent;color:#aaa;border:1px solid #e8e4dc;border-radius:3px;padding:14px;font-size:.82rem;cursor:pointer;font-family:'Inter',sans-serif}
+
+.fine{text-align:center;font-size:.7rem;color:#bbb;margin-top:20px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <div class="brand">Praktisk Intelligens</div>
+    <div class="confirm-icon">
+      <div class="circle"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span class="confirm-tag">Kartlegging fullført</span>
+    </div>
+    <h1>Din rapport<br>er underveis.</h1>
+    <p class="header-sub">Vi analyserer bedriften din og sender deg en personlig KI-rapport innen 24 timer.</p>
+  </div>
+
+  <div class="card-body">
+    <div class="what-next">
+      <h3>Hva skjer nå</h3>
+      <div class="step-item">
+        <div class="step-num done">✓</div>
+        <div class="step-info"><strong>Kartlegging registrert</strong><span>Svarene dine er lagret og klare for analyse</span></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-info"><strong>Personlig gjennomgang</strong><span>Krisfred analyserer kartleggingen manuelt</span></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-info"><strong>Rapport på e-post</strong><span>Komplett analyse med ROI, muligheter og anbefalinger</span></div>
+      </div>
+    </div>
+
+    <div class="quote">
+      <p>"De fleste bedriftseiere sitter på 8–15 timer ukentlig som kan frigjøres med riktig KI-oppsett. Rapporten din viser nøyaktig hvor."</p>
+      <cite>— Krisfred, Praktisk Intelligens</cite>
+    </div>
+
+    <button class="btn" onclick="location.href='/quiz'">Ta bedriftsquizen →</button>
+    <button class="btn2" onclick="location.reload()">Start ny kartlegging</button>
+    <p class="fine">100% konfidensielt · All data anonymiseres<br>Praktisk Intelligens · praktiski.no</p>
+  </div>
+</div>
+</body>
+</html>

@@ -131,9 +131,17 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .scan-opp-item::before{content:'→';position:absolute;left:0;color:var(--orange)}
 
 /* CTA */
-.cta-box{background:linear-gradient(135deg,rgba(79,195,247,.1),rgba(102,187,106,.1));border:1px solid var(--accent);border-radius:14px;padding:1.5rem;text-align:center;margin-top:2rem}
-.cta-box h3{font-size:1.1rem;margin-bottom:.5rem}
-.cta-box p{font-size:.88rem;color:var(--muted);margin-bottom:1rem;line-height:1.5}
+.cta-box{background:linear-gradient(135deg,rgba(240,165,0,.12),rgba(255,107,53,.08));border:2px solid rgba(240,165,0,.5);border-radius:20px;padding:2.2rem 1.8rem;text-align:center;margin-top:2.5rem;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(240,165,0,.15),0 8px 32px rgba(0,0,0,.3)}
+.cta-box::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(240,165,0,.015) 2px,rgba(240,165,0,.015) 4px);pointer-events:none}
+.cta-box h3{font-size:1.5rem;margin-bottom:.6rem;font-weight:800;color:#fff;text-shadow:0 0 20px rgba(240,165,0,.4)}
+.cta-box .cta-sub{font-size:.95rem;color:#c8d8e8;margin-bottom:.5rem;line-height:1.6}
+.cta-box .cta-proof{display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.cta-box .cta-proof span{font-size:.78rem;color:rgba(52,211,153,.9);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:20px;padding:5px 12px;font-weight:600}
+.cta-box .cta-btn{display:block;width:100%;background:linear-gradient(135deg,#f0a500,#ff6b35);color:#1a2332;border:none;border-radius:14px;padding:20px 28px;font-size:1.15rem;font-weight:800;cursor:pointer;letter-spacing:.3px;box-shadow:0 0 25px rgba(240,165,0,.45),0 4px 16px rgba(0,0,0,.3);transition:all .2s;position:relative;overflow:hidden}
+.cta-box .cta-btn::before{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:rgba(255,255,255,.15);transform:skewX(-20deg);transition:left .4s}
+.cta-box .cta-btn:hover{box-shadow:0 0 40px rgba(240,165,0,.65),0 6px 24px rgba(0,0,0,.4);transform:translateY(-1px)}
+.cta-box .cta-btn:hover::before{left:120%}
+.cta-box .cta-fine{font-size:.75rem;color:rgba(138,155,181,.8);margin-top:.8rem}
 
 /* Footer */
 .footer{text-align:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)}
@@ -165,10 +173,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <p style="color:var(--muted);margin-bottom:1.5rem;font-size:.9rem">Vi bruker dette til å tilpasse rapporten din.</p>
   <div class="form-group"><label>Bedriftsnavn</label><input id="f-company" placeholder="F.eks. Tromsø Bygg AS"></div>
   <div class="form-group"><label>Nettside (valgfritt)</label><input id="f-url" placeholder="https://dinbedrift.no"></div>
-  <div class="form-group"><label>E-post</label><input id="f-email" type="email" placeholder="din@epost.no"></div>
   <div class="form-group"><label>Ditt navn</label><input id="f-name" placeholder="Ola Nordmann"></div>
   <div class="form-group"><label>Hvilken by bor du i? <span style="color:var(--muted);font-weight:400">(valgfritt)</span></label><input id="f-city" placeholder="F.eks. Tromsø"></div>
-  <div class="form-group"><label>Hvordan fant du quizen? <span style="color:var(--muted);font-weight:400">(valgfritt)</span></label><select id="f-referral"><option value="" disabled selected>Velg...</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="google">Google-søk</option><option value="linkedin">LinkedIn</option><option value="bekjent">Anbefalt av noen</option><option value="foredrag">Foredrag/event</option><option value="annet">Annet</option></select></div>
+  <div class="form-group"><label>Hvordan fant du quizen? <span style="color:var(--muted);font-weight:400">(valgfritt)</span></label><select id="f-referral" onchange="document.getElementById('f-referral-annet-wrap').style.display=this.value==='annet'?'block':'none'"><option value="" disabled selected>Velg...</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="google">Google-søk</option><option value="linkedin">LinkedIn</option><option value="bekjent">Anbefalt av noen</option><option value="foredrag">Foredrag/event</option><option value="annet">Annet</option></select></div>
+  <div class="form-group" id="f-referral-annet-wrap" style="display:none"><input id="f-referral-annet" placeholder="Fortell gjerne mer..."></div>
   <p id="lead-error" style="color:var(--red);font-size:.85rem;margin-bottom:.5rem;display:none"></p>
   <button class="btn" onclick="startQuiz()" style="margin-top:.5rem">Start quiz →</button>
 </div>
@@ -201,10 +209,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="q-category">Om bedriften</div>
     <div class="q-text" style="font-size:1.05rem">Hvor mange ansatte har bedriften?</div>
     <div class="options" id="qual-employees">
-      <div class="option" onclick="selectQual('employees',0,this)"><div class="option-key">1</div><div class="option-text">1-2 (solopreneur/mikro)</div></div>
-      <div class="option" onclick="selectQual('employees',1,this)"><div class="option-key">2</div><div class="option-text">3-10</div></div>
-      <div class="option" onclick="selectQual('employees',2,this)"><div class="option-key">3</div><div class="option-text">11-50</div></div>
-      <div class="option" onclick="selectQual('employees',3,this)"><div class="option-key">4</div><div class="option-text">51+</div></div>
+      <div class="option" onclick="selectQual('employees',0,this)"><div class="option-key">1</div><div class="option-text">1-2</div></div>
+      <div class="option" onclick="selectQual('employees',1,this)"><div class="option-key">2</div><div class="option-text">2-5</div></div>
+      <div class="option" onclick="selectQual('employees',2,this)"><div class="option-key">3</div><div class="option-text">5-10</div></div>
+      <div class="option" onclick="selectQual('employees',3,this)"><div class="option-key">4</div><div class="option-text">10-20</div></div>
+      <div class="option" onclick="selectQual('employees',4,this)"><div class="option-key">5</div><div class="option-text">20+</div></div>
     </div>
   </div>
 
@@ -223,10 +232,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="q-category">Budsjett</div>
     <div class="q-text" style="font-size:1.05rem">Hvis noen kunne sette opp KI-systemer for bedriften din — hva ville du investert?</div>
     <div class="options" id="qual-budget">
-      <div class="option" onclick="selectQual('budget',0,this)"><div class="option-key">1</div><div class="option-text">Under 5 000 kr</div></div>
-      <div class="option" onclick="selectQual('budget',1,this)"><div class="option-key">2</div><div class="option-text">5 000 – 15 000 kr</div></div>
-      <div class="option" onclick="selectQual('budget',2,this)"><div class="option-key">3</div><div class="option-text">15 000 – 50 000 kr</div></div>
-      <div class="option" onclick="selectQual('budget',3,this)"><div class="option-key">4</div><div class="option-text">50 000 kr+</div></div>
+      <div class="option" onclick="selectQual('budget',0,this)"><div class="option-key">1</div><div class="option-text">Under 15 000 kr</div></div>
+      <div class="option" onclick="selectQual('budget',1,this)"><div class="option-key">2</div><div class="option-text">15 000 – 50 000 kr</div></div>
+      <div class="option" onclick="selectQual('budget',2,this)"><div class="option-key">3</div><div class="option-text">50 000 – 150 000 kr</div></div>
+      <div class="option" onclick="selectQual('budget',3,this)"><div class="option-key">4</div><div class="option-text">150 000 kr+</div></div>
       <div class="option" onclick="selectQual('budget',4,this)"><div class="option-key">5</div><div class="option-text">Vet ikke ennå — kommer an på verdien</div></div>
     </div>
   </div>
@@ -288,10 +297,16 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
   <!-- CTA -->
   <div class="cta-box">
-    <h3>🗺️ Klar for å komme i gang?</h3>
-    <p>Få din personlige KI-veikart — vi viser deg nøyaktig hvor du skal starte og hva du skal prioritere. De fleste SMBer sitter på 5-15 timer spart per uke uten å vite det.</p>
-    <button class="btn" onclick="window.open('https://framtidsundervising.no','_blank')">Få din KI-veikart →</button>
-    <p style="font-size:.8rem;color:var(--muted);margin-top:.5rem">Kartlegging: 5 000 kr — du får rapport og roadmap tilpasset din bedrift</p>
+    <div style="font-size:.8rem;font-weight:700;color:rgba(240,165,0,.9);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.6rem">⚡ Neste steg</div>
+    <h3>Finn ut hva KI kan spare deg</h3>
+    <p class="cta-sub">Du vet nå hvor du står. Neste steg tar 10–20 minutter — og gir deg en konkret rapport med de beste KI-mulighetene for din bedrift, med mulighet for å få en komplett pakke tilpasset ditt behov.</p>
+    <div class="cta-proof">
+      <span>✓ Gratis rapport</span>
+      <span>✓ 10–20 min</span>
+      <span>✓ Ingen forpliktelser</span>
+    </div>
+    <button class="cta-btn" onclick="window.location.href='/kartlegging-v4'">Start din KI-kartlegging →</button>
+    <p class="cta-fine">100% konfidensielt · All informasjon anonymiseres for å forbedre kartleggingsprosessen</p>
   </div>
 
   <div class="footer"><p>KI-Modenhetsscore av Praktisk Intelligens © 2026</p></div>
@@ -366,6 +381,33 @@ const QuizScraper = (() => {
 })();
 </script>
 <script>
+// ─── SUPABASE ───
+const SUPABASE_URL = 'https://qfbdwqqebnhdlwqsvgea.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmYmR3cXFlYm5oZGx3cXN2Z2VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzcyNzAsImV4cCI6MjA4OTYxMzI3MH0.y0l7QXnS9wV8ZND5LVB3tg8aCKh05xf-1YGpeVqhTok';
+
+async function saveQuizLead(data) {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/quiz_leads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      console.error('Supabase feil:', err);
+    } else {
+      console.log('Supabase: lead lagret ✅');
+    }
+  } catch (e) {
+    console.error('Supabase kall feilet:', e);
+  }
+}
+
 // ─── DATA ───
 const questions = [
   // Kategori 1: KI-bruk i dag (3 spm, max 12p)
@@ -375,7 +417,7 @@ const questions = [
 
   // Kategori 2: Digitale verktøy (2 spm, max 8p)
   {cat:"Digitale verktøy",catIdx:1,text:"Hvordan holder dere oversikt over kunder og oppdrag?",opts:["Husker det / papir / Post-it-lapper","Excel-ark eller Google Sheets","Et eget system (CRM, prosjektverktøy e.l.)","Integrert system som kobler kunder, oppgaver og kommunikasjon","KI-drevet CRM som automatisk oppdaterer, scorer og følger opp kunder"]},
-  {cat:"Digitale verktøy",catIdx:1,text:"Hvordan sender dere tilbud og fakturaer?",opts:["Skriver tilbud manuelt i Word eller e-post","Bruker en fast mal, sender på e-post","Bruker fakturaprogram (Fiken, Tripletex o.l.)","Systemet lager tilbud/faktura basert på prosjektdata","KI genererer tilbud automatisk basert på kundehistorikk og prosjektdata"]},
+  {cat:"Digitale verktøy",catIdx:1,text:"Hvordan sender dere tilbud og fakturaer?",opts:["Skriver tilbud manuelt i Word eller e-post","Bruker en fast mal, sender på e-post","Bruker fakturaprogram (Fiken, Tripletex, Conta, Visma o.l.)","Systemet lager tilbud/faktura basert på prosjektdata","KI genererer tilbud automatisk basert på kundehistorikk og prosjektdata"]},
 
   // Kategori 3: Prosesser & Automatisering (4 spm, max 16p)
   {cat:"Prosesser & Automatisering",catIdx:2,text:"Hvordan håndterer dere kundehenvendelser i dag?",opts:["Alt manuelt — vi leser og svarer på alt selv","Vi har en felles e-post, men svarer manuelt","Delvis automatisert — autosvar, maler, osv.","KI-chatbot eller automatisk sortering/routing av henvendelser","KI-agent som svarer, prioriterer og løser henvendelser autonomt"]},
@@ -414,11 +456,11 @@ const levelRoadmaps = [
   [
     {step:1,icon:"⚡",title:"Prøv KI i 10 minutter — i morgen",desc:"Åpne ChatGPT, skriv: 'Lag et tilbud for [din tjeneste] til en kunde som heter [navn]'. Se hva som skjer."},
     {step:2,icon:"💳",title:"Digitalisér fakturaene",desc:"Fiken eller Tripletex tar 15 min å sette opp. Du sparer timer hver måned."},
-    {step:3,icon:"🗺️",title:"Book en KI-veikart samtale",desc:"Vi viser deg de 3 enkleste KI-grepene for akkurat din bedrift — på vanlig norsk.",cta:true}
+    {step:3,icon:"🗺️",title:"Få en personlig KI-kartlegging",desc:"Svar på 8 seksjoner om bedriften din — vi analyserer prosessene, regner ut ROI og gir deg en konkret plan. Gratis.",cta:true}
   ],[
     {step:1,icon:"🎯",title:"Velg ÉTT verktøy og bruk det daglig i 30 dager",desc:"Ikke hopp mellom alt. ChatGPT eller Claude — velg én og bygg vanen."},
     {step:2,icon:"📝",title:"Finn de 3 oppgavene som stjeler mest tid",desc:"Skriv dem ned. Minst én av dem kan KI gjøre for deg allerede i dag."},
-    {step:3,icon:"🗺️",title:"Få en personlig KI-veikart",desc:"Vi analyserer bedriften din og gir deg en konkret plan — steg for steg.",cta:true}
+    {step:3,icon:"🗺️",title:"Få en personlig KI-kartlegging",desc:"Svar på 8 seksjoner om bedriften din — vi analyserer prosessene, regner ut ROI og gir deg en konkret plan. Gratis.",cta:true}
   ],[
     {step:1,icon:"📋",title:"Lag en intern KI-strategi",desc:"30 min med teamet: 'Hva bruker vi KI til? Hva burde vi? Hvem har ansvaret?'"},
     {step:2,icon:"🔗",title:"Koble verktøyene sammen",desc:"Automatisér flyten mellom e-post, CRM og faktura med Zapier, Make eller n8n."},
@@ -453,18 +495,15 @@ function showScreen(id){
 
 function startQuiz(){
   const company = document.getElementById('f-company').value.trim();
-  const email = document.getElementById('f-email').value.trim();
   const name = document.getElementById('f-name').value.trim();
   const url = document.getElementById('f-url').value.trim();
 
-  if(!company||!email||!name){
-    const err = document.getElementById('lead-error');
-    err.textContent='Fyll inn bedriftsnavn, e-post og navn for å starte.';
-    err.style.display='block';
-    return;
-  }
+
   const city = document.getElementById('f-city').value.trim();
-  const referral = document.getElementById('f-referral').value;
+  const referralSelect = document.getElementById('f-referral').value;
+  const referralAnnet = document.getElementById('f-referral-annet')?.value.trim();
+  const referral = referralSelect === 'annet' && referralAnnet ? 'Annet: ' + referralAnnet : referralSelect;
+  const email = '';
   leadData = {company,email,name,url,city,referral};
 
   // Background scans — all in parallel
@@ -657,8 +696,9 @@ function showResults(){
   const roadmap = levelRoadmaps[levelIdx];
   let roadmapHtml='<h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">🗺️ Din 3-stegs veikart</h3>';
   roadmap.forEach((step,i)=>{
-    const ctaClass = step.cta ? ' style="border-color:var(--accent);background:rgba(79,195,247,.05)"' : '';
-    roadmapHtml+=`<div class="rec-card"${ctaClass}><h4>${step.icon} ${step.step}. ${step.title}</h4><p>${step.desc}</p></div>`;
+    const ctaClass = step.cta ? ' style="border-color:var(--accent);background:rgba(79,195,247,.05);cursor:pointer" onclick="window.location.href=\'/kartlegging-v4\'"' : '';
+    const ctaArrow = step.cta ? ' <span style="color:var(--accent);font-size:.85rem">→ Start kartlegging</span>' : '';
+    roadmapHtml+=`<div class="rec-card"${ctaClass}><h4>${step.icon} ${step.step}. ${step.title}${ctaArrow}</h4><p>${step.desc}</p></div>`;
   });
   document.getElementById('recs').innerHTML=roadmapHtml;
 
@@ -666,9 +706,9 @@ function showResults(){
   renderDeepScan();
 
   // Lead data enrichment
-  const employeeLabels = ['1-2','3-10','11-50','51+'];
+  const employeeLabels = ['1-2','2-5','5-10','10-20','20+'];
   const spendingLabels = ['Ingen (gratis)','Under 1 000 kr/mnd','1 000-5 000 kr/mnd','Over 5 000 kr/mnd'];
-  const budgetLabels = ['Under 5 000 kr','5 000-15 000 kr','15 000-50 000 kr','50 000 kr+','Vet ikke — kommer an på verdien'];
+  const budgetLabels = ['Under 15 000 kr','15 000-50 000 kr','50 000-150 000 kr','150 000 kr+','Vet ikke — kommer an på verdien'];
   const leadPayload = {
     lead: leadData,
     quiz: { score: total, level: level.name, answers: [...answers] },
@@ -686,7 +726,19 @@ function showResults(){
     }
   };
   console.log('LEAD_DATA:', JSON.stringify(leadPayload));
-  
+
+  // Save to Supabase (non-blocking)
+  saveQuizLead({
+    navn: leadData.name || null,
+    epost: leadData.email || null,
+    bedrift: leadData.company || null,
+    score: total,
+    bransje: null,
+    antall_ansatte: qualifyData.employees !== null ? (['1-2','2-5','5-10','10-20','20+'][qualifyData.employees] || null) : null,
+    created_at: new Date().toISOString(),
+    status: 'ny'
+  });
+
   // Send data to API
   submitQuizData(leadPayload);
 }

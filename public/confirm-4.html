@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant 4 — Dark Bold Executive</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0f1923;color:#e8ecf1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+
+.wrap{max-width:480px;width:100%;position:relative}
+
+.brand{font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:#4a5a6e;text-align:center;margin-bottom:40px}
+
+.check-circle{width:72px;height:72px;border-radius:50%;border:1px solid rgba(240,165,0,.35);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;background:rgba(240,165,0,.06)}
+.check-circle svg{width:30px;height:30px;stroke:#f0a500;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.eyebrow{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:#f0a500;text-align:center;margin-bottom:10px}
+
+h1{font-family:'DM Serif Display',serif;font-size:2.6rem;text-align:center;line-height:1.15;margin-bottom:14px}
+
+.sub{font-size:.95rem;color:#6a7d90;text-align:center;line-height:1.75;margin-bottom:40px;max-width:380px;margin-left:auto;margin-right:auto}
+
+.cards{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:32px;border:1px solid rgba(255,255,255,.06)}
+.info-row{background:#141e2b;padding:18px 22px;display:flex;align-items:center;gap:16px}
+.info-row .ic{font-size:1.1rem;width:36px;text-align:center;flex-shrink:0}
+.info-row .txt strong{display:block;font-size:.88rem;font-weight:600;color:#d4dce8;margin-bottom:2px}
+.info-row .txt span{font-size:.76rem;color:#4a5a6e;line-height:1.4}
+.info-row .badge-right{margin-left:auto;font-size:.68rem;background:rgba(240,165,0,.12);color:#f0a500;border:1px solid rgba(240,165,0,.2);padding:3px 10px;border-radius:3px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.info-row .badge-right.green{background:rgba(52,211,153,.1);color:#34d399;border-color:rgba(52,211,153,.2)}
+
+.btn{width:100%;background:#f0a500;color:#0f1923;border:none;border-radius:6px;padding:19px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:10px;letter-spacing:.3px}
+.btn:hover{background:#e09500}
+.btn2{width:100%;background:transparent;color:#3a4a5e;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:14px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+.fine{font-size:.7rem;color:#2a3a4e;text-align:center;margin-top:20px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Praktisk Intelligens</div>
+
+  <div class="check-circle">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+
+  <div class="eyebrow">Kartlegging fullført</div>
+  <h1>Rapporten din<br>er på vei.</h1>
+  <p class="sub">Vi setter nå sammen en analyse basert på kartleggingen din. Rapporten sendes til din e-post og inneholder det du trenger for å ta en informert beslutning.</p>
+
+  <div class="cards">
+    <div class="info-row">
+      <div class="ic">✅</div>
+      <div class="txt"><strong>Kartlegging registrert</strong><span>Alle svar lagret</span></div>
+      <div class="badge-right green">Fullført</div>
+    </div>
+    <div class="info-row">
+      <div class="ic">📊</div>
+      <div class="txt"><strong>KI-rapport med ROI-analyse</strong><span>Skreddersydd for din bedrift</span></div>
+      <div class="badge-right">Innen 24t</div>
+    </div>
+    <div class="info-row">
+      <div class="ic">🎯</div>
+      <div class="txt"><strong>Topp 3 KI-muligheter</strong><span>Konkrete tiltak tilpasset din bransje</span></div>
+      <div class="badge-right">Innen 24t</div>
+    </div>
+    <div class="info-row">
+      <div class="ic">📦</div>
+      <div class="txt"><strong>Pakkeanbefaling</strong><span>Tilpasset ditt behov og budsjett</span></div>
+      <div class="badge-right">Innen 24t</div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="location.href='/quiz'">Ta bedriftsquizen →</button>
+  <button class="btn2" onclick="location.reload()">Start ny kartlegging</button>
+  <p class="fine">100% konfidensielt · All informasjon anonymiseres<br>Praktisk Intelligens · praktiski.no</p>
+</div>
+</body>
+</html>
