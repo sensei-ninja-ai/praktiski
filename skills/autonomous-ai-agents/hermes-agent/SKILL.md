@@ -264,6 +264,35 @@ bump in frontmatter or reference URL updates. Merge, then continue.
 3. Gateway auto-restarts
 4. Skills synced to all profiles
 
+### User Display Preferences (Kristoffer)
+
+User prefers compact output — minimal system noise, only final response
+and primary tool calls visible. Settings to apply:
+
+```bash
+hermes config set display.compact true
+hermes config set display.show_reasoning false
+hermes config set display.tool_preview_length 0
+hermes config set display.interim_assistant_messages false
+hermes config set display.show_cost false
+```
+
+These suppress verbose tool previews, reasoning traces, and interim messages.
+Restart hermes or start a new session for changes to take effect.
+
+### Vision Model Configuration
+
+For image analysis, set auxiliary vision model:
+
+```bash
+hermes config set auxiliary.vision.provider openrouter
+hermes config set auxiliary.vision.model qwen/qwen3-vl-8b-instruct
+```
+
+`qwen/qwen3-vl-8b-instruct` is the recommended budget option: $0.08/1M tokens,
+128K context, adequate for screenshot inspection and image understanding.
+No fully free vision models on OpenRouter as of May 2026.
+
 ---
 
 ## Slash Commands (In-Session)
@@ -881,6 +910,14 @@ If `auxiliary` tasks (vision, compression, session_search) fail silently, the `a
 hermes config set auxiliary.vision.provider <your_provider>
 hermes config set auxiliary.vision.model <model_name>
 ```
+
+**Vision models on OpenRouter — cheap options (May 2026):**
+- `qwen/qwen3-vl-8b-instruct` — $0.08/1M tokens, 128K context
+- `qwen/qwen3-vl-32b-instruct` — $0.10/1M tokens, 128K context
+- `meta-llama/llama-3.2-11b-vision-instruct` — $0.24/1M tokens, 131K context
+- No fully free vision models on OpenRouter (free tier requires separate setup)
+
+Set for image analysis: `hermes config set auxiliary.vision.model qwen/qwen3-vl-8b-instruct`
 
 ---
 

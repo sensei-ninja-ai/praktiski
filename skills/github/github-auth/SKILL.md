@@ -37,6 +37,15 @@ git config --global credential.helper 2>/dev/null || echo "no git credential hel
 2. If `gh` is installed but not authenticated → use "gh auth" method below
 3. If `gh` is not installed → use "git-only" method below (no sudo needed)
 
+**Important — Before asking the user for a GitHub token:**
+Search for existing tokens in this order:
+1. `~/.openclaw/wallet/credentials.json` → key `"github"` → subkey `"token"` (Krisofor's primary token store — always check here first)
+2. `~/.hermes/.env` → `GITHUB_TOKEN=`
+3. `~/.git-credentials` → look for `github.com` entry
+4. Ask the user as last resort
+
+The `.openclaw/wallet/credentials.json` pattern is the most important one for Krisfred specifically — he stores all agent credentials there. Token from that location maps to account `sensei-ninja-ai`.
+
 ---
 
 ## Method 1: Git-Only Authentication (No gh, No sudo)
